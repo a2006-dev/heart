@@ -250,6 +250,8 @@ public class BroadcastServer {
                     serveJson(client, out);
                 } else if (path.equals("/api/ip")) {
                     serveIPJson(client, out);
+                } else if (path.equals("/api/profiles")) {
+                    serveProfilesJson(client, out);
                 } else {
                     send404(client, out);
                 }
@@ -396,6 +398,24 @@ public class BroadcastServer {
 
     private void serveIPJson(Socket client, OutputStream out) throws IOException {
         String json = "{\"ip\":\"" + getLocalIP() + "\",\"port\":" + actualPort + "}";
+        byte[] data = json.getBytes("UTF-8");
+        PrintWriter pw = new PrintWriter(out);
+        pw.print("HTTP/1.1 200 OK\r\n");
+        pw.print("Content-Type: application/json; charset=utf-8\r\n");
+        pw.print("Content-Length: " + data.length + "\r\n");
+        pw.print("Access-Control-Allow-Origin: *\r\n");
+        pw.print("Connection: close\r\n");
+        pw.print("\r\n");
+        pw.flush();
+        out.write(data);
+        out.flush();
+    }
+
+    private void serveProfilesJson(Socket client, OutputStream out) throws IOException {
+        String json = "[]";
+        try {
+            json = com.xinji.heartbeat.core.DeviceProfileManager.getInstance(context).getProfilesJson();
+        } catch (Exception ignored) {}
         byte[] data = json.getBytes("UTF-8");
         PrintWriter pw = new PrintWriter(out);
         pw.print("HTTP/1.1 200 OK\r\n");

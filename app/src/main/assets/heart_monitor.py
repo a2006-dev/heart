@@ -299,6 +299,36 @@ _ble_connected = False
 _ble_device_name = ""
 _ble_client = None
 _ble_stop_event = threading.Event()
+# 本地缓存的设备特征码
+_device_profiles = []
+
+def load_device_profiles_from_server(server_url=None):
+    """从手机广播服务器加载已保存的设备特征码"""
+    global _device_profiles
+    if server_url:
+        url = f"http://{server_url}/api/profiles"
+    else:
+        url = f"http://{ip()}:{UNIFIED_PORT}/api/profiles"
+    try:
+        resp = urllib.request.urlopen(url, timeout=3)
+        data = json.loads(resp.read().decode())
+        resp.close()
+        if isinstance(data, list):
+            _device_profiles = data
+            log(f"📦 从手机加载 {len(data)} 个设备特征码")
+            return data
+    except:
+        pass
+    # 尝试加载本地缓存的 profiles.json
+    local_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "heart_device_profiles.json")
+    if os.path.exists(local_path):
+        try:
+            with open(local_path, "r") as f:
+                _device_profiles = json.load(f)
+            log(f"📦 从本地加载 {len(_device_profiles)} 个设备特征码")
+        except:
+            pass
+    return _device_profiles
 
 def scan_ble(cb: Callable):
     def _r():
@@ -306,17 +336,66 @@ def scan_ble(cb: Callable):
             import bleak, asyncio
             async def _scan():
                 from bleak import BleakScanner
-                d = await BleakScanner.discover(timeout=3.0)
-                return [(dd.address, dd.name or dd.address, dd.rssi or -100) for dd in d if dd.name]
+                # 广义搜索：扫描所有设备，不过滤
+                d = await BleakScanner.discover(timeout=5.0, return_adv=True)
+                results = []
+                for addr, (dev, adv) in d.items():
+                    name = dev.name or ""
+                    rssi = adv.rssi if adv else -100
+                    # 提取广播的服务 UUID
+                    svc_uuids = []
+                    if adv and adv.service_uuids:
+                        svc_uuids = [u.lower() for u in adv.service_uuids]
+                    results.append((addr, name, rssi, svc_uuids))
+                return results
             devs = asyncio.run(_scan())
             cb(devs if devs else [])
-        except:
+        except Exception as e:
+            log(f"❌ BLE 扫描失败: {e}")
             cb([])
     threading.Thread(target=_r, daemon=True).start()
 
-def connect_ble(addr: str, name: str = ""):
-    """真实的 BLE 连接 + 心率特征值订阅"""
-    global _ble_connected, _ble_device_name, _ble_client, _ble_stop_event
+# 心率关键词（与手机端保持一致）
+_HEART_KEYWORDS = ["heart", "hr", "rate", "心率", "pulse", "bpm"]
+
+def _matches_heart_rate(uuid_str, char_name=None):
+    """检查 UUID 或名称是否匹配心率关键词"""
+    lower = uuid_str.lower()
+    for kw in _HEART_KEYWORDS:
+        if kw in lower:
+            return True
+    if char_name:
+        lower_name = char_name.lower()
+        for kw in _HEART_KEYWORDS:
+            if kw in lower_name:
+                return True
+    return False
+
+def _guess_char_name(uuid_lower):
+    """根据常见 UUID 猜测特征名称"""
+    mapping = {
+        "2a37": "心率测量", "2a38": "身体传感位置", "2a39": "心率控制点",
+        "2a5c": "心率记录", "2a5d": "RR区间", "2a19": "电池电量",
+        "2a24": "型号", "2a25": "序列号", "2a26": "固件版本",
+        "2a27": "硬件版本", "2a28": "软件版本", "2a29": "制造商"
+    }
+    for key, val in mapping.items():
+        if key in uuid_lower:
+            return val
+    if "ff06" in uuid_lower or "1a02" in uuid_lower:
+        return "小米私有数据"
+    if "0008" in uuid_lower and "3512" in uuid_lower:
+        return "小米私有心率"
+    return None
+
+def connect_ble(addr: str, name: str = "", use_broad_search=False):
+    """
+    真实的 BLE 连接 + 心率特征值订阅
+    支持两种模式：
+      默认：使用已知特征码（从服务器加载或标准 0x2A37）
+      use_broad_search=True：遍历所有服务/特征，自动匹配心率关键词
+    """
+    global _ble_connected, _ble_device_name, _ble_client, _ble_stop_event, _device_profiles
     if _ble_connected:
         log("⚠️ 已有蓝牙连接，请先断开")
         return False
@@ -324,40 +403,121 @@ def connect_ble(addr: str, name: str = ""):
     _ble_device_name = name or addr
     _ble_stop_event.clear()
 
+    # 先查找有没有已保存的特征码
+    target_svc_uuid = None
+    target_char_uuid = None
+    for p in _device_profiles:
+        if p.get("address", "").lower() == addr.lower() or p.get("name", "") == name:
+            if p.get("service_uuid") and p.get("char_uuid"):
+                target_svc_uuid = p["service_uuid"]
+                target_char_uuid = p["char_uuid"]
+                log(f"📋 使用已保存特征码: {p.get('name')} → {target_char_uuid}")
+                break
+
+    if not target_char_uuid and not use_broad_search:
+        # 默认使用标准心率特征
+        target_char_uuid = "00002a37-0000-1000-8000-00805f9b34fb"
+        log("📋 使用标准心率特征 (0x2A37)")
+
     def _connect_thread():
         global _ble_connected, _ble_client
         try:
             import asyncio
-            from bleak import BleakClient
-
-            # 标准蓝牙心率服务 UUID
-            HR_CHAR_UUID = "00002a37-0000-1000-8000-00805f9b34fb"
+            from bleak import BleakClient, BleakGATTServiceCollection
 
             async def run():
                 client = BleakClient(addr)
-                await client.connect(timeout=10.0)
+                await client.connect(timeout=15.0)
                 _ble_client = client
                 _ble_connected = True
                 state.update(0, _ble_device_name, "蓝牙", priority=SRC_BLE)
                 log(f"✅ 蓝牙已连接: {_ble_device_name}")
 
-                def hr_notification(sender, data):
-                    if len(data) < 2:
-                        return
-                    flags = data[0]
-                    if flags & 0x01:
-                        hr_val = (data[1] & 0xFF) | ((data[2] & 0xFF) << 8)
-                    else:
-                        hr_val = data[1] & 0xFF
-                    state.update(hr_val, _ble_device_name, "蓝牙", priority=SRC_BLE)
+                char_to_notify = target_char_uuid
 
-                await client.start_notify(HR_CHAR_UUID, hr_notification)
+                # 如果启用了广义搜索但没有已保存特征码，遍历所有服务
+                if use_broad_search and not target_char_uuid:
+                    log("🔍 [广义搜索] 遍历所有服务匹配心率特征...")
+                    await asyncio.sleep(1)
+                    for service in client.services:
+                        svc_uuid = service.uuid.lower()
+                        for char in service.characteristics:
+                            ch_uuid = char.uuid.lower()
+                            ch_name = _guess_char_name(ch_uuid)
+                            if _matches_heart_rate(ch_uuid, ch_name):
+                                log(f"✅ [广义搜索] 匹配到: 服务={svc_uuid} 特征={ch_uuid} ({ch_name or '未知'})")
+                                char_to_notify = char.uuid
+                                # 保存到本地特征码
+                                _device_profiles.append({
+                                    "name": _ble_device_name,
+                                    "address": addr,
+                                    "service_uuid": svc_uuid,
+                                    "char_uuid": ch_uuid,
+                                    "last_connected": time.strftime("%Y-%m-%d %H:%M:%S")
+                                })
+                                # 保存本地 JSON
+                                try:
+                                    local_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "heart_device_profiles.json")
+                                    with open(local_path, "w") as f:
+                                        json.dump(_device_profiles, f, indent=2)
+                                except:
+                                    pass
+                                break
+                        if char_to_notify and char_to_notify != target_char_uuid:
+                            break
+                    if not char_to_notify or char_to_notify == target_char_uuid:
+                        log("⚠️ [广义搜索] 未匹配到心率特征，尝试订阅所有 Notify 特征")
+                        char_to_notify = None
 
-                # 保持线程存活，直到收到停止信号
+                # 订阅特征通知
+                if char_to_notify:
+                    try:
+                        def hr_notification(sender, data):
+                            if len(data) < 2:
+                                return
+                            flags = data[0]
+                            if flags & 0x01:
+                                hr_val = (data[1] & 0xFF) | ((data[2] & 0xFF) << 8)
+                            else:
+                                hr_val = data[1] & 0xFF
+                            # 也尝试小米私有格式
+                            if (hr_val <= 0 or hr_val > 250) and len(data) >= 3:
+                                hr_val = data[2] & 0xFF
+                            if (hr_val <= 0 or hr_val > 250) and len(data) >= 2:
+                                hr_val = data[1] & 0xFF
+                            if 20 < hr_val < 250:
+                                state.update(hr_val, _ble_device_name, "蓝牙", priority=SRC_BLE)
+
+                        await client.start_notify(char_to_notify, hr_notification)
+                        log(f"✅ 已订阅心率通知: {char_to_notify}")
+                    except Exception as e:
+                        log(f"⚠️ 订阅失败: {e}")
+                else:
+                    # 没有特征码时，尝试订阅所有有 Notify 的特征
+                    log("🔍 尝试订阅所有 Notify 特征...")
+                    for service in client.services:
+                        for char in service.characteristics:
+                            if "notify" in str(char.properties).lower():
+                                try:
+                                    def cb(sender, data):
+                                        if len(data) >= 2:
+                                            v = data[1] if data[0] & 0x01 == 0 else (data[1] | (data[2] << 8))
+                                            if 20 < v < 250:
+                                                state.update(v, _ble_device_name, "蓝牙", priority=SRC_BLE)
+                                    await client.start_notify(char.uuid, cb)
+                                    log(f"  → 已订阅: {char.uuid}")
+                                except:
+                                    pass
+
+                log(f"📊 共发现 {len(client.services)} 个服务")
                 while not _ble_stop_event.is_set():
                     await asyncio.sleep(1)
 
-                await client.stop_notify(HR_CHAR_UUID)
+                if char_to_notify:
+                    try:
+                        await client.stop_notify(char_to_notify)
+                    except:
+                        pass
                 await client.disconnect()
                 _ble_connected = False
                 _ble_client = None

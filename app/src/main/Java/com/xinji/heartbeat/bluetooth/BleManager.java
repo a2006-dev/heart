@@ -449,6 +449,10 @@ public class BleManager {
     private int filterTotalServices = 0;
     private int filterTotalChars = 0;
     private int filterMatched = 0;
+    private String filterDeviceAddress;
+    private String filterDeviceName;
+    private String matchedServiceUuid;
+    private String matchedCharUuid;
     private static final String[] HEART_KEYWORDS = {"heart", "hr", "rate", "心率", "pulse", "bpm"};
 
     /**
@@ -460,6 +464,9 @@ public class BleManager {
             if (callback != null) callback.onError("蓝牙适配器不可用");
             return;
         }
+        // 保存地址和名称供后续使用
+        this.filterDeviceAddress = address;
+        this.filterDeviceName = name;
         this.filterCallback = callback;
         this.filterMode = true;
         this.filterTotalServices = 0;
@@ -559,6 +566,8 @@ public class BleManager {
                     // 检查是否匹配心率关键词
                     if (matchesHeartRate(chUuid, chName)) {
                         filterMatched++;
+                        matchedServiceUuid = svcUuid;
+                        matchedCharUuid = chUuid;
                         if (filterCallback != null) {
                             filterCallback.onHeartRateCharFound(svcUuid, chUuid);
                         }
@@ -579,6 +588,11 @@ public class BleManager {
                                 if (filterCallback != null) {
                                     filterCallback.onSubscribed(svcUuid, chUuid);
                                 }
+                                // 保存特征码到本地 JSON
+                                try {
+                                    com.xinji.heartbeat.core.DeviceProfileManager.getInstance(context)
+                                        .addOrUpdateProfile(filterDeviceName, filterDeviceAddress, svcUuid, chUuid);
+                                } catch (Exception ignored) {}
                             } catch (Exception ignored) {}
                         }
                     }
