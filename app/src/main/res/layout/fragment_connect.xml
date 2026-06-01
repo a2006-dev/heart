@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#0c0c10">
+
+    <!-- ========== 上半：连接/设备列表区域 ========== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="设备连接"
+            android:textColor="#ff5d7c"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp"
+            android:layout_marginTop="4dp"/>
+
+        <!-- 当前连接状态卡片 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@drawable/glass_card"
+            android:padding="14dp"
+            android:layout_marginBottom="10dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tvDevice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⚡ 未连接"
+                    android:textColor="#e2c2cf"
+                    android:textSize="15sp"/>
+                <TextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="待机"
+                    android:textColor="#675c62"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp"/>
+            </LinearLayout>
+            <Button
+                android:id="@+id/btnDisconnect"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="断开"
+                android:backgroundTint="#2a282c"
+                android:textColor="#cbadbb"
+                android:textSize="12sp"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:gravity="center"/>
+        </LinearLayout>
+
+        <!-- 扫描控制行 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
+            <Button
+                android:id="@+id/btnScan"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="🔍 开始搜索"
+                android:backgroundTint="#ff5d7c"
+                android:textColor="#ffffff"
+                android:textSize="14sp"/>
+            <TextView
+                android:id="@+id/tvScanCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="#675c62"
+                android:textSize="12sp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="8dp"/>
+        </LinearLayout>
+
+        <!-- 广义搜索开关 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/glass_card"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:layout_marginBottom="6dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="广义搜索（不过滤特征码）"
+                android:textColor="#cbadbb"
+                android:textSize="13sp"/>
+            <TextView
+                android:id="@+id/tvBroadSearchHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="#ff5d7c"
+                android:textSize="11sp"
+                android:layout_marginEnd="8sp"
+                android:visibility="gone"/>
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/swBroadSearch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:thumbTint="#675c62"
+                android:trackTint="#2a282c"/>
+        </LinearLayout>
+
+        <!-- 设备列表（RecyclerView） -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvDevices"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/glass_card"
+            android:clipToPadding="false"
+            android:padding="6dp"/>
+    </LinearLayout>
+
+    <!-- ========== 分割线 ========== -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#2a252a"/>
+
+    <!-- ========== 下半：日志区域 ========== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:orientation="vertical"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="📋 日志"
+                android:textColor="#675c62"
+                android:textSize="13sp"/>
+            <Button
+                android:id="@+id/btnClearLog"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:text="清空"
+                android:backgroundTint="#2a282c"
+                android:textColor="#cbadbb"
+                android:textSize="10sp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:gravity="center"/>
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/logScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/glass_card"
+            android:scrollbars="vertical"
+            android:fillViewport="true">
+            <TextView
+                android:id="@+id/tvLog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:textColor="#675c62"
+                android:textSize="11sp"
+                android:typeface="monospace"
+                android:lineSpacingExtra="2dp"
+                android:gravity="top"/>
+        </ScrollView>
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0c0c10">
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_margin="16dp"
+            android:layout_marginBottom="0dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="游戏模式"
+                android:textColor="#ff5d7c"
+                android:textSize="22sp"
+                android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="显示系统应用"
+                android:textColor="#e2c2cf"
+                android:textSize="12sp"
+                android:layout_marginEnd="6dp"/>
+            <Switch
+                android:id="@+id/swShowSystem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+        
+        <!-- 小窗/分屏继续记录开关 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/glass_card"
+            android:padding="12dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="8dp">
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="小窗/分屏继续记录"
+                        android:textColor="#e2c2cf"
+                        android:textSize="14sp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="切出去刷视频、回消息时不中断"
+                        android:textColor="#675c62"
+                        android:textSize="11sp"
+                        android:layout_marginTop="2dp"/>
+                </LinearLayout>
+                <Switch
+                    android:id="@+id/swContinueInWindow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+            
+            <TextView
+                android:id="@+id/tvWindowModeHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="#665c62"
+                android:textSize="10sp"
+                android:layout_marginTop="6dp"
+                android:lineSpacingExtra="2dp"/>
+        </LinearLayout>
+        
+        <!-- 手动记录按钮 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="12dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/glass_card">
+            <Button
+                android:id="@+id/btnStartRecord"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="⏺ 开始记录"
+                android:backgroundTint="#ff5d7c"
+                android:textColor="#ffffff"
+                android:textSize="15sp"
+                android:layout_marginEnd="8dp"/>
+            <Button
+                android:id="@+id/btnStopRecord"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="⏹ 停止记录"
+                android:backgroundTint="#2a282c"
+                android:textColor="#cbadbb"
+                android:textSize="15sp"
+                android:enabled="false"/>
+            <TextView
+                android:id="@+id/tvRecordStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="#4CAF50"
+                android:textSize="12sp"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+        
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+            
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recordsList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="8dp"/>
+            
+            <TextView
+                android:id="@+id/tvEmpty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="暂无游戏\n点击右下角 + 添加"
+                android:textColor="#675c62"
+                android:textSize="16sp"
+                android:gravity="center"
+                android:layout_gravity="center"/>
+        </FrameLayout>
+    </LinearLayout>
+    
+    <ImageView
+        android:id="@+id/btnAddGame"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:src="@android:drawable/ic_menu_add"
+        android:background="@drawable/glass_card"
+        android:padding="16dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:contentDescription="添加游戏"/>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

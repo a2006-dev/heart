@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>心迹 · 生命脉搏</title>
+    <style>
+        /* 以下 CSS 完全复制自你的 xl.html，未修改任何数值 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: #0c0c10;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+        }
+
+        .ambient {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(40, 20, 25, 0.6), #020104);
+            z-index: 0;
+        }
+
+        .app {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.8rem;
+        }
+
+        .card {
+            max-width: 860px;
+            width: 100%;
+            background: rgba(18, 16, 20, 0.55);
+            backdrop-filter: blur(28px);
+            border-radius: 72px;
+            border: 0.5px solid rgba(255, 100, 120, 0.25);
+            box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+            overflow: hidden;
+        }
+
+        .content {
+            padding: 2.2rem 2.2rem 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .device-badge {
+            background: rgba(25, 20, 23, 0.7);
+            padding: 0.5rem 1.4rem;
+            border-radius: 60px;
+            font-size: 0.75rem;
+            font-weight: 460;
+            color: #e2c2cf;
+            font-family: 'SF Mono', monospace;
+            letter-spacing: 0.3px;
+            backdrop-filter: blur(4px);
+            border: 0.5px solid rgba(210, 80, 95, 0.4);
+        }
+        .connection-area {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+        }
+        .conn-status {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            color: #cbadbb;
+            letter-spacing: 0.3px;
+        }
+        .conn-btn {
+            background: transparent;
+            border: 1px solid rgba(240, 90, 110, 0.65);
+            padding: 0.45rem 1.6rem;
+            border-radius: 60px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #ffc0cb;
+            cursor: pointer;
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+        }
+        .conn-btn:hover {
+            background: rgba(220, 70, 90, 0.2);
+            border-color: #ff8aa0;
+            color: white;
+            box-shadow: 0 0 10px rgba(255, 80, 100, 0.3);
+        }
+
+        .heart-core {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.2rem;
+        }
+        .hr-big {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            justify-content: center;
+        }
+        .hr-number {
+            font-size: 7rem;
+            font-weight: 620;
+            font-family: 'Inter', 'SF Mono', monospace;
+            color: #ff5d7c;
+            text-shadow: 0 0 18px rgba(255, 60, 100, 0.5);
+            letter-spacing: -2px;
+            line-height: 1;
+        }
+        .hr-unit {
+            font-size: 1.2rem;
+            font-weight: 430;
+            color: #ffb0bd;
+            letter-spacing: 1px;
+        }
+        .pulse-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.3rem 1rem;
+            border-radius: 60px;
+            backdrop-filter: blur(4px);
+        }
+        .pulse-led {
+            width: 26px;
+            height: 26px;
+            background: #f44b6e;
+            border-radius: 50%;
+            box-shadow: 0 0 18px #ff3e64;
+            transition: transform 0.1s cubic-bezier(0.2, 1.3, 0.8, 1);
+        }
+        .pulse-text {
+            font-size: 0.7rem;
+            color: #ffb7c4;
+            letter-spacing: 1.2px;
+        }
+
+        .wave-panel {
+            background: rgba(0, 0, 0, 0.55);
+            border-radius: 44px;
+            border: 1px solid rgba(200, 80, 95, 0.4);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            height: 190px;
+            width: 100%;
+            position: relative;
+        }
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .footnote {
+            display: flex;
+            justify-content: center;
+            gap: 1.2rem;
+            font-size: 0.6rem;
+            color: #675c62;
+            letter-spacing: 0.5px;
+            padding-top: 0.2rem;
+        }
+
+        /* 新增功能按钮样式（不影响原有卡片） */
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .glass-btn {
+            background: rgba(255, 93, 124, 0.2);
+            border: 1px solid #ff5d7c;
+            border-radius: 40px;
+            padding: 6px 18px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #ffb0bd;
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .glass-btn:hover {
+            background: rgba(220, 70, 90, 0.3);
+            border-color: #ff8aa0;
+            transform: scale(1.02);
+        }
+        .glass-btn:active {
+            transform: scale(0.98);
+        }
+        .glass-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 帮助弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: rgba(18, 16, 20, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 48px;
+            border: 1px solid rgba(255, 100, 120, 0.4);
+            max-width: 300px;
+            width: 80%;
+            padding: 24px 20px;
+            text-align: center;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.5);
+        }
+        .modal-content h3 {
+            color: #ff5d7c;
+            margin-bottom: 16px;
+            font-size: 1.3rem;
+        }
+        .modal-content ol {
+            color: #e2c2cf;
+            font-size: 0.8rem;
+            text-align: left;
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+        .modal-content li {
+            margin: 8px 0;
+        }
+        .close-modal {
+            background: rgba(255, 93, 124, 0.3);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: white;
+            font-size: 0.8rem;
+            margin-top: 12px;
+            cursor: pointer;
+        }
+        .close-modal:hover {
+            background: rgba(255, 93, 124, 0.6);
+        }
+        @media (max-width: 600px) {
+            .app { padding: 1rem; }
+            .content { padding: 1.5rem 1.2rem; gap: 1.5rem; }
+            .hr-number { font-size: 4.5rem; }
+            .wave-panel { height: 130px; }
+        }
+        .action-buttons, .conn-btn, .conn-status, .connection-area { display: none !important; }
+    </style>
+</head>
+<body>
+<div class="ambient"></div>
+<div class="app">
+    <div class="card">
+        <div class="content">
+            <div class="header-row">
+                <div class="device-badge" id="deviceNameDisplay">⚡ 未连接</div>
+                <div class="connection-area">
+                    <div class="conn-status" id="statusText">待机</div>
+                    <button class="conn-btn" id="connectBtn">连接设备</button>
+                </div>
+            </div>
+
+            <div class="heart-core">
+                <div class="hr-big">
+                    <span class="hr-number" id="heartRate">—</span>
+                    <span class="hr-unit">BPM</span>
+                </div>
+                <div class="pulse-meta">
+                    <div class="pulse-led" id="pulseDot"></div>
+                    <span class="pulse-text">生命脉搏</span>
+                </div>
+            </div>
+
+            <div class="wave-panel">
+                <canvas id="ecgCanvas"></canvas>
+            </div>
+            <div class="footnote">
+                <span>♥ 真实心率传感</span>
+                <span>⚡ 每一次跳动都可见</span>
+            </div>
+
+            <!-- 新增功能按钮 -->
+            <div class="action-buttons">
+                <button id="floatToggleBtn" class="glass-btn">✨ 开启悬浮窗</button>
+                <button id="floatLockBtn" class="glass-btn" disabled>🔒 锁定</button>
+                <button id="helpBtn" class="glass-btn">❓ 帮助</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 帮助弹窗 -->
+<div id="helpModal" class="modal">
+    <div class="modal-content">
+        <h3>📖 使用教程</h3>
+        <ol>
+            <li>请确保你的智能穿戴设备支持蓝牙广播。</li>
+            <li>打开蓝牙广播功能，并选择你的设备。</li>
+            <li>如果连接成功但不显示心率，可以多试几次。</li>
+            <li>有问题请联系作者（QQ：3544399875）。</li>
+        </ol>
+        <button class="close-modal" id="closeModalBtn">知道了</button>
+    </div>
+</div>
+
+<script>
+    // ---------- 波形引擎（与你原版完全一致）----------
+    class StableECG {
+        constructor(canvas) {
+            this.canvas = canvas;
+            this.ctx = canvas.getContext('2d');
+            this.width = canvas.width;
+            this.height = canvas.height;
+            this.baselineY = this.height * 0.7;
+            this.amplitude = this.height * 0.26;
+            this.bufferLength = this.width;
+            this.buffer = new Array(this.bufferLength).fill(0);
+            this.pulseActive = false;
+            this.pulseIndex = 0;
+            this.template = [
+                0.00, 0.01, 0.04, 0.11, 0.22, 0.38, 0.58, 0.79, 0.96, 1.09, 1.15, 1.13, 1.00, 0.76, 0.44, 0.14,
+                -0.10, -0.22, -0.18, -0.08, 0.00, 0.06, 0.10, 0.12, 0.10, 0.06, 0.02, 0.00
+            ];
+            this.templateLen = this.template.length;
+        }
+
+        resize(w, h) {
+            if (this.width === w && this.height === h) return;
+            this.width = w;
+            this.height = h;
+            this.canvas.width = w;
+            this.canvas.height = h;
+            this.baselineY = this.height * 0.7;
+            this.amplitude = this.height * 0.26;
+            const newBuf = new Array(w).fill(0);
+            for (let i = 0; i < Math.min(this.buffer.length, w); i++) newBuf[i] = this.buffer[i];
+            this.buffer = newBuf;
+            this.bufferLength = w;
+            this.drawGrid();
+            this.render();
+        }
+
+        drawGrid() {
+            if (!this.ctx) return;
+            this.ctx.save();
+            this.ctx.strokeStyle = "rgba(200, 85, 100, 0.2)";
+            this.ctx.lineWidth = 0.5;
+            const refs = [this.baselineY, this.baselineY - this.amplitude * 0.7, this.baselineY + this.amplitude * 0.5];
+            refs.forEach(y => {
+                if (y > 5 && y < this.height - 5) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, y);
+                    this.ctx.lineTo(this.width, y);
+                    this.ctx.stroke();
+                }
+            });
+            const step = this.width / 8;
+            for (let x = step; x < this.width; x += step) {
+                this.ctx.beginPath();
+                this.ctx.moveTo(x, 0);
+                this.ctx.lineTo(x, this.height);
+                this.ctx.strokeStyle = "rgba(170, 70, 85, 0.08)";
+                this.ctx.stroke();
+            }
+            this.ctx.restore();
+        }
+
+        triggerBeat() {
+            this.pulseActive = true;
+            this.pulseIndex = 0;
+            const led = document.getElementById('pulseDot');
+            if (led) {
+                led.style.transform = 'scale(1.5)';
+                led.style.boxShadow = '0 0 28px #ff4468';
+                setTimeout(() => { if(led) { led.style.transform = ''; led.style.boxShadow = '0 0 18px #ff4d6e'; } }, 160);
+            }
+            const hrSpan = document.getElementById('heartRate');
+            if (hrSpan && hrSpan.innerText !== '—') {
+                hrSpan.style.textShadow = '0 0 20px #ff3a60';
+                setTimeout(() => { if(hrSpan) hrSpan.style.textShadow = '0 0 14px rgba(255, 70, 100, 0.5)'; }, 200);
+            }
+        }
+
+        updateAndDraw() {
+            for (let i = 0; i < this.bufferLength - 1; i++) this.buffer[i] = this.buffer[i+1];
+            let newVal = 0;
+            if (this.pulseActive) {
+                if (this.pulseIndex < this.templateLen) {
+                    newVal = this.template[this.pulseIndex];
+                    this.pulseIndex++;
+                } else {
+                    this.pulseActive = false;
+                }
+            }
+            this.buffer[this.bufferLength - 1] = newVal;
+            this.render();
+        }
+
+        render() {
+            if (!this.ctx || this.width <= 0 || this.buffer.length < 2) return;
+            this.ctx.clearRect(0, 0, this.width, this.height);
+            this.drawGrid();
+            this.ctx.beginPath();
+            this.ctx.lineWidth = 2.2;
+            this.ctx.lineCap = 'round';
+            this.ctx.lineJoin = 'round';
+            this.ctx.shadowBlur = 5;
+            this.ctx.shadowColor = "#e04266";
+            const grad = this.ctx.createLinearGradient(0, 0, this.width, 0);
+            grad.addColorStop(0, "#ff90a5");
+            grad.addColorStop(0.5, "#f84e70");
+            grad.addColorStop(1, "#ff335f");
+            this.ctx.strokeStyle = grad;
+            const stepX = this.width / (this.bufferLength - 1);
+            let first = true;
+            for (let i = 0; i < this.bufferLength; i++) {
+                let x = i * stepX;
+                let y = this.baselineY - (this.buffer[i] * this.amplitude);
+                y = Math.min(this.height - 12, Math.max(12, y));
+                if (first) { this.ctx.moveTo(x, y); first = false; }
+                else this.ctx.lineTo(x, y);
+            }
+            this.ctx.stroke();
+            this.ctx.shadowBlur = 0;
+            const lastY = this.baselineY - (this.buffer[this.bufferLength-1] * this.amplitude);
+            this.ctx.beginPath();
+            this.ctx.arc(this.width - 5, lastY, 3, 0, 2 * Math.PI);
+            this.ctx.fillStyle = "#ff6f8c";
+            this.ctx.shadowBlur = 8;
+            this.ctx.fill();
+            this.ctx.shadowBlur = 0;
+        }
+
+        startLoop() {
+            const loop = () => { this.updateAndDraw(); requestAnimationFrame(loop); };
+            requestAnimationFrame(loop);
+        }
+    }
+
+    // 初始化波形
+    const canvas = document.getElementById('ecgCanvas');
+    const ecgEngine = new StableECG(canvas);
+    window.ecgEngine = ecgEngine;
+
+    function resizeCanvas() {
+        const container = canvas.parentElement;
+        const rect = container.getBoundingClientRect();
+        if (rect.width && rect.height) ecgEngine.resize(rect.width, rect.height);
+    }
+    const ro = new ResizeObserver(() => resizeCanvas());
+    ro.observe(canvas.parentElement);
+    window.addEventListener('resize', resizeCanvas);
+    setTimeout(resizeCanvas, 100);
+    ecgEngine.startLoop();
+
+    // 心率数字动态光晕（与你原版一致）
+    let currentHr = null;
+    function animateGlow() {
+        if (currentHr && currentHr > 30) {
+            const intensity = Math.min(0.7, (currentHr - 50) / 150);
+            const glow = 8 + intensity * 18;
+            document.getElementById('heartRate').style.textShadow = `0 0 ${glow}px #ff4568`;
+        } else {
+            document.getElementById('heartRate').style.textShadow = `0 0 8px rgba(255, 70, 100, 0.6)`;
+        }
+        requestAnimationFrame(animateGlow);
+    }
+    animateGlow();
+
+    // ========== 与 MainActivity.java 原生蓝牙对接 ==========
+    // 这些函数会被原生端通过 evaluateJavascript 调用
+    window.updateHeartRate = function(hr) {
+        if (hr && hr > 30 && hr < 220) {
+            currentHr = hr;
+            document.getElementById('heartRate').innerText = hr;
+            if (ecgEngine) ecgEngine.triggerBeat();
+            document.getElementById('statusText').innerText = "❤️ 同步中";
+        }
+    };
+    window.setDeviceName = function(name) {
+        document.getElementById('deviceNameDisplay').innerText = name || "⚡ 未连接";
+    };
+    window.setStatus = function(status) {
+        document.getElementById('statusText').innerText = status;
+    };
+    window.resetHeartRate = function() {
+        document.getElementById('heartRate').innerText = '—';
+        document.getElementById('statusText').innerText = '待机';
+        currentHr = null;
+    };
+
+    // 悬浮窗相关按钮状态（供原生调用）
+    window.setFloatButtonText = function(visible) {
+        var btn = document.getElementById('floatToggleBtn');
+        if (btn) btn.innerText = visible ? '✨ 关闭悬浮窗' : '✨ 开启悬浮窗';
+    };
+    window.setLockButtonEnabled = function(enabled) {
+        var btn = document.getElementById('floatLockBtn');
+        if (btn) btn.disabled = !enabled;
+    };
+    window.setLockButtonText = function(locked) {
+        var btn = document.getElementById('floatLockBtn');
+        if (btn) btn.innerText = locked ? '🔓 解锁' : '🔒 锁定';
+    };
+
+    // 连接设备按钮：调用原生接口
+    document.getElementById('connectBtn').onclick = function() {
+        if (window.AndroidBluetooth) {
+            window.AndroidBluetooth.showDeviceList();
+        } else {
+            alert("原生接口未就绪");
+        }
+    };
+    // 悬浮窗开关
+    document.getElementById('floatToggleBtn').onclick = function() {
+        if (window.AndroidBluetooth) window.AndroidBluetooth.toggleFloatWindow();
+    };
+    // 锁定/解锁
+    document.getElementById('floatLockBtn').onclick = function() {
+        if (window.AndroidBluetooth) window.AndroidBluetooth.lockFloatWindow();
+    };
+
+    // 帮助弹窗
+    var modal = document.getElementById('helpModal');
+    document.getElementById('helpBtn').onclick = function() {
+        modal.style.display = 'flex';
+    };
+    document.getElementById('closeModalBtn').onclick = function() {
+        modal.style.display = 'none';
+    };
+    window.onclick = function(event) {
+        if (event.target == modal) modal.style.display = 'none';
+    };
+</script>
+</body>
+</html>
