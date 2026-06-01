@@ -87,3 +87,7 @@ git clone -b debug https://github.com/a2006-dev/heart.git
 > 免责声明：本应用仅用于健康数据展示，不做医疗诊断用途。
 
 <p align="center">Made with ❤️</p>
+
+---
+
+[⬇️ 下载 heart-v2.3-debug.apk](https://github.com/a2006-dev/heart/releases/download/v2.3-debug/heart-v2.3-debug.apk) | [📦 前往 Release 页面](https://github.com/a2006-dev/heart/releases/tag/v2.3-debug)
