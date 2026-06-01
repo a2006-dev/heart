@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">心迹</string>
+    <string-array name="positions">
+        <item>左上角</item>
+        <item>右上角</item>
+        <item>左下角</item>
+        <item>右下角</item>
+    </string-array>
+</resources>

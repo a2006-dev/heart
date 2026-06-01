@@ -1,0 +1,44 @@
+# 心迹 - Wine 使用说明
+# 在安卓 Wine 上运行 Python 脚本
+
+━━━ 第1步：装 Python ━━━
+
+在 Wine 里打开浏览器，访问：
+https://www.python.org/downloads/
+
+下载 Python 3.12+ 的 Windows 安装包
+（选 Windows installer 64-bit）
+
+下载完后双击安装，注意勾选：
+☑ Add Python to PATH
+
+━━━ 第2步：放脚本 ━━━
+
+把 heart_monitor.py 传到手机
+放到 Wine 能访问的位置，比如：
+  Z:\storage\emulated\0\Download\heart_monitor.py
+
+或者放到：
+  C:\users\root\Desktop\heart_monitor.py
+
+━━━ 第3步：运行 ━━━
+
+在 Wine 里打开命令行（cmd），执行：
+  python C:\path\to\heart_monitor.py
+
+或者直接双击 heart_monitor.py
+
+━━━ 注意事项 ━━━
+
+⚠️ Wine 里的蓝牙可能用不了
+   → 连接手表可能失败，但手机推送可以用
+
+⚠️ 游戏模式可能检测不到窗口
+   → 因为 Wine 模拟的窗口和 Windows 不一样
+
+⚠️ 进程保护的隐藏控制台可能无效
+   → 不影响主要功能
+
+✅ HTTP 服务器肯定能用
+✅ 心率数据显示没问题
+✅ CSV 保存没问题

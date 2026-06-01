@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:tools="http://schemas.android.com/tools">
+
+     <!-- Android 11+ 需要 QUERY_ALL_PACKAGES 才能枚举所有已安装应用 -->
+     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+         tools:ignore="QueryAllPackagesPermission" />
+
+     <uses-permission android:name="android.permission.BLUETOOTH" />
+     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
+     <uses-permission android:name="android.permission.INTERNET" />
+     <!-- 后台定位权限：部分国产ROM（华为/小米/OPPO）后台扫描蓝牙需要 -->
+     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+     <!-- 高精度蓝牙扫描需要的权限 -->
+     <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" />
+     <!-- 防止在某些ROM上被杀死 -->
+     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+         android:allowBackup="true"
+         android:icon="@drawable/ic_launcher"
+         android:roundIcon="@drawable/ic_launcher"
+         android:label="心迹"
+         android:theme="@style/Theme.App.Starting"
+         android:supportsRtl="true"
+         android:persistent="false"
+         tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute">
+
+<activity
+              android:name=".OnboardingActivity"
+              android:exported="true"
+              android:theme="@style/SplashTheme">
+              <intent-filter>
+                  <action android:name="android.intent.action.MAIN" />
+                  <category android:name="android.intent.category.LAUNCHER" />
+              </intent-filter>
+          </activity>
+          <activity
+              android:name=".SplashActivity"
+              android:exported="false"
+              android:theme="@style/SplashTheme" />
+
+<activity
+              android:name=".MainActivity"
+              android:exported="false"
+              android:launchMode="singleTop"
+              android:configChanges="orientation|screenSize|keyboardHidden|navigation"
+              android:theme="@style/AppTheme">
+         </activity>
+
+<service
+               android:name=".core.GameModeService"
+               android:enabled="true"
+               android:exported="false"
+               android:foregroundServiceType="connectedDevice|dataSync" />
+              
+          <activity
+              android:name=".GameRecordsActivity"
+              android:exported="false"
+              android:theme="@style/AppTheme" />
+          
+          <activity
+              android:name=".BroadcastActivity"
+              android:exported="false"
+              android:theme="@style/AppTheme"
+              android:screenOrientation="portrait" />
+
+          <provider
+              android:name="androidx.core.content.FileProvider"
+              android:authorities="${applicationId}.fileprovider"
+              android:exported="false"
+              android:grantUriPermissions="true">
+              <meta-data
+                  android:name="android.support.FILE_PROVIDER_PATHS"
+                  android:resource="@xml/file_paths" />
+          </provider>
+      </application>
+ </manifest>
