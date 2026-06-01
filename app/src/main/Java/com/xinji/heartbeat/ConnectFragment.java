@@ -120,11 +120,41 @@ public class ConnectFragment extends Fragment {
             }
         });
 
-        updateStatus("⚡ 未连接", "待机");
+        // 初始化：同步当前连接状态
+        syncConnectionStatus();
+
         appendLog("📱 心迹连接页面已加载", 0xFF675c62);
         appendLog("💡 点击「开始搜索」扫描附近设备", 0xFF675c62);
         appendLog("💡 开启「广义搜索」可查看所有设备，点击 ⋮ 选择「筛选模式」自动匹配心率服务", 0xFF675c62);
         return v;
+    }
+
+    /** 从 BleManager 同步当前连接状态（用于页面切换回来时恢复） */
+    private void syncConnectionStatus() {
+        if (activity == null) return;
+        BleManager ble = activity.getBleManager();
+        if (ble.isConnected()) {
+            String name = ble.getCurrentDeviceName();
+            if (name != null) {
+                updateStatus(name, "已连接");
+            } else {
+                updateStatus("⚡ 已连接", "同步中");
+            }
+        } else {
+            String savedName = ble.getLastDeviceName();
+            if (!savedName.isEmpty() && ble.isAutoConnectEnabled()) {
+                updateStatus("⚡ " + savedName, "自动重连中...");
+            } else {
+                updateStatus("⚡ 未连接", "待机");
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // 每次页面回到前台时同步状态
+        syncConnectionStatus();
     }
 
     @Override
@@ -159,7 +189,6 @@ public class ConnectFragment extends Fragment {
             ssb.setSpan(new ForegroundColorSpan(entry.color), start, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         tvLog.setText(ssb);
-        // 自动滚动 ScrollView 到底部
         logScrollView.post(() -> logScrollView.fullScroll(View.FOCUS_DOWN));
     }
 
@@ -203,9 +232,6 @@ public class ConnectFragment extends Fragment {
                 requestBluetoothPermission();
                 return false;
             }
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Build.VERSION_CODES.S > Build.VERSION_CODES.S) {
-            // Android 6-11: ACCESS_FINE_LOCATION
         }
         return true;
     }
@@ -303,7 +329,6 @@ public class ConnectFragment extends Fragment {
                 h.tvDeviceIcon.setText("📡");
             }
 
-            // ⋮ 按钮：仅广义搜索模式下可见
             if (broadSearch) {
                 h.btnServiceDetail.setVisibility(View.VISIBLE);
                 h.btnServiceDetail.setOnClickListener(v -> showServiceMenu(dev));
@@ -312,7 +337,6 @@ public class ConnectFragment extends Fragment {
                 h.btnServiceDetail.setOnClickListener(null);
             }
 
-            // 整行点击连接
             h.itemView.setOnClickListener(v -> {
                 if (activity == null) return;
                 if (isScanning) {
@@ -332,11 +356,6 @@ public class ConnectFragment extends Fragment {
 
     // ==================== ⋮ 菜单 ====================
 
-    /**
-     * 点击 ⋮ 弹出菜单，有两个选项：
-     * 1. 查看广播服务 UUID
-     * 2. 筛选模式 — 自动连接并遍历所有service/characteristic，找到含 heart/hr/rate 的特征并订阅
-     */
     private void showServiceMenu(BleManager.ScanDeviceInfo dev) {
         if (getContext() == null) return;
         String name = dev.name != null && !dev.name.isEmpty() ? dev.name : "未知设备";
@@ -344,17 +363,13 @@ public class ConnectFragment extends Fragment {
         new AlertDialog.Builder(requireContext())
             .setTitle(name)
             .setItems(new String[]{"📋 查看广播服务 UUID", "🔍 筛选模式（自动匹配心率特征）"}, (dialog, which) -> {
-                if (which == 0) {
-                    showServiceUuidDialog(dev);
-                } else {
-                    startFilterMode(dev);
-                }
+                if (which == 0) showServiceUuidDialog(dev);
+                else startFilterMode(dev);
             })
             .setNegativeButton("取消", null)
             .show();
     }
 
-    /** 显示该设备广播的 Service UUID */
     private void showServiceUuidDialog(BleManager.ScanDeviceInfo dev) {
         if (getContext() == null) return;
         String name = dev.name != null && !dev.name.isEmpty() ? dev.name : "未知设备";
@@ -404,10 +419,6 @@ public class ConnectFragment extends Fragment {
 
     // ==================== 筛选模式 ====================
 
-    /**
-     * 筛选模式：连接设备 → 遍历所有 service → 遍历所有 characteristic
-     * → 找到 UUID/名称含 heart/hr/rate/心率 的特征 → 订阅通知 → 记录到日志
-     */
     private void startFilterMode(BleManager.ScanDeviceInfo dev) {
         if (activity == null) return;
         String name = dev.name != null && !dev.name.isEmpty() ? dev.name : "未知设备";
@@ -415,14 +426,12 @@ public class ConnectFragment extends Fragment {
         appendLog("🔍 [筛选模式] 开始分析 " + name + " ...", 0xFF4CAF50);
         appendLog("🔍 [筛选模式] 正在连接并发现所有服务...", 0xFFcbadbb);
 
-        // 先停止扫描
         if (isScanning) {
             activity.getBleManager().stopManualScan();
             isScanning = false;
             btnScan.setText("🔍 开始搜索");
         }
 
-        // 使用 BleManager 的筛选模式连接
         activity.getBleManager().connectAndFilterServices(dev.address, dev.name,
             new BleManager.FilterCallback() {
                 @Override
@@ -438,7 +447,15 @@ public class ConnectFragment extends Fragment {
                 @Override
                 public void onSubscribed(String serviceUuid, String charUuid) {
                     appendLog("✅ [筛选] 已订阅通知: " + charUuid + " → 等待心率数据...", 0xFF4CAF50);
+                    // ★ 重要：更新连接状态到 UI，保存设备信息
                     updateStatus(name, "已连接（筛选模式）");
+                    if (activity != null) {
+                        activity.getBleManager().saveLastDevice(dev.name, dev.address);
+                        // 通知主页面和悬浮窗更新
+                        if (activity.homeFragment != null) {
+                            activity.homeFragment.updateDevice(name);
+                        }
+                    }
                 }
 
                 @Override
@@ -481,9 +498,41 @@ public class ConnectFragment extends Fragment {
         handler.post(() -> {
             deviceList.clear();
             deviceList.addAll(devices);
+            // 智能排序：watch/band/heart/小米等穿戴设备排前面，未知设备排后面
+            sortDeviceList();
             deviceAdapter.notifyDataSetChanged();
             tvScanCount.setText("共 " + devices.size() + " 个");
         });
+    }
+
+    /** 穿戴设备优先排序 */
+    private void sortDeviceList() {
+        deviceList.sort((a, b) -> {
+            int pa = getDevicePriority(a);
+            int pb = getDevicePriority(b);
+            if (pa != pb) return Integer.compare(pb, pa); // 优先级高的在前
+            // 同优先级按信号强度降序
+            return Integer.compare(b.rssi, a.rssi);
+        });
+    }
+
+    /** 根据设备名判断优先级，越高越靠前 */
+    private int getDevicePriority(BleManager.ScanDeviceInfo dev) {
+        if (dev.name == null || dev.name.isEmpty() || "未知设备".equals(dev.name)) return 0;
+        String n = dev.name.toLowerCase(Locale.ROOT);
+        // 最优先：名称含 heart（心率设备）
+        if (n.contains("heart")) return 100;
+        // 其次：watch / band（手表/手环）
+        if (n.contains("watch") || n.contains("band")) return 80;
+        // 小米/华米/华为等常见品牌手环
+        if (n.contains("mi ") || n.contains("xiaomi") || n.contains("小米")
+            || n.contains("华为") || n.contains("huawei")
+            || n.contains("honor") || n.contains("荣耀")
+            || n.contains("三星") || n.contains("samsung")
+            || n.contains("oppo") || n.contains("vivo")
+            || n.contains("iqoo")) return 70;
+        // 有具体名称的设备（不是未知）
+        return 50;
     }
 
     public void onScanStopped() {
