@@ -1,5 +1,6 @@
 package com.xinji.heartbeat;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,8 +14,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.xinji.heartbeat.bluetooth.BleManager;
 
@@ -22,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 设备连接页面 — 使用 BleManager 进行扫描和连接，不再直接操作蓝牙 API。
+ * 设备连接页面 — 使用 BleManager 进行扫描和连接。
  */
 public class ConnectFragment extends Fragment {
     private MainActivity activity;
@@ -72,6 +71,7 @@ public class ConnectFragment extends Fragment {
             ble.stopManualScan();
             isScanning = false;
             btnScan.setText("🔍 扫描设备");
+            showDevicePicker(); // 停止扫描后弹出设备列表
             return;
         }
 
@@ -88,7 +88,32 @@ public class ConnectFragment extends Fragment {
         btnScan.setText("⏹ 停止扫描");
     }
 
-    // ==================== 状态更新（从 MainActivity 回调）====================
+    /** 停止扫描后弹出设备列表弹窗 */
+    private void showDevicePicker() {
+        if (deviceList.isEmpty()) {
+            Toast.makeText(activity, "未发现设备，请确保手表已开启并靠近手机", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String[] names = new String[deviceList.size()];
+        for (int i = 0; i < deviceList.size(); i++) {
+            BleManager.ScanDeviceInfo d = deviceList.get(i);
+            names[i] = d.name + "  (" + d.address + ")  RSSI:" + d.rssi;
+        }
+
+        new AlertDialog.Builder(requireContext())
+            .setTitle("选择设备")
+            .setItems(names, (dialog, which) -> {
+                BleManager.ScanDeviceInfo selected = deviceList.get(which);
+                if (activity != null) {
+                    activity.getBleManager().connectToDevice(selected.address, selected.name);
+                }
+            })
+            .setNegativeButton("取消", null)
+            .show();
+    }
+
+    // ==================== 状态更新 ====================
 
     public void onScanResult(List<BleManager.ScanDeviceInfo> devices) {
         handler.post(() -> {
