@@ -1,0 +1,295 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.xinji.heartbeat"
+4    android:versionCode="5"
+5    android:versionName="2.3" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+8-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml
+9        android:targetSdkVersion="34" />
+9-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml
+10
+11    <!-- Android 11+ 需要 QUERY_ALL_PACKAGES 才能枚举所有已安装应用 -->
+12    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+12-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:6:6-7:54
+12-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:6:23-75
+13    <uses-permission android:name="android.permission.BLUETOOTH" />
+13-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:9:6-69
+13-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:9:23-66
+14    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+14-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:10:6-75
+14-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:10:23-72
+15    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+15-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:11:6-80
+15-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:11:23-77
+16    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+16-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:12:6-74
+16-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:12:23-71
+17    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+17-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:13:6-77
+17-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:13:23-74
+18    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+18-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:14:6-79
+18-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:14:23-76
+19    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+19-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:15:6-96
+19-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:15:23-93
+20    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+20-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:16:6-78
+20-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:16:23-75
+21    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+21-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:17:6-78
+21-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:17:23-75
+22    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+22-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:18:6-95
+22-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:18:23-92
+23    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+23-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:19:6-88
+23-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:19:23-85
+24    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
+24-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:20:6-79
+24-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:20:23-76
+25    <uses-permission android:name="android.permission.INTERNET" />
+25-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:21:6-68
+25-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:21:23-65
+26    <!-- 后台定位权限：部分国产ROM（华为/小米/OPPO）后台扫描蓝牙需要 -->
+27    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+27-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:23:6-86
+27-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:23:23-83
+28    <!-- 高精度蓝牙扫描需要的权限 -->
+29    <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" />
+29-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:25:6-80
+29-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:25:23-77
+30    <!-- 防止在某些ROM上被杀死 -->
+31    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+31-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:27:6-82
+31-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:27:23-79
+32
+33    <queries>
+33-->[com.itsaky.androidide:logsender:2.7.1-beta] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/b01642dd26d693ba3f60409c345c688b/transformed/logsender-2.7.1-beta-debug/AndroidManifest.xml:23:5-25:15
+34        <package android:name="com.itsaky.androidide" />
+34-->[com.itsaky.androidide:logsender:2.7.1-beta] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/b01642dd26d693ba3f60409c345c688b/transformed/logsender-2.7.1-beta-debug/AndroidManifest.xml:24:9-57
+34-->[com.itsaky.androidide:logsender:2.7.1-beta] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/b01642dd26d693ba3f60409c345c688b/transformed/logsender-2.7.1-beta-debug/AndroidManifest.xml:24:18-54
+35    </queries>
+36
+37    <uses-permission android:name="com.itsaky.androidide.permission.BIND_LOG_SERVICE" />
+37-->[com.itsaky.androidide:logsender:2.7.1-beta] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/b01642dd26d693ba3f60409c345c688b/transformed/logsender-2.7.1-beta-debug/AndroidManifest.xml:28:5-89
+37-->[com.itsaky.androidide:logsender:2.7.1-beta] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/b01642dd26d693ba3f60409c345c688b/transformed/logsender-2.7.1-beta-debug/AndroidManifest.xml:28:22-86
+38
+39    <permission
+39-->[androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:22:5-24:47
+40        android:name="com.xinji.heartbeat.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+40-->[androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:23:9-81
+41        android:protectionLevel="signature" />
+41-->[androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:24:9-44
+42
+43    <uses-permission android:name="com.xinji.heartbeat.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+43-->[androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:26:5-97
+43-->[androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:26:22-94
+44
+45    <application
+45-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:29:5-93:21
+46        android:allowBackup="true"
+46-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:30:10-36
+47        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+47-->[androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:28:18-86
+48        android:debuggable="true"
+49        android:extractNativeLibs="false"
+50        android:icon="@drawable/ic_launcher"
+50-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:31:10-46
+51        android:label="心迹"
+51-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:33:10-28
+52        android:persistent="false"
+52-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:36:10-36
+53        android:roundIcon="@drawable/ic_launcher"
+53-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:32:10-51
+54        android:supportsRtl="true"
+54-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:35:10-36
+55        android:theme="@style/Theme.App.Starting" >
+55-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:34:10-51
+56        <activity
+56-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:39:1-47:22
+57            android:name="com.xinji.heartbeat.OnboardingActivity"
+57-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:40:15-49
+58            android:exported="true"
+58-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:41:15-38
+59            android:theme="@style/SplashTheme" >
+59-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:42:15-49
+60            <intent-filter>
+60-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:43:15-46:31
+61                <action android:name="android.intent.action.MAIN" />
+61-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:44:19-71
+61-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:44:27-68
+62
+63                <category android:name="android.intent.category.LAUNCHER" />
+63-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:45:19-79
+63-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:45:29-76
+64            </intent-filter>
+65        </activity>
+66        <activity
+66-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:48:11-51:52
+67            android:name="com.xinji.heartbeat.SplashActivity"
+67-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:49:15-45
+68            android:exported="false"
+68-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:50:15-39
+69            android:theme="@style/SplashTheme" />
+69-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:51:15-49
+70        <activity
+70-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:53:1-59:21
+71            android:name="com.xinji.heartbeat.MainActivity"
+71-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:54:15-43
+72            android:configChanges="orientation|screenSize|keyboardHidden|navigation"
+72-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:57:15-87
+73            android:exported="false"
+73-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:55:15-39
+74            android:launchMode="singleTop"
+74-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:56:15-45
+75            android:theme="@style/AppTheme" >
+75-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:58:15-46
+76        </activity>
+77
+78        <service
+78-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:61:1-65:75
+79            android:name="com.xinji.heartbeat.core.GameModeService"
+79-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:62:16-52
+80            android:enabled="true"
+80-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:63:16-38
+81            android:exported="false"
+81-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:64:16-40
+82            android:foregroundServiceType="connectedDevice|dataSync" />
+82-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:65:16-72
+83        <service
+83-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:67:11-71:75
+84            android:name="com.xinji.heartbeat.core.HeartRateService"
+84-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:68:16-53
+85            android:enabled="true"
+85-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:69:16-38
+86            android:exported="false"
+86-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:70:16-40
+87            android:foregroundServiceType="connectedDevice|dataSync" />
+87-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:71:16-72
+88
+89        <activity
+89-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:73:11-76:49
+90            android:name="com.xinji.heartbeat.GameRecordsActivity"
+90-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:74:15-50
+91            android:exported="false"
+91-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:75:15-39
+92            android:theme="@style/AppTheme" />
+92-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:76:15-46
+93        <activity
+93-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:78:11-82:54
+94            android:name="com.xinji.heartbeat.BroadcastActivity"
+94-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:79:15-48
+95            android:exported="false"
+95-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:80:15-39
+96            android:screenOrientation="portrait"
+96-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:82:15-51
+97            android:theme="@style/AppTheme" />
+97-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:81:15-46
+98
+99        <provider
+100            android:name="androidx.core.content.FileProvider"
+100-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:85:15-64
+101            android:authorities="com.xinji.heartbeat.fileprovider"
+101-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:86:15-66
+102            android:exported="false"
+102-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:87:15-39
+103            android:grantUriPermissions="true" >
+103-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:88:15-49
+104            <meta-data
+104-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:89:15-91:56
+105                android:name="android.support.FILE_PROVIDER_PATHS"
+105-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:90:19-69
+106                android:resource="@xml/file_paths" />
+106-->/storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:91:19-53
+107        </provider>
+108        <provider
+108-->[com.itsaky.androidide:logsender:2.7.1-beta] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/b01642dd26d693ba3f60409c345c688b/transformed/logsender-2.7.1-beta-debug/AndroidManifest.xml:32:9-36:40
+109            android:name="com.itsaky.androidide.logsender.utils.LogSenderInstaller"
+109-->[com.itsaky.androidide:logsender:2.7.1-beta] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/b01642dd26d693ba3f60409c345c688b/transformed/logsender-2.7.1-beta-debug/AndroidManifest.xml:33:13-84
+110            android:authorities="com.xinji.heartbeat.logsender-installer"
+110-->[com.itsaky.androidide:logsender:2.7.1-beta] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/b01642dd26d693ba3f60409c345c688b/transformed/logsender-2.7.1-beta-debug/AndroidManifest.xml:34:13-71
+111            android:enabled="@bool/logsender_enabled"
+111-->[com.itsaky.androidide:logsender:2.7.1-beta] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/b01642dd26d693ba3f60409c345c688b/transformed/logsender-2.7.1-beta-debug/AndroidManifest.xml:35:13-54
+112            android:exported="false" />
+112-->[com.itsaky.androidide:logsender:2.7.1-beta] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/b01642dd26d693ba3f60409c345c688b/transformed/logsender-2.7.1-beta-debug/AndroidManifest.xml:36:13-37
+113
+114        <service
+114-->[com.itsaky.androidide:logsender:2.7.1-beta] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/b01642dd26d693ba3f60409c345c688b/transformed/logsender-2.7.1-beta-debug/AndroidManifest.xml:38:9-41:56
+115            android:name="com.itsaky.androidide.logsender.LogSenderService"
+115-->[com.itsaky.androidide:logsender:2.7.1-beta] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/b01642dd26d693ba3f60409c345c688b/transformed/logsender-2.7.1-beta-debug/AndroidManifest.xml:39:13-76
+116            android:exported="false"
+116-->[com.itsaky.androidide:logsender:2.7.1-beta] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/b01642dd26d693ba3f60409c345c688b/transformed/logsender-2.7.1-beta-debug/AndroidManifest.xml:40:13-37
+117            android:foregroundServiceType="dataSync" />
+117-->[com.itsaky.androidide:logsender:2.7.1-beta] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/b01642dd26d693ba3f60409c345c688b/transformed/logsender-2.7.1-beta-debug/AndroidManifest.xml:41:13-53
+118
+119        <provider
+119-->[androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:24:9-32:20
+120            android:name="androidx.startup.InitializationProvider"
+120-->[androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:25:13-67
+121            android:authorities="com.xinji.heartbeat.androidx-startup"
+121-->[androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:26:13-68
+122            android:exported="false" >
+122-->[androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:27:13-37
+123            <meta-data
+123-->[androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:29:13-31:52
+124                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+124-->[androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:30:17-75
+125                android:value="androidx.startup" />
+125-->[androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:31:17-49
+126            <meta-data
+126-->[androidx.lifecycle:lifecycle-process:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/aea0abc86b4400ea6a2f99baabc238c6/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:29:13-31:52
+127                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+127-->[androidx.lifecycle:lifecycle-process:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/aea0abc86b4400ea6a2f99baabc238c6/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:30:17-78
+128                android:value="androidx.startup" />
+128-->[androidx.lifecycle:lifecycle-process:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/aea0abc86b4400ea6a2f99baabc238c6/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:31:17-49
+129            <meta-data
+129-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:29:13-31:52
+130                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+130-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:30:17-85
+131                android:value="androidx.startup" />
+131-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:31:17-49
+132        </provider>
+133
+134        <receiver
+134-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:34:9-52:20
+135            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+135-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:35:13-76
+136            android:directBootAware="false"
+136-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:36:13-44
+137            android:enabled="true"
+137-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:37:13-35
+138            android:exported="true"
+138-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:38:13-36
+139            android:permission="android.permission.DUMP" >
+139-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:39:13-57
+140            <intent-filter>
+140-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:40:13-42:29
+141                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+141-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:17-91
+141-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:25-88
+142            </intent-filter>
+143            <intent-filter>
+143-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:43:13-45:29
+144                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+144-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:17-85
+144-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:25-82
+145            </intent-filter>
+146            <intent-filter>
+146-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:46:13-48:29
+147                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+147-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:17-88
+147-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:25-85
+148            </intent-filter>
+149            <intent-filter>
+149-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:49:13-51:29
+150                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+150-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:17-95
+150-->[androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:25-92
+151            </intent-filter>
+152        </receiver>
+153    </application>
+154
+155</manifest>

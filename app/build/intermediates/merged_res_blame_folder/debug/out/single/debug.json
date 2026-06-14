@@ -1,0 +1,110 @@
+[
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/drawable_glass_button.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/drawable/glass_button.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/layout_activity_broadcast.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/layout/activity_broadcast.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/layout_activity_splash.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/layout/activity_splash.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/layout_item_onboarding_page.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/layout/item_onboarding_page.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/drawable_glass_card.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/drawable/glass_card.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/layout_item_game.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/layout/item_game.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/layout_activity_game_records.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/layout/activity_game_records.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/layout_fragment_home.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/layout/fragment_home.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/drawable-v24_ic_launcher_foreground.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/drawable-v24/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/drawable_ic_launcher.png.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/drawable/ic_launcher.png"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/xml_data_extraction_rules.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/xml/data_extraction_rules.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/layout_fragment_settings.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/layout/fragment_settings.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/layout_activity_onboarding.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/layout/activity_onboarding.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/drawable_bottom_nav_selector.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/drawable/bottom_nav_selector.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/drawable_ic_bg.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/drawable/ic_bg.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/layout_fragment_connect.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/layout/fragment_connect.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/layout_marker_view.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/layout/marker_view.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/layout_item_record.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/layout/item_record.xml"
+    },
+    {
+        "merged": "com.xinji.heartbeat.app-merged_res-35:/layout_fragment_settings.xml.flat",
+        "source": "com.xinji.heartbeat.app-main-37:/layout/fragment_settings.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/layout_activity_main.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/layout/activity_main.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/drawable_ic_launcher_background.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/drawable/ic_launcher_background.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/layout_item_ble_device.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/layout/item_ble_device.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/xml_backup_rules.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/xml/backup_rules.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/xml_file_paths.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/xml/file_paths.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/layout_fragment_game_mode.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/layout/fragment_game_mode.xml"
+    },
+    {
+        "merged": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-merged_res-35:/menu_bottom_nav_menu.xml.flat",
+        "source": "/data/data/com.itsaky.androidide/files/home/.gradle/daemon/7.4.2/com.xinji.heartbeat.app-main-37:/menu/bottom_nav_menu.xml"
+    },
+    {
+        "merged": "com.xinji.heartbeat.app-merged_res-35:/layout_activity_broadcast.xml.flat",
+        "source": "com.xinji.heartbeat.app-main-37:/layout/activity_broadcast.xml"
+    }
+]

@@ -1,0 +1,460 @@
+-- Merging decision tree log ---
+provider#androidx.core.content.FileProvider
+INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:84:11-92:22
+	android:grantUriPermissions
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:88:15-49
+	android:authorities
+		INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:86:15-66
+	android:exported
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:87:15-39
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:85:15-64
+manifest
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:2:2-94:13
+INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:2:2-94:13
+INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:2:2-94:13
+INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:2:2-94:13
+MERGED from [androidx.core:core-splashscreen:1.0.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/b45aa24339f339229717e274817a649b/transformed/core-splashscreen-1.0.1/AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.android.material:material:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/04f863115df0ad8341ba5049dcc75c8a/transformed/material-1.9.0/AndroidManifest.xml:17:1-26:12
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e29f5179c0244829cb7996c62a830fa5/transformed/constraintlayout-2.1.4/AndroidManifest.xml:2:1-11:12
+MERGED from [androidx.appcompat:appcompat-resources:1.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/7de87b085bc11e4cbb21339b76ec6b5f/transformed/appcompat-resources-1.6.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.appcompat:appcompat:1.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/ac102ed266376a0d5b2d29238d5fba2d/transformed/appcompat-1.6.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/2d886ed1486d10d6c5b22ae420d04018/transformed/viewpager2-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.fragment:fragment:1.6.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/eefffb0fd420e0d0c74bfa98fcc762e1/transformed/fragment-1.6.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.recyclerview:recyclerview:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/8506309682aa5cd23f1b9a39bf69d46b/transformed/recyclerview-1.3.0/AndroidManifest.xml:17:1-22:12
+MERGED from [com.github.PhilJay:MPAndroidChart:v3.1.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/3cc0f8c2407be9a7df109169f398960f/transformed/MPAndroidChart-v3.1.0/AndroidManifest.xml:2:1-20:12
+MERGED from [androidx.activity:activity:1.6.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/ac0fedb9352030e087e51334d3bd9d13/transformed/activity-1.6.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.emoji2:emoji2-views-helper:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/5b83c71853f959a0f5bde99cc5fed89a/transformed/emoji2-views-helper-1.2.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.drawerlayout:drawerlayout:1.1.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/24e681712a16931a1ea490ec31174cca/transformed/drawerlayout-1.1.1/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/352e0f34408fc294699694ba5594cdfd/transformed/coordinatorlayout-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/8d7654e3db21228ee134f290f9faeb72/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.transition:transition:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e8f52804058f75fd0494319843d1b212/transformed/transition-1.2.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/09ce7da5807edd3d3b863acbf1cab37b/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e5dd1c6bebe479e70a9dd8d2f9f87ca6/transformed/vectordrawable-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e1d3a6124a73fb5d5a1d65f1cbb242c6/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.loader:loader:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/cc6fb0d4a4510e5e4b7cafce31232305/transformed/loader-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/76705a06ad1f6584d31397b47718584d/transformed/viewpager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.savedstate:savedstate:1.2.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/4e7d362e054bb3492f2538b00cc0864c/transformed/savedstate-1.2.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/cc5f795c1087b60cb875b7abf4145d09/transformed/lifecycle-livedata-2.6.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/aea0abc86b4400ea6a2f99baabc238c6/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1debc88a600daa5787e515ba279bd8aa/transformed/lifecycle-livedata-core-2.6.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/513e0456e8ac143341ac8520a9660ea1/transformed/lifecycle-viewmodel-2.6.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/2a445a85c6b5e0c244947ed02468e367/transformed/lifecycle-runtime-2.6.1/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/4e4bafccad79594e86040b9e56f05bcf/transformed/lifecycle-viewmodel-savedstate-2.6.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/800bd98b681b10f5923b17a260820cf0/transformed/customview-poolingcontainer-1.0.0/AndroidManifest.xml:17:1-23:12
+MERGED from [androidx.core:core-ktx:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/3b20ac67c1bb28664b85ce203b08c064/transformed/core-ktx-1.9.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.customview:customview:1.1.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/3f55fcf5b26aa62ffc2bfe8daf91cebe/transformed/customview-1.1.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:17:1-30:12
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/270979e214c44b7e429876e2c5f24968/transformed/cursoradapter-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.cardview:cardview:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/c7d44896594ea479f1e23e0cd11aeb8b/transformed/cardview-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/cde915856dfaefa7c7e23071dba0ea94/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:17:1-55:12
+MERGED from [androidx.startup:startup-runtime:1.1.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/afbc17d3e3c6465b5c5834cc1fcfe041/transformed/startup-runtime-1.1.1/AndroidManifest.xml:17:1-33:12
+MERGED from [androidx.tracing:tracing:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/78082d39aaed3933880f9c77fa1c124f/transformed/tracing-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/69a2f218e2b0d9df3336b80d7515c0ea/transformed/core-runtime-2.2.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/aa844372806d76a4f987ca2a86310756/transformed/interpolator-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.documentfile:documentfile:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/a12d4c9d62484124989797fe011e3244/transformed/documentfile-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/441d8f0d6f91f611b31714689c9bea9f/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.print:print:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/2a026ed8be82e8732303e1830d82b24e/transformed/print-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.annotation:annotation-experimental:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/51f793e3f0280f15a74a35972d9c9417/transformed/annotation-experimental-1.3.0/AndroidManifest.xml:17:1-22:12
+INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:2:2-94:13
+INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:2:2-94:13
+INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:2:2-94:13
+	package
+		INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:2:2-94:13
+		INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:2:2-94:13
+		INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml
+	xmlns:tools
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:3:6-52
+	android:versionCode
+		INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:2:2-94:13
+		INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:2:12-70
+uses-permission#android.permission.QUERY_ALL_PACKAGES
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:6:6-7:54
+	tools:ignore
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:7:10-51
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:6:23-75
+uses-permission#android.permission.BLUETOOTH
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:9:6-69
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:9:23-66
+uses-permission#android.permission.BLUETOOTH_ADMIN
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:10:6-75
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:10:23-72
+uses-permission#android.permission.ACCESS_FINE_LOCATION
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:11:6-80
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:11:23-77
+uses-permission#android.permission.BLUETOOTH_SCAN
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:12:6-74
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:12:23-71
+uses-permission#android.permission.BLUETOOTH_CONNECT
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:13:6-77
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:13:23-74
+uses-permission#android.permission.SYSTEM_ALERT_WINDOW
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:14:6-79
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:14:23-76
+uses-permission#android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:15:6-96
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:15:23-93
+uses-permission#android.permission.POST_NOTIFICATIONS
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:16:6-78
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:16:23-75
+uses-permission#android.permission.FOREGROUND_SERVICE
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:17:6-78
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:17:23-75
+uses-permission#android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:18:6-95
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:18:23-92
+uses-permission#android.permission.FOREGROUND_SERVICE_DATA_SYNC
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:19:6-88
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:19:23-85
+uses-permission#android.permission.PACKAGE_USAGE_STATS
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:20:6-79
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:20:23-76
+uses-permission#android.permission.INTERNET
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:21:6-68
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:21:23-65
+uses-permission#android.permission.ACCESS_BACKGROUND_LOCATION
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:23:6-86
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:23:23-83
+uses-permission#android.permission.BLUETOOTH_PRIVILEGED
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:25:6-80
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:25:23-77
+uses-permission#android.permission.RECEIVE_BOOT_COMPLETED
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:27:6-82
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:27:23-79
+application
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:29:5-93:21
+MERGED from [com.google.android.material:material:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/04f863115df0ad8341ba5049dcc75c8a/transformed/material-1.9.0/AndroidManifest.xml:24:5-20
+MERGED from [com.google.android.material:material:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/04f863115df0ad8341ba5049dcc75c8a/transformed/material-1.9.0/AndroidManifest.xml:24:5-20
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e29f5179c0244829cb7996c62a830fa5/transformed/constraintlayout-2.1.4/AndroidManifest.xml:9:5-20
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e29f5179c0244829cb7996c62a830fa5/transformed/constraintlayout-2.1.4/AndroidManifest.xml:9:5-20
+MERGED from [androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/aea0abc86b4400ea6a2f99baabc238c6/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/aea0abc86b4400ea6a2f99baabc238c6/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:28:5-89
+MERGED from [androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:28:5-89
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/cde915856dfaefa7c7e23071dba0ea94/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/cde915856dfaefa7c7e23071dba0ea94/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/afbc17d3e3c6465b5c5834cc1fcfe041/transformed/startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/afbc17d3e3c6465b5c5834cc1fcfe041/transformed/startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:28:18-86
+	android:supportsRtl
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:35:10-36
+	android:label
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:33:10-28
+	tools:ignore
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:37:10-77
+	android:roundIcon
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:32:10-51
+	android:persistent
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:36:10-36
+	android:icon
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:31:10-46
+	android:allowBackup
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:30:10-36
+	android:theme
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:34:10-51
+activity#com.xinji.heartbeat.OnboardingActivity
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:39:1-47:22
+	android:exported
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:41:15-38
+	android:theme
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:42:15-49
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:40:15-49
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:43:15-46:31
+action#android.intent.action.MAIN
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:44:19-71
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:44:27-68
+category#android.intent.category.LAUNCHER
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:45:19-79
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:45:29-76
+activity#com.xinji.heartbeat.SplashActivity
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:48:11-51:52
+	android:exported
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:50:15-39
+	android:theme
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:51:15-49
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:49:15-45
+activity#com.xinji.heartbeat.MainActivity
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:53:1-59:21
+	android:launchMode
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:56:15-45
+	android:exported
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:55:15-39
+	android:configChanges
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:57:15-87
+	android:theme
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:58:15-46
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:54:15-43
+service#com.xinji.heartbeat.core.GameModeService
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:61:1-65:75
+	android:enabled
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:63:16-38
+	android:exported
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:64:16-40
+	android:foregroundServiceType
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:65:16-72
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:62:16-52
+service#com.xinji.heartbeat.core.HeartRateService
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:67:11-71:75
+	android:enabled
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:69:16-38
+	android:exported
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:70:16-40
+	android:foregroundServiceType
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:71:16-72
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:68:16-53
+activity#com.xinji.heartbeat.GameRecordsActivity
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:73:11-76:49
+	android:exported
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:75:15-39
+	android:theme
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:76:15-46
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:74:15-50
+activity#com.xinji.heartbeat.BroadcastActivity
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:78:11-82:54
+	android:screenOrientation
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:82:15-51
+	android:exported
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:80:15-39
+	android:theme
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:81:15-46
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:79:15-48
+uses-sdk
+INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml
+INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml
+MERGED from [androidx.core:core-splashscreen:1.0.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/b45aa24339f339229717e274817a649b/transformed/core-splashscreen-1.0.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core-splashscreen:1.0.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/b45aa24339f339229717e274817a649b/transformed/core-splashscreen-1.0.1/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.material:material:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/04f863115df0ad8341ba5049dcc75c8a/transformed/material-1.9.0/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.android.material:material:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/04f863115df0ad8341ba5049dcc75c8a/transformed/material-1.9.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e29f5179c0244829cb7996c62a830fa5/transformed/constraintlayout-2.1.4/AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e29f5179c0244829cb7996c62a830fa5/transformed/constraintlayout-2.1.4/AndroidManifest.xml:5:5-7:41
+MERGED from [androidx.appcompat:appcompat-resources:1.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/7de87b085bc11e4cbb21339b76ec6b5f/transformed/appcompat-resources-1.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.appcompat:appcompat-resources:1.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/7de87b085bc11e4cbb21339b76ec6b5f/transformed/appcompat-resources-1.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.appcompat:appcompat:1.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/ac102ed266376a0d5b2d29238d5fba2d/transformed/appcompat-1.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.appcompat:appcompat:1.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/ac102ed266376a0d5b2d29238d5fba2d/transformed/appcompat-1.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/2d886ed1486d10d6c5b22ae420d04018/transformed/viewpager2-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.viewpager2:viewpager2:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/2d886ed1486d10d6c5b22ae420d04018/transformed/viewpager2-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.fragment:fragment:1.6.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/eefffb0fd420e0d0c74bfa98fcc762e1/transformed/fragment-1.6.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.fragment:fragment:1.6.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/eefffb0fd420e0d0c74bfa98fcc762e1/transformed/fragment-1.6.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.recyclerview:recyclerview:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/8506309682aa5cd23f1b9a39bf69d46b/transformed/recyclerview-1.3.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.recyclerview:recyclerview:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/8506309682aa5cd23f1b9a39bf69d46b/transformed/recyclerview-1.3.0/AndroidManifest.xml:20:5-44
+MERGED from [com.github.PhilJay:MPAndroidChart:v3.1.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/3cc0f8c2407be9a7df109169f398960f/transformed/MPAndroidChart-v3.1.0/AndroidManifest.xml:16:5-18:41
+MERGED from [com.github.PhilJay:MPAndroidChart:v3.1.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/3cc0f8c2407be9a7df109169f398960f/transformed/MPAndroidChart-v3.1.0/AndroidManifest.xml:16:5-18:41
+MERGED from [androidx.activity:activity:1.6.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/ac0fedb9352030e087e51334d3bd9d13/transformed/activity-1.6.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity:1.6.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/ac0fedb9352030e087e51334d3bd9d13/transformed/activity-1.6.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.emoji2:emoji2-views-helper:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/5b83c71853f959a0f5bde99cc5fed89a/transformed/emoji2-views-helper-1.2.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.emoji2:emoji2-views-helper:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/5b83c71853f959a0f5bde99cc5fed89a/transformed/emoji2-views-helper-1.2.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.drawerlayout:drawerlayout:1.1.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/24e681712a16931a1ea490ec31174cca/transformed/drawerlayout-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.drawerlayout:drawerlayout:1.1.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/24e681712a16931a1ea490ec31174cca/transformed/drawerlayout-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/352e0f34408fc294699694ba5594cdfd/transformed/coordinatorlayout-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.1.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/352e0f34408fc294699694ba5594cdfd/transformed/coordinatorlayout-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/8d7654e3db21228ee134f290f9faeb72/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.dynamicanimation:dynamicanimation:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/8d7654e3db21228ee134f290f9faeb72/transformed/dynamicanimation-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.transition:transition:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e8f52804058f75fd0494319843d1b212/transformed/transition-1.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.transition:transition:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e8f52804058f75fd0494319843d1b212/transformed/transition-1.2.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/09ce7da5807edd3d3b863acbf1cab37b/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/09ce7da5807edd3d3b863acbf1cab37b/transformed/vectordrawable-animated-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e5dd1c6bebe479e70a9dd8d2f9f87ca6/transformed/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e5dd1c6bebe479e70a9dd8d2f9f87ca6/transformed/vectordrawable-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e1d3a6124a73fb5d5a1d65f1cbb242c6/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e1d3a6124a73fb5d5a1d65f1cbb242c6/transformed/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/cc6fb0d4a4510e5e4b7cafce31232305/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/cc6fb0d4a4510e5e4b7cafce31232305/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/76705a06ad1f6584d31397b47718584d/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/76705a06ad1f6584d31397b47718584d/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/4e7d362e054bb3492f2538b00cc0864c/transformed/savedstate-1.2.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/4e7d362e054bb3492f2538b00cc0864c/transformed/savedstate-1.2.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/cc5f795c1087b60cb875b7abf4145d09/transformed/lifecycle-livedata-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/cc5f795c1087b60cb875b7abf4145d09/transformed/lifecycle-livedata-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/aea0abc86b4400ea6a2f99baabc238c6/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/aea0abc86b4400ea6a2f99baabc238c6/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1debc88a600daa5787e515ba279bd8aa/transformed/lifecycle-livedata-core-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1debc88a600daa5787e515ba279bd8aa/transformed/lifecycle-livedata-core-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/513e0456e8ac143341ac8520a9660ea1/transformed/lifecycle-viewmodel-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/513e0456e8ac143341ac8520a9660ea1/transformed/lifecycle-viewmodel-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/2a445a85c6b5e0c244947ed02468e367/transformed/lifecycle-runtime-2.6.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/2a445a85c6b5e0c244947ed02468e367/transformed/lifecycle-runtime-2.6.1/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/4e4bafccad79594e86040b9e56f05bcf/transformed/lifecycle-viewmodel-savedstate-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/4e4bafccad79594e86040b9e56f05bcf/transformed/lifecycle-viewmodel-savedstate-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/800bd98b681b10f5923b17a260820cf0/transformed/customview-poolingcontainer-1.0.0/AndroidManifest.xml:20:5-21:38
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/800bd98b681b10f5923b17a260820cf0/transformed/customview-poolingcontainer-1.0.0/AndroidManifest.xml:20:5-21:38
+MERGED from [androidx.core:core-ktx:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/3b20ac67c1bb28664b85ce203b08c064/transformed/core-ktx-1.9.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-ktx:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/3b20ac67c1bb28664b85ce203b08c064/transformed/core-ktx-1.9.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.customview:customview:1.1.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/3f55fcf5b26aa62ffc2bfe8daf91cebe/transformed/customview-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.customview:customview:1.1.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/3f55fcf5b26aa62ffc2bfe8daf91cebe/transformed/customview-1.1.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/270979e214c44b7e429876e2c5f24968/transformed/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/270979e214c44b7e429876e2c5f24968/transformed/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cardview:cardview:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/c7d44896594ea479f1e23e0cd11aeb8b/transformed/cardview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cardview:cardview:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/c7d44896594ea479f1e23e0cd11aeb8b/transformed/cardview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/cde915856dfaefa7c7e23071dba0ea94/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/cde915856dfaefa7c7e23071dba0ea94/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.startup:startup-runtime:1.1.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/afbc17d3e3c6465b5c5834cc1fcfe041/transformed/startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.startup:startup-runtime:1.1.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/afbc17d3e3c6465b5c5834cc1fcfe041/transformed/startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.tracing:tracing:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/78082d39aaed3933880f9c77fa1c124f/transformed/tracing-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.tracing:tracing:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/78082d39aaed3933880f9c77fa1c124f/transformed/tracing-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/69a2f218e2b0d9df3336b80d7515c0ea/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/69a2f218e2b0d9df3336b80d7515c0ea/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/aa844372806d76a4f987ca2a86310756/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/aa844372806d76a4f987ca2a86310756/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/a12d4c9d62484124989797fe011e3244/transformed/documentfile-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/a12d4c9d62484124989797fe011e3244/transformed/documentfile-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/441d8f0d6f91f611b31714689c9bea9f/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/441d8f0d6f91f611b31714689c9bea9f/transformed/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/2a026ed8be82e8732303e1830d82b24e/transformed/print-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/2a026ed8be82e8732303e1830d82b24e/transformed/print-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/51f793e3f0280f15a74a35972d9c9417/transformed/annotation-experimental-1.3.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/51f793e3f0280f15a74a35972d9c9417/transformed/annotation-experimental-1.3.0/AndroidManifest.xml:20:5-44
+INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml
+INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml
+		INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml
+		INJECTED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml
+meta-data#android.support.FILE_PROVIDER_PATHS
+ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:89:15-91:56
+	android:resource
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:91:19-53
+	android:name
+		ADDED from /storage/emulated/0/AndroidIDEProjects/Heart/app/src/main/AndroidManifest.xml:90:19-69
+provider#androidx.startup.InitializationProvider
+ADDED from [androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/aea0abc86b4400ea6a2f99baabc238c6/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/aea0abc86b4400ea6a2f99baabc238c6/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.startup:startup-runtime:1.1.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/afbc17d3e3c6465b5c5834cc1fcfe041/transformed/startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+MERGED from [androidx.startup:startup-runtime:1.1.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/afbc17d3e3c6465b5c5834cc1fcfe041/transformed/startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+	tools:node
+		ADDED from [androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:28:13-31
+	android:authorities
+		ADDED from [androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:26:13-68
+	android:exported
+		ADDED from [androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:27:13-37
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:25:13-67
+meta-data#androidx.emoji2.text.EmojiCompatInitializer
+ADDED from [androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.2.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/1d84b29accd3eb08bef5d91b6fb34d06/transformed/emoji2-1.2.0/AndroidManifest.xml:30:17-75
+meta-data#androidx.lifecycle.ProcessLifecycleInitializer
+ADDED from [androidx.lifecycle:lifecycle-process:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/aea0abc86b4400ea6a2f99baabc238c6/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.lifecycle:lifecycle-process:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/aea0abc86b4400ea6a2f99baabc238c6/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.lifecycle:lifecycle-process:2.6.1] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/aea0abc86b4400ea6a2f99baabc238c6/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:30:17-78
+permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:23:9-81
+permission#com.xinji.heartbeat.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:23:9-81
+uses-permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:26:22-94
+uses-permission#com.xinji.heartbeat.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.9.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/e16760dd5f6393e122b0e9feaf4bbd32/transformed/core-1.9.0/AndroidManifest.xml:26:22-94
+meta-data#androidx.profileinstaller.ProfileInstallerInitializer
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:30:17-85
+receiver#androidx.profileinstaller.ProfileInstallReceiver
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:34:9-52:20
+	android:enabled
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:38:13-36
+	android:permission
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:39:13-57
+	android:directBootAware
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:36:13-44
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:35:13-76
+intent-filter#action:name:androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:40:13-42:29
+action#androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:17-91
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:25-88
+intent-filter#action:name:androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:43:13-45:29
+action#androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:17-85
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:25-82
+intent-filter#action:name:androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:46:13-48:29
+action#androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:17-88
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:25-85
+intent-filter#action:name:androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:49:13-51:29
+action#androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:17-95
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /data/data/com.itsaky.androidide/files/home/.gradle/caches/transforms-3/07cf9a75bd59ba484a9feddd2809c986/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:25-92

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>心迹 - 电脑悬浮窗</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
+  body {
+    width:100vw; height:100vh; overflow:hidden;
+    font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    background: transparent !important;
+    display:flex; align-items:center; justify-content:center;
+  }
+  
+  .float-window {
+    position:fixed;
+    top:20px; right:20px;
+    cursor:grab;
+    z-index:9999;
+    display:flex; flex-direction:column; align-items:center;
+    gap:4px; padding:10px 16px;
+    background: rgba(12,12,16,0.7);
+    backdrop-filter: blur(16px);
+    border-radius: 16px;
+    border: 1px solid rgba(255,93,124,0.25);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    transition: box-shadow 0.2s;
+    pointer-events: auto;
+  }
+  .float-window:hover {
+    box-shadow: 0 6px 28px rgba(0,0,0,0.6);
+  }
+  .float-window:active { cursor:grabbing; }
+  
+  .float-window.transparent-mode {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+
+  .float-window.locked {
+    pointer-events: none;
+  }
+  .float-window.locked .lock-area {
+    display: none;
+  }
+  .float-window.locked:hover .lock-area {
+    display: flex;
+  }
+  .float-window.locked:hover {
+    pointer-events: auto;
+  }
+  
+  .lock-area {
+    display: none;
+    position: absolute;
+    top: -8px; right: -8px;
+    gap: 4px;
+    z-index: 10000;
+  }
+  .float-window:hover .lock-area {
+    display: flex;
+  }
+  .lock-btn {
+    background: rgba(12,12,16,0.85);
+    border: 1px solid rgba(255,93,124,0.4);
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 10px;
+    color: #ffb0bd;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: all 0.15s;
+    line-height: 1.4;
+    pointer-events: auto;
+  }
+  .lock-btn:hover {
+    background: rgba(255,93,124,0.3);
+    border-color: #ff8aa0;
+  }
+  
+  .float-window.disconnected {
+    opacity: 0.5;
+    filter: grayscale(1);
+  }
+  .float-window.disconnected::after {
+    content: '⚠ 离线';
+    position: absolute;
+    top: -6px; right: -6px;
+    background: rgba(255,50,50,0.9);
+    color: white;
+    font-size: 9px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    pointer-events: none;
+  }
+  .float-window.transparent-mode.disconnected::after {
+    top: 2px; right: 2px;
+  }
+  
+  .hr-row {
+    display:flex; align-items:baseline; gap:4px;
+  }
+  .hr-number {
+    font-size: 2.6rem; font-weight:700;
+    font-family: 'Inter', 'SF Mono', monospace;
+    color: #ff5d7c;
+    text-shadow: 0 0 14px rgba(255,60,100,0.5);
+    line-height:1; letter-spacing:-1px;
+  }
+  .hr-unit {
+    font-size: 0.8rem; color:#ffb0bd; font-weight:500;
+  }
+  .device-bar {
+    display:flex; align-items:center; gap:6px;
+    margin-top:1px;
+  }
+  .pulse-dot {
+    width:6px; height:6px; border-radius:50%;
+    background:#f44b6e;
+    box-shadow: 0 0 6px #ff3e64;
+    transition: transform 0.1s cubic-bezier(0.2,1.3,0.8,1);
+  }
+  .pulse-dot.beat { transform: scale(1.8); }
+  .pulse-dot.disconnected { background:#444; box-shadow:none; }
+  .device-name {
+    font-size:0.6rem; color:#998088;
+  }
+  .disconnected .hr-number { color:#665c62; text-shadow:none; }
+  .disconnected .pulse-dot { background:#444; box-shadow:none; }
+  /* 5秒无数据警告闪烁 */
+  @keyframes pulse-warn {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .stale-data .hr-number {
+    animation: pulse-warn 1s ease-in-out infinite;
+    color: #ffaa00;
+    text-shadow: 0 0 14px rgba(255,170,0,0.5);
+  }
+</style>
+</head>
+<body>
+<div class="float-window" id="floatWindow">
+  <div class="lock-area" id="lockArea">
+    <button class="lock-btn" id="lockBtn">🔒 锁定</button>
+  </div>
+  <div class="hr-row">
+    <span class="hr-number" id="hrValue">--</span>
+    <span class="hr-unit">BPM</span>
+  </div>
+  <div class="device-bar">
+    <div class="pulse-dot" id="pulseDot"></div>
+    <span class="device-name" id="deviceName">等待连接...</span>
+  </div>
+</div>
+<script>
+  // URL 参数
+  (function(){
+    var params = new URLSearchParams(location.search);
+    if (params.has('transparent') && (params.get('transparent') === '1' || params.get('transparent') === 'true')) {
+      document.getElementById('floatWindow').classList.add('transparent-mode');
+    }
+  })();
+
+  // 拖拽功能 — 修复：用 absolute 定位替代 offsetLeft/Top，避免与外层 position 冲突
+  var floatWin = document.getElementById('floatWindow');
+  var isDragging = false, startX, startY, origX, origY;
+  var isLocked = false;
+  
+  // 锁定/解锁按钮
+  document.getElementById('lockBtn').onclick = function(e) {
+    e.stopPropagation();
+    isLocked = !isLocked;
+    if (isLocked) {
+      floatWin.classList.add('locked');
+      document.getElementById('lockBtn').innerText = '🔓 解锁';
+    } else {
+      floatWin.classList.remove('locked');
+      document.getElementById('lockBtn').innerText = '🔒 锁定';
+    }
+  };
+  
+  // 初始化：如果已有 left 样式则用 left，否则保持 right
+  floatWin.style.left = 'auto';
+  
+  floatWin.addEventListener('mousedown', function(e) {
+    isDragging = true;
+    startX = e.clientX; startY = e.clientY;
+    // 获取当前实际位置
+    var rect = floatWin.getBoundingClientRect();
+    origX = rect.left; origY = rect.top;
+    // 切换到 left 定位
+    floatWin.style.left = origX + 'px';
+    floatWin.style.right = 'auto';
+    floatWin.style.top = origY + 'px';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e) {
+    if (!isDragging) return;
+    floatWin.style.left = (origX + e.clientX - startX) + 'px';
+    floatWin.style.top = (origY + e.clientY - startY) + 'px';
+  });
+  document.addEventListener('mouseup', function() { isDragging = false; });
+
+  // SSE + Fallback 轮询 — 修复：自适应重连间隔
+  var evtSource = null;
+  var pollingTimer = null;
+  var connectionActive = false;
+  var staleTimer = null;
+  var lastUpdateTime = 0;
+  var reconnectAttempts = 0;
+
+  function connectSSE() {
+    if (evtSource) { evtSource.close(); evtSource = null; }
+    if (!window.EventSource) { startPolling(); return; }
+    evtSource = new EventSource('/');
+    evtSource.onmessage = function(e) {
+      connectionActive = true;
+      reconnectAttempts = 0;
+      try { updateDisplay(JSON.parse(e.data)); } catch(err) {}
+    };
+    evtSource.onerror = function() {
+      connectionActive = false;
+      if (evtSource) { evtSource.close(); evtSource = null; }
+      reconnectAttempts++;
+      // 自适应重连：首次2秒，之后逐步延长到最多10秒
+      var delay = Math.min(2000 + reconnectAttempts * 1000, 10000);
+      setTimeout(connectSSE, delay);
+    };
+  }
+
+  function startPolling() {
+    if (pollingTimer) clearInterval(pollingTimer);
+    pollingTimer = setInterval(function() {
+      fetch('/api/hr').then(function(r){ return r.json(); }).then(updateDisplay).catch(function(){});
+    }, 1000);
+  }
+
+  function updateDisplay(data) {
+    var el = document.getElementById('hrValue');
+    var win = document.getElementById('floatWindow');
+    var dot = document.getElementById('pulseDot');
+    var nameEl = document.getElementById('deviceName');
+
+    lastUpdateTime = Date.now();
+
+    if (data.connected && data.hr > 30 && data.hr < 220) {
+      el.innerText = data.hr;
+      win.classList.remove('disconnected', 'stale-data');
+      dot.classList.remove('disconnected');
+      dot.classList.remove('beat');
+      void dot.offsetWidth;
+      dot.classList.add('beat');
+      setTimeout(function(){ dot.classList.remove('beat'); }, 200);
+    } else {
+      el.innerText = '--';
+      win.classList.add('disconnected');
+      win.classList.remove('stale-data');
+      dot.classList.add('disconnected');
+    }
+    nameEl.innerText = data.device || '等待连接...';
+  }
+
+  // 5秒无更新 → stale 警告，15秒无更新 → 强制刷新
+  setInterval(function() {
+    var elapsed = Date.now() - lastUpdateTime;
+    if (connectionActive && elapsed > 5000) {
+      document.getElementById('floatWindow').classList.add('stale-data');
+    }
+    // 超过15秒无数据，强制刷新SSE连接
+    if (elapsed > 15000) {
+      document.getElementById('floatWindow').classList.add('stale-data');
+      if (evtSource) { evtSource.close(); evtSource = null; }
+      connectSSE();
+    }
+  }, 1000);
+
+  connectSSE();
+</script>
+</body>
+</html>

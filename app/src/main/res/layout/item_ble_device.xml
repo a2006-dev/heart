@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="#1A141216"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:layout_marginBottom="2dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <!-- 设备图标 -->
+    <TextView
+        android:id="@+id/tvDeviceIcon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:gravity="center"
+        android:text="⌚"
+        android:textSize="16sp"/>
+
+    <!-- 设备名称和地址 -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginStart="10dp">
+        <TextView
+            android:id="@+id/tvDevName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#e2c2cf"
+            android:textSize="14sp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="未知设备"/>
+        <TextView
+            android:id="@+id/tvDevAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#675c62"
+            android:textSize="10sp"
+            android:typeface="monospace"
+            android:text="00:00:00:00:00:00"/>
+    </LinearLayout>
+
+    <!-- 信号强度 -->
+    <TextView
+        android:id="@+id/tvDevRssi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#ff5d7c"
+        android:textSize="14sp"
+        android:typeface="monospace"
+        android:text="--/--📶"
+        android:layout_marginEnd="2dp"/>
+
+    <!-- "⋮" 服务UUID详情按钮（广义搜索模式下可见） -->
+    <TextView
+        android:id="@+id/btnServiceDetail"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:gravity="center"
+        android:text="⋮"
+        android:textColor="#675c62"
+        android:textSize="20sp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:visibility="gone"/>
+
+</LinearLayout>

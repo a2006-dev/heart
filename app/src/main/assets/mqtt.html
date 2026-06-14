@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>MQTT接收</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js"></script>
+    <style>
+        body{font-family:monospace;padding:15px;background:#1e1e1e;color:#ccc}
+        input{width:100%;padding:8px;margin:5px 0;box-sizing:border-box;background:#333;color:#fff;border:1px solid #555}
+        button{padding:10px 20px;background:#0a84ff;border:none;color:#fff;cursor:pointer}
+        #log{margin-top:15px;white-space:pre-wrap;background:#111;color:#0f0;padding:10px;height:300px;overflow-y:auto}
+        .hint{color:#ff0}
+        .info{color:#0af;margin:4px 0}
+    </style>
+</head>
+<body>
+    <input id="connStr" placeholder="粘贴连接码，如 HEARTBEAT#V1#...#heart/rate" value="HEARTBEAT#V1#N7TYKY8Q#broker-cn.emqx.io:1883#heart/rate"><br>
+    <button onclick="connect()">连接并接收</button> <span id="status"></span>
+    <div class="info" id="topicInfo"></div>
+    <div id="log"></div>
+
+    <script>
+        let client;
+
+        function log(msg) { 
+            const el = document.getElementById('log');
+            el.textContent += msg + '\n';
+            el.scrollTop = el.scrollHeight;
+        }
+
+        /**
+         * 解析连接码：
+         *   HEARTBEAT#V1#设备标识#host:port#topicBase
+         * 返回 { wsUrl, fullTopic }
+         */
+        function parseConnCode(raw) {
+            if (!raw.startsWith('HEARTBEAT#')) return null;
+            const body = raw.substring('HEARTBEAT#'.length);
+            const parts = body.split('#');
+            if (parts.length < 4) return null;
+            if (parts[0] !== 'V1') return null;
+
+            const tag = parts[1];
+            const hostPort = parts[2];
+            const topicBase = parts[3];
+
+            const colonIdx = hostPort.lastIndexOf(':');
+            if (colonIdx <= 0) return null;
+            const host = hostPort.substring(0, colonIdx);
+            const port = hostPort.substring(colonIdx + 1);
+
+            // 构造完整 topic（末尾加上设备标识）
+            let fullTopic = topicBase;
+            if (!fullTopic.endsWith('/' + tag)) fullTopic = fullTopic + '/' + tag;
+
+            // 确定 WebSocket 地址
+            let wsUrl;
+            if (port === '1883') wsUrl = `ws://${host}:8083/mqtt`;
+            else if (port === '8883') wsUrl = `wss://${host}:8084/mqtt`;
+            else wsUrl = `ws://${host}:${port}/mqtt`;
+
+            return { wsUrl, fullTopic, tag, host, port };
+        }
+
+        function connect() {
+            const raw = document.getElementById('connStr').value.trim();
+            if (!raw) return;
+
+            const info = parseConnCode(raw);
+            if (!info) { log('❌ 无法解析连接码，格式: HEARTBEAT#V1#标识#host:port#topic'); return; }
+
+            // 订阅通配符（匹配所有子设备的心率）
+            const subTopic = info.fullTopic.substring(0, info.fullTopic.lastIndexOf('/')) + '/+';
+
+            document.getElementById('log').textContent = '';
+            document.getElementById('topicInfo').textContent = '🔔 订阅: ' + subTopic;
+
+            log('🔗 WebSocket: ' + info.wsUrl);
+            log('📡 完整Topic: ' + info.fullTopic);
+            log('🔔 订阅: ' + subTopic);
+            log('连接中...');
+
+            if (client && client.isConnected()) {
+                client.disconnect();
+            }
+
+            client = new Paho.MQTT.Client(info.wsUrl, 'r_' + Math.random().toString(16).slice(2, 8));
+            
+            client.onConnectionLost = (resp) => {
+                log('⚠️ 连接断开' + (resp.errorMessage ? ': ' + resp.errorMessage : ''));
+                document.getElementById('status').textContent = '断开';
+            };
+            
+            client.onMessageArrived = (msg) => {
+                log(`📩 [${msg.destinationName}] ${msg.payloadString}`);
+            };
+
+            client.connect({
+                onSuccess: () => {
+                    log('✅ 已连接！');
+                    document.getElementById('status').textContent = '已连接';
+                    
+                    client.subscribe(subTopic, {
+                        onSuccess: () => {
+                            log('✅ 已订阅 ' + subTopic);
+                            log('等待数据中...');
+                        },
+                        onFailure: (err) => {
+                            log('❌ 订阅失败: ' + err.errorMessage);
+                            // 备用：尝试订阅具体 topic
+                            log('尝试订阅具体 topic: ' + info.fullTopic);
+                            client.subscribe(info.fullTopic, {
+                                onSuccess: () => log('✅ 已订阅 ' + info.fullTopic),
+                                onFailure: (e) => log('❌ 也失败了: ' + e.errorMessage)
+                            });
+                        }
+                    });
+                },
+                onFailure: (err) => {
+                    log('❌ 连接失败: ' + err.errorMessage);
+                    document.getElementById('status').textContent = '失败';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

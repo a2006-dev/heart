@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="positions">
+        <item>左上角</item>
+        <item>右上角</item>
+        <item>左下角</item>
+        <item>右下角</item>
+    </string-array>
+    <string name="app_name">心迹</string>
+    <string name="app_version">v2.3</string>
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">#0c0c10</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
+         <item name="android:windowFullscreen">true</item>
+         <item name="android:windowBackground">#0c0c10</item>
+         <item name="android:statusBarColor">#0c0c10</item>
+         <item name="android:navigationBarColor">#0c0c10</item>
+     </style>
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+         <item name="windowSplashScreenBackground">#0c0c10</item>
+         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher</item>
+         <item name="postSplashScreenTheme">@style/AppTheme</item>
+     </style>
+</resources>

@@ -1,0 +1,4 @@
+#Sun Jun 14 09:32:47 GMT 2026
+base.0=/storage/emulated/0/AndroidIDEProjects/Heart/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+renamed.0=classes.dex
+path.0=classes.dex
