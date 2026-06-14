@@ -1,0 +1,86 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.xinji.heartbeat'
+    compileSdk 34
+
+    configurations.all {
+        exclude module: 'kotlin-stdlib-jdk7'
+        exclude module: 'kotlin-stdlib-jdk8'
+    }
+
+    defaultConfig {
+        applicationId "com.xinji.heartbeat"
+        minSdk 24
+        targetSdk 34
+        versionCode 5
+        versionName "2.3"
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file("${System.getProperty('user.home')}/.android/debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+        // ❌ release 不再默认用 debug.keystore（严重安全风险）
+        // 如需发布 Release 版本，请按以下步骤：
+        // 1. 生成你自己的密钥：
+        //    keytool -genkey -v -keystore release.keystore -alias my-release-key -keyalg RSA -keysize 2048 -validity 10000
+        // 2. 将 release.keystore 放在项目根目录（不要提交到 Git）
+        // 3. 创建 app/release-signing.properties 文件，内容：
+        //    storeFile=../release.keystore
+        //    storePassword=你的密码
+        //    keyAlias=my-release-key
+        //    keyPassword=你的密码
+        // 4. 移除下方 release 签名的注释
+        /*
+        release {
+            def props = new Properties()
+            def propFile = file('release-signing.properties')
+            if (propFile.exists()) {
+                props.load(new FileInputStream(propFile))
+                storeFile file(props['storeFile'])
+                storePassword props['storePassword']
+                keyAlias props['keyAlias']
+                keyPassword props['keyPassword']
+            }
+        }
+        */
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            // ⚠️ 安全提醒：release 签名请见上方 signingConfigs.release 注释
+            // signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-splashscreen:1.0.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
+    implementation 'androidx.fragment:fragment:1.6.0'
+    implementation 'androidx.recyclerview:recyclerview:1.3.0'
+    
+    // MPAndroidChart 图表库
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+
+    // Eclipse Paho MQTT 客户端
+    implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5'
+
+}

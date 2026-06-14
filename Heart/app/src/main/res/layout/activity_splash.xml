@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/splashRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0c0c10">
+
+    <TextView
+        android:id="@+id/heartIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="40dp"
+        android:text="❤️"
+        android:textSize="56sp"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/textTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/heartIcon"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:text="心迹"
+        android:textColor="#ff5d7c"
+        android:textSize="42sp"
+        android:fontFamily="sans-serif-light"
+        android:alpha="0" />
+
+    <TextView
+        android:id="@+id/textSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textTitle"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="12dp"
+        android:text="感知每一次心跳"
+        android:textColor="#e2c2cf"
+        android:textSize="16sp"
+        android:alpha="0" />
+
+    <TextView
+        android:id="@+id/textVersion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="36dp"
+        android:text="@string/app_version"
+        android:textColor="#44ffffff"
+        android:textSize="12sp"
+        android:alpha="0" />
+
+</RelativeLayout>

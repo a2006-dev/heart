@@ -1,0 +1,30 @@
+# Gradle
+.gradle/
+build/
+local.properties
+*.iml
+
+# IDE
+.idea/
+.androidide/
+
+# Android
+app/build/
+app/release/
+*.apk
+*.aab
+
+# PC client
+pc_client/heart_client
+pc_client/heart_client.exe
+pc_client/heart_client_mac
+pc_client/heart_client_linux
+
+# Python
+*.pyc
+__pycache__/
+heart_device_profiles.json
+
+# Signing
+release.keystore
+release-signing.properties
