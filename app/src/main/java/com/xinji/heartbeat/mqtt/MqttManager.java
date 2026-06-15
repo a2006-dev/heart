@@ -162,13 +162,14 @@ public class MqttManager {
 
     /** 带设备标识的完整 Topic */
     public String getTaggedTopic() {
-        String tag = deviceTag != null ? deviceTag : "--------";
+        String tag = deviceTag;
+        if (tag == null) return topic; // 未初始化时只发基础 Topic，避免用占位符造成冲突
         if (topic.endsWith("/" + tag)) return topic;
         return topic + "/" + tag;
     }
 
     public static String getDeviceTagStatic() {
-        return deviceTag != null ? deviceTag : "--------";
+        return deviceTag != null ? deviceTag : "";
     }
 
     public boolean hasValidConfig() {

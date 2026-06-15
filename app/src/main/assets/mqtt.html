@@ -69,8 +69,8 @@
             const info = parseConnCode(raw);
             if (!info) { log('❌ 无法解析连接码，格式: HEARTBEAT#V1#标识#host:port#topic'); return; }
 
-            // 订阅通配符（匹配所有子设备的心率）
-            const subTopic = info.fullTopic.substring(0, info.fullTopic.lastIndexOf('/')) + '/+';
+            // 精确订阅，不通配符
+            const subTopic = info.fullTopic;
 
             document.getElementById('log').textContent = '';
             document.getElementById('topicInfo').textContent = '🔔 订阅: ' + subTopic;
@@ -92,6 +92,7 @@
             };
             
             client.onMessageArrived = (msg) => {
+                window._lastMsgTime = Date.now();
                 log(`📩 [${msg.destinationName}] ${msg.payloadString}`);
             };
 
@@ -104,6 +105,15 @@
                         onSuccess: () => {
                             log('✅ 已订阅 ' + subTopic);
                             log('等待数据中...');
+                            // 10秒超时检测
+                            setTimeout(() => {
+                                if (window._lastMsgTime === undefined) {
+                                    log('⏰ 10秒未收到数据，链接可能已过期');
+                                    log('💡 请重新复制手机端最新的连接码');
+                                    document.getElementById('status').textContent = '已过期';
+                                }
+                            }, 10000);
+                            window._lastMsgTime = undefined;
                         },
                         onFailure: (err) => {
                             log('❌ 订阅失败: ' + err.errorMessage);

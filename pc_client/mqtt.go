@@ -357,14 +357,9 @@ func startMQTT(broker, topic string) error {
 	}
 
 	client := NewMQTTClient(broker, fmt.Sprintf("heart_pc_%d", time.Now().UnixNano()))
-	// 提取前缀用于通配符匹配
-	topicPrefix := topic
-	if idx := strings.LastIndex(topicPrefix, "/"); idx >= 0 {
-		topicPrefix = topicPrefix[:idx] + "/"
-	}
 	client.SetCallback(func(t string, payload []byte) {
-		// 精确匹配 或 前缀匹配（兼容通配符订阅）
-		if t != topic && !strings.HasPrefix(t, topicPrefix) {
+		// 只允许精确匹配，不接收通配符数据
+		if t != topic {
 			return
 		}
 		var data HRData
@@ -378,7 +373,6 @@ func startMQTT(broker, topic string) error {
 			connected = data.Connected
 			mu.Unlock()
 			updateUIHR()
-			// MQTT 数据强制刷新一次 UI（绕过频率限制）
 			forceUpdateHR()
 		}
 	})
@@ -386,21 +380,31 @@ func startMQTT(broker, topic string) error {
 	if err := client.Connect(); err != nil {
 		return err
 	}
-	// 订阅具体 topic
+	// 只订阅精确的 topic，不订阅通配符，确保特征码的隔离作用
 	if err := client.Subscribe(topic); err != nil {
 		client.Disconnect()
 		return err
 	}
-	// 也订阅通配符 +，兼容设备 tag 变更的情况
-	wildTopic := topic
-	if idx := strings.LastIndex(wildTopic, "/"); idx >= 0 {
-		wildTopic = wildTopic[:idx] + "/+"
-	}
-	if wildTopic != topic {
-		_ = client.Subscribe(wildTopic)
-	}
 
 	mqttClient = client
+	// 启动超时检测：10秒内未收到数据提示用户重新连接
+	go func() {
+		lastHR := 0
+		for i := 0; i < 20; i++ { // 最多等20秒
+			time.Sleep(500 * time.Millisecond)
+			mu.Lock()
+			hr := currentHR
+			mu.Unlock()
+			if hr != lastHR && hr > 0 {
+				return // 收到数据，正常退出
+			}
+			if i == 10 { // 5秒时记录一次
+				lastHR = hr
+			}
+		}
+		addLog("⏰ 10秒未收到数据，链接可能已过期")
+		addLog("💡 请重新复制手机端最新的连接码")
+	}()
 	return nil
 }
 
