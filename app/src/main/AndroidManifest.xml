@@ -2,10 +2,6 @@
  <manifest xmlns:android="http://schemas.android.com/apk/res/android"
      xmlns:tools="http://schemas.android.com/tools">
 
-     <!-- Android 11+ 需要 QUERY_ALL_PACKAGES 才能枚举所有已安装应用 -->
-     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
-         tools:ignore="QueryAllPackagesPermission" />
-
      <uses-permission android:name="android.permission.BLUETOOTH" />
      <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
      <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -17,12 +13,9 @@
      <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
      <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
      <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
      <uses-permission android:name="android.permission.INTERNET" />
-     <!-- 后台定位权限：部分国产ROM（华为/小米/OPPO）后台扫描蓝牙需要 -->
+     <!-- 后台定位权限：部分国产ROM后台扫描蓝牙需要 -->
      <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-     <!-- 高精度蓝牙扫描需要的权限 -->
-     <uses-permission android:name="android.permission.BLUETOOTH_PRIVILEGED" />
      <!-- 防止在某些ROM上被杀死 -->
      <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 

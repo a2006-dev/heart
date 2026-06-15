@@ -44,6 +44,7 @@ import java.util.Locale;
 public class ConnectFragment extends Fragment implements HeartEventBus.EventListener {
     private HeartServiceLocator serviceLocator;
     private List<BleManager.ScanDeviceInfo> deviceList = new ArrayList<>();
+    private List<BleManager.ScanDeviceInfo> pairedList = new ArrayList<>(); // 已配对设备（常驻）
     private Button btnScan, btnDisconnect, btnClearLog;
     private TextView tvDevice, tvStatus, tvScanCount, tvLog, tvBroadSearchHint;
     private ScrollView logScrollView;
@@ -118,6 +119,7 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
         });
 
         syncConnectionStatus();
+        loadPairedDevices();
         appendLog("📱 心迹连接页面已加载", 0xFF675c62);
         appendLog("💡 点击「开始搜索」扫描附近设备", 0xFF675c62);
         appendLog("💡 开启「广义搜索」可查看所有设备，点击 ⋮ 选择「筛选模式」自动匹配心率服务", 0xFF675c62);
@@ -330,10 +332,50 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
         }
     }
 
-    class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder> {
-        class ViewHolder extends RecyclerView.ViewHolder {
+    class DeviceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+        private static final int TYPE_PAIRED_HEADER = 0;
+        private static final int TYPE_PAIRED_DEVICE = 1;
+        private static final int TYPE_SCAN_HEADER = 2;
+        private static final int TYPE_SCAN_DEVICE = 3;
+
+        private boolean hasPaired() { return !pairedList.isEmpty(); }
+        private boolean hasScan() { return !deviceList.isEmpty(); }
+
+        @Override
+        public int getItemViewType(int pos) {
+            if (hasPaired()) {
+                if (pos == 0) return TYPE_PAIRED_HEADER;
+                if (pos < pairedList.size() + 1) return TYPE_PAIRED_DEVICE;
+                int scanStart = pairedList.size() + 1;
+                if (hasScan()) {
+                    if (pos == scanStart) return TYPE_SCAN_HEADER;
+                    return TYPE_SCAN_DEVICE;
+                }
+            } else if (hasScan()) {
+                if (pos == 0) return TYPE_SCAN_HEADER;
+                return TYPE_SCAN_DEVICE;
+            }
+            return TYPE_SCAN_DEVICE;
+        }
+
+        @NonNull @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            LayoutInflater inflater = LayoutInflater.from(requireContext());
+            if (viewType == TYPE_PAIRED_HEADER || viewType == TYPE_SCAN_HEADER) {
+                TextView tv = new TextView(requireContext());
+                tv.setPadding(24, 16, 24, 8);
+                tv.setTextSize(13);
+                tv.setTextColor(0xFF7a6a70);
+                tv.setTypeface(null, android.graphics.Typeface.BOLD);
+                return new RecyclerView.ViewHolder(tv) {};
+            }
+            View v = inflater.inflate(R.layout.item_ble_device, parent, false);
+            return new DeviceViewHolder(v);
+        }
+
+        class DeviceViewHolder extends RecyclerView.ViewHolder {
             TextView tvDevName, tvDevAddress, tvDevRssi, tvDeviceIcon, btnServiceDetail;
-            ViewHolder(@NonNull View itemView) {
+            DeviceViewHolder(@NonNull View itemView) {
                 super(itemView);
                 tvDevName = itemView.findViewById(R.id.tvDevName);
                 tvDevAddress = itemView.findViewById(R.id.tvDevAddress);
@@ -343,40 +385,56 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
             }
         }
 
-        @NonNull @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(requireContext()).inflate(R.layout.item_ble_device, parent, false);
-            return new ViewHolder(v);
+        private BleManager.ScanDeviceInfo getItem(int pos) {
+            if (hasPaired()) {
+                if (pos == 0 || pos == pairedList.size() + 1) return null; // header
+                if (pos < pairedList.size() + 1) return pairedList.get(pos - 1);
+                return deviceList.get(pos - pairedList.size() - 2);
+            }
+            if (pos == 0) return null; // header
+            return deviceList.get(pos - 1);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull ViewHolder h, int pos) {
-            BleManager.ScanDeviceInfo dev = deviceList.get(pos);
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder h, int pos) {
+            int type = getItemViewType(pos);
+            if (type == TYPE_PAIRED_HEADER) {
+                ((TextView) h.itemView).setText("📋 已配对设备 · 长按删除");
+                return;
+            }
+            if (type == TYPE_SCAN_HEADER) {
+                ((TextView) h.itemView).setText("📡 搜索到的设备");
+                return;
+            }
+
+            DeviceViewHolder dh = (DeviceViewHolder) h;
+            BleManager.ScanDeviceInfo dev = getItem(pos);
+            if (dev == null) return;
             String name = dev.name != null && !dev.name.isEmpty() ? dev.name : "未知设备";
-            h.tvDevName.setText(name);
-            h.tvDevAddress.setText(dev.address);
-            h.tvDevRssi.setText(formatRssi(dev.rssi));
+            dh.tvDevName.setText(type == TYPE_PAIRED_DEVICE ? "🔗 " + name : name);
+            dh.tvDevAddress.setText(dev.address);
+            dh.tvDevRssi.setText(formatRssi(dev.rssi));
 
             String lowerName = (dev.name != null ? dev.name : "").toLowerCase(Locale.ROOT);
             if (lowerName.contains("heart") || lowerName.contains("watch") || lowerName.contains("band")) {
-                h.tvDeviceIcon.setText("❤️");
+                dh.tvDeviceIcon.setText("❤️");
             } else if (lowerName.contains("mi") || lowerName.contains("xiaomi") || lowerName.contains("小米")) {
-                h.tvDeviceIcon.setText("⌚");
+                dh.tvDeviceIcon.setText("⌚");
             } else if (lowerName.contains("iqoo") || lowerName.contains("vivo")) {
-                h.tvDeviceIcon.setText("⌚");
+                dh.tvDeviceIcon.setText("⌚");
             } else {
-                h.tvDeviceIcon.setText("📡");
+                dh.tvDeviceIcon.setText("📡");
             }
 
             if (broadSearch) {
-                h.btnServiceDetail.setVisibility(View.VISIBLE);
-                h.btnServiceDetail.setOnClickListener(v -> showServiceMenu(dev));
+                dh.btnServiceDetail.setVisibility(View.VISIBLE);
+                dh.btnServiceDetail.setOnClickListener(v -> showServiceMenu(dev));
             } else {
-                h.btnServiceDetail.setVisibility(View.GONE);
-                h.btnServiceDetail.setOnClickListener(null);
+                dh.btnServiceDetail.setVisibility(View.GONE);
+                dh.btnServiceDetail.setOnClickListener(null);
             }
 
-            h.itemView.setOnClickListener(v -> {
+            dh.itemView.setOnClickListener(v -> {
                 BleManager ble = serviceLocator.getBleManager();
                 if (ble == null) return;
                 if (isScanning) {
@@ -390,7 +448,6 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
                         Toast.makeText(getActivity(), "已连接 " + name, Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    // 已连接其他设备，先断开
                     ble.disconnect();
                     appendLog("🔌 已断开当前设备，切换到 " + name, 0xFFffaa33);
                 }
@@ -398,10 +455,28 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
                 ble.connectToDevice(dev.address, dev.name);
                 updateStatus("📡 " + name, "连接中...");
             });
+
+            // 长按：取消配对（仅已配对设备）
+            dh.itemView.setOnLongClickListener(v -> {
+                if (getContext() == null) return false;
+                if (type != TYPE_PAIRED_DEVICE) return false;
+                new AlertDialog.Builder(requireContext())
+                    .setTitle("🗑️ 取消配对")
+                    .setMessage("确定要忘记「" + name + "」吗？")
+                    .setPositiveButton("确定", (d, w) -> unpairDevice(dev))
+                    .setNegativeButton("取消", null)
+                    .show();
+                return true;
+            });
         }
 
         @Override
-        public int getItemCount() { return deviceList.size(); }
+        public int getItemCount() {
+            int count = 0;
+            if (hasPaired()) count += pairedList.size() + 1; // header + devices
+            if (hasScan()) count += deviceList.size() + 1; // header + devices
+            return count;
+        }
     }
 
     private void showServiceMenu(BleManager.ScanDeviceInfo dev) {
@@ -537,8 +612,18 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
     public void onScanResult(List<BleManager.ScanDeviceInfo> devices) {
         handler.post(() -> {
             deviceList.clear();
-            deviceList.addAll(devices);
+            // 过滤掉已配对的设备
+            java.util.Set<String> pairedAddrs = new java.util.HashSet<>();
+            for (BleManager.ScanDeviceInfo p : pairedList) {
+                pairedAddrs.add(p.address);
+            }
+            for (BleManager.ScanDeviceInfo d : devices) {
+                if (!pairedAddrs.contains(d.address)) {
+                    deviceList.add(d);
+                }
+            }
             sortDeviceList();
+            loadPairedDevices();
             deviceAdapter.notifyDataSetChanged();
             tvScanCount.setText("共 " + devices.size() + " 个");
         });
@@ -553,8 +638,76 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
         });
     }
 
+    /** 加载已配对设备列表（常驻显示） */
+    private void loadPairedDevices() {
+        pairedList.clear();
+        try {
+            // 从 BleManager 获取最近连接的设备
+            BleManager ble = serviceLocator.getBleManager();
+            if (ble != null) {
+                java.util.Map<String, String> paired = ble.getPairedDevices();
+                for (java.util.Map.Entry<String, String> entry : paired.entrySet()) {
+                    BleManager.ScanDeviceInfo info = new BleManager.ScanDeviceInfo(entry.getValue(), entry.getKey(), -100);
+                    info.isKnown = true;
+                    pairedList.add(info);
+                }
+            }
+            // 从 DeviceProfileManager 获取更多已保存设备（解耦：由 UI 层直接调用）
+            try {
+                com.xinji.heartbeat.core.DeviceProfileManager mgr = serviceLocator.getDeviceProfileManager();
+                if (mgr != null) {
+                    java.util.List<com.xinji.heartbeat.core.DeviceProfileManager.DeviceProfile> profiles = mgr.getProfiles();
+                    if (profiles != null) {
+                        for (com.xinji.heartbeat.core.DeviceProfileManager.DeviceProfile p : profiles) {
+                            if (p.address != null && p.name != null && !p.address.isEmpty()) {
+                                // 避免重复
+                                boolean exists = false;
+                                for (BleManager.ScanDeviceInfo info : pairedList) {
+                                    if (info.address.equals(p.address)) {
+                                        exists = true;
+                                        break;
+                                    }
+                                }
+                                if (!exists) {
+                                    BleManager.ScanDeviceInfo info = new BleManager.ScanDeviceInfo(p.name, p.address, -100);
+                                    info.isKnown = true;
+                                    pairedList.add(info);
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ignored) {}
+        } catch (Exception ignored) {}
+        deviceAdapter.notifyDataSetChanged();
+    }
+
+    /** 取消配对：从已配对列表中移除 */
+    private void unpairDevice(BleManager.ScanDeviceInfo dev) {
+        BleManager ble = serviceLocator.getBleManager();
+        if (ble != null) {
+            if (ble.isConnected() && dev.address != null && dev.address.equals(ble.getCurrentDeviceAddress())) {
+                ble.disconnect();
+            }
+            ble.clearLastDevice();
+        }
+        // 从 DeviceProfileManager 中删除该设备的 profile（解耦：UI 层直接调用）
+        try {
+            DeviceProfileManager mgr = serviceLocator.getDeviceProfileManager();
+            if (mgr != null && dev.address != null) {
+                mgr.removeProfileByAddress(dev.address);
+            }
+        } catch (Exception ignored) {}
+        pairedList.remove(dev);
+        deviceAdapter.notifyDataSetChanged();
+        appendLog("🗑️ 已取消配对: " + (dev.name != null ? dev.name : dev.address), 0xFFffaa33);
+        Toast.makeText(getActivity(), "已忘记 " + (dev.name != null ? dev.name : dev.address), Toast.LENGTH_SHORT).show();
+    }
+
     private int getDevicePriority(BleManager.ScanDeviceInfo dev) {
         if (dev.name == null || dev.name.isEmpty() || "未知设备".equals(dev.name)) return 0;
+        // 已连接过的设备优先展示
+        if (dev.isKnown) return 200;
         String n = dev.name.toLowerCase(Locale.ROOT);
         if (n.contains("heart")) return 100;
         if (n.contains("watch") || n.contains("band")) return 80;

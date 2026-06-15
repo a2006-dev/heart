@@ -106,6 +106,21 @@ public class DeviceProfileManager {
         addOrUpdateProfile(name, address, "", "");
     }
 
+    /** 根据地址删除设备 profile（取消配对时调用） */
+    public void removeProfileByAddress(String address) {
+        if (address == null) return;
+        for (int i = 0; i < profiles.length(); i++) {
+            try {
+                JSONObject obj = profiles.getJSONObject(i);
+                if (address.equals(obj.optString("address", ""))) {
+                    profiles.remove(i);
+                    save();
+                    return;
+                }
+            } catch (Exception ignored) {}
+        }
+    }
+
     public String getProfilesJson() {
         return profiles.toString();
     }

@@ -362,6 +362,7 @@ public class FloatWindowManager {
             flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
         }
         floatParams.flags = flags;
+        floatParams.alpha = floatLocked ? 1.0f : 1.0f;
         try { wm.updateViewLayout(floatView, floatParams); } catch (Exception ignored) {}
     }
 

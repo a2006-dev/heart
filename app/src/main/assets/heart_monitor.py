@@ -92,8 +92,7 @@ def _mqtt_loop(broker,port,topic):
         c=mqtt.Client(client_id=f"hr_{int(time.time())}",protocol=mqtt.MQTTv311)
         c.on_message=mqtt_cb; log(f"🔗 MQTT {broker}:{port}..."); c.connect(broker,port,30)
         c.subscribe(topic); log(f"✅ {topic}")
-        wt=topic; i=wt.rfind("/")
-        if i>=0: wt=wt[:i]+"/+"; c.subscribe(wt); log(f"✅ {wt}")
+        # 不订阅通配符，只收精确匹配，靠特征码隔离
         _mqtt_client=c;_mqtt_connected=True; c.loop_forever()
     except Exception as e:
         log(f"❌ MQTT: {e}"); _mqtt_connected=False;_mqtt_client=None
@@ -104,7 +103,20 @@ def mqtt_connect(code):
     p=parse_conn_code(code)
     if not p: return "❌ 连接码无效"
     if not _ensure_paho(): return "❌ paho-mqtt 未安装"
+    
+    # 记录连接前的状态快照
+    old_hr = state.hr
+    
     _mqtt_thread=threading.Thread(target=_mqtt_loop,args=(p["host"],p["port"],p["topic"]),daemon=True); _mqtt_thread.start()
+    
+    # 启动超时检测：10秒后检查是否收到过数据
+    def timeout_check(old):
+        time.sleep(12)  # 等12秒确保连接和首次数据时间充裕
+        if state.hr == old or state.hr == 0:
+            log("⏰ 10秒未收到数据，链接可能已过期")
+            log("💡 请重新复制手机端最新的连接码")
+    threading.Thread(target=timeout_check,args=(old_hr,),daemon=True).start()
+    
     return f"✅ 连接 {p['host']}:{p['port']}..."
 
 def mqtt_disconnect():

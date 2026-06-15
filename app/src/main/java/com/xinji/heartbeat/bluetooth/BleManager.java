@@ -98,6 +98,7 @@ public class BleManager {
         public String name;
         public String address;
         public int rssi;
+        public boolean isKnown = false; // 是否已连接过（由 BleManager 在扫描时标记）
 
         public List<String> serviceUuids = new ArrayList<>();
 
@@ -183,6 +184,9 @@ public class BleManager {
                     }
                 }
 
+                String savedAddr = getLastDeviceAddress();
+                String savedName = getLastDeviceName();
+
                 ScanDeviceInfo info;
                 if (deviceMap.containsKey(addr)) {
                     info = deviceMap.get(addr);
@@ -193,6 +197,8 @@ public class BleManager {
                     }
                 } else {
                     info = new ScanDeviceInfo(name, addr, result.getRssi(), svcUuids);
+                    // 标记已知设备（已连接过的优先展示）
+                    info.isKnown = addr.equals(savedAddr) || name.equals(savedName);
                     deviceMap.put(addr, info);
                     scanResults.add(info);
                 }
@@ -270,6 +276,7 @@ public class BleManager {
                 String savedAddr = getLastDeviceAddress();
                 ScanDeviceInfo target = null;
 
+                // 只连接上次连过的设备
                 if (!savedAddr.isEmpty()) {
                     for (ScanDeviceInfo d : scanResults) {
                         if (savedAddr.equals(d.address)) {
@@ -286,9 +293,7 @@ public class BleManager {
                         }
                     }
                 }
-                if (target == null && !scanResults.isEmpty()) {
-                    target = scanResults.get(0);
-                }
+                // 不再自动连接未知设备（避免连到别人的手表）
 
                 if (target != null) {
                     final ScanDeviceInfo finalTarget = target;
@@ -723,6 +728,27 @@ public class BleManager {
             .edit()
             .putString(KEY_LAST_DEVICE_NAME, name != null ? name : "")
             .putString(KEY_LAST_DEVICE_ADDR, address != null ? address : "")
+            .apply();
+    }
+
+    /** 获取已配对设备列表（地址 -> 名称） */
+    /** 获取已配对设备列表（地址 -> 名称），只包含 SharedPreferences 中保存的最新设备 */
+    public java.util.Map<String, String> getPairedDevices() {
+        java.util.Map<String, String> result = new java.util.HashMap<>();
+        String name = getLastDeviceName();
+        String addr = getLastDeviceAddress();
+        if (!name.isEmpty() && !addr.isEmpty()) {
+            result.put(addr, name);
+        }
+        return result;
+    }
+
+    /** 清除已保存的设备记录（取消配对/忘记设备） */
+    public void clearLastDevice() {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .remove(KEY_LAST_DEVICE_NAME)
+            .remove(KEY_LAST_DEVICE_ADDR)
             .apply();
     }
 
