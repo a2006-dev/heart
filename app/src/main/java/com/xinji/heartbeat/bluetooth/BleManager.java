@@ -25,6 +25,7 @@ import android.os.ParcelUuid;
 import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -80,7 +81,10 @@ public class BleManager {
         void onConnecting(String name);
         void onConnected(String name, String address);
         void onDisconnected(String name);
+        /** @deprecated 使用 onHeartRateUpdate(int hr, int[] rrIntervals) */
+        @Deprecated
         void onHeartRateUpdate(int hr);
+        void onHeartRateUpdate(int hr, int[] rrIntervals);
         void onConnectionFailed(String reason);
         void onBleNotAvailable(String reason);
     }
@@ -619,7 +623,27 @@ public class BleManager {
 
                 if (hr > 20 && hr < 250) {
                     if (filterCallback != null) filterCallback.onHeartRateData(hr);
-                    if (listener != null) listener.onHeartRateUpdate(hr);
+                    if (listener != null) {
+                        // filterGattCallback 也解析 RR
+                        int[] rrInts = null;
+                        if (data.length >= 3) {
+                            int f = data[0] & 0xFF;
+                            boolean hasRR = (f & 0x10) != 0;
+                            if (hasRR) {
+                                int hrBytes = (f & 0x01) == 0 ? 1 : 2;
+                                int rrCnt = (data.length - 1 - hrBytes) / 2;
+                                if (rrCnt > 0) {
+                                    rrInts = new int[rrCnt];
+                                    for (int ri = 0; ri < rrCnt; ri++) {
+                                        int off = 1 + hrBytes + ri * 2;
+                                        if (off + 1 < data.length)
+                                            rrInts[ri] = (data[off] & 0xFF) | ((data[off + 1] & 0xFF) << 8);
+                                    }
+                                }
+                            }
+                        }
+                        listener.onHeartRateUpdate(hr, rrInts);
+                    }
                 }
             } catch (Exception ignored) {}
         }
@@ -712,8 +736,27 @@ public class BleManager {
                 int hr = (flags & 0x01) == 0
                     ? (data[1] & 0xFF)
                     : ((data[1] & 0xFF) | ((data[2] & 0xFF) << 8));
+
+                // 解析 RR-Interval（标准心率特征格式）
+                int[] rrIntervals = null;
+                boolean hasRR = (flags & 0x10) != 0; // Bit4=RR-Interval flag
+                if (hasRR) {
+                    int hrBytes = (flags & 0x01) == 0 ? 1 : 2;
+                    int rrCount = (data.length - 1 - hrBytes) / 2;
+                    if (rrCount > 0) {
+                        rrIntervals = new int[rrCount];
+                        for (int i = 0; i < rrCount; i++) {
+                            int offset = 1 + hrBytes + i * 2;
+                            if (offset + 1 < data.length) {
+                                // RR-Interval 单位: 1/1024 秒
+                                rrIntervals[i] = (data[offset] & 0xFF) | ((data[offset + 1] & 0xFF) << 8);
+                            }
+                        }
+                    }
+                }
+
                 if (listener != null) {
-                    listener.onHeartRateUpdate(hr);
+                    listener.onHeartRateUpdate(hr, rrIntervals);
                 }
             } catch (Exception ignored) {}
         }
