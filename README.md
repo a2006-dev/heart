@@ -3,11 +3,6 @@
 </p>
 
 <p align="center">
-  <a href="README.md"><img src="https://img.shields.io/badge/语言-中文-ff5d7c?style=flat-square" alt="中文"/></a>
-  <a href="README.en.md"><img src="https://img.shields.io/badge/lang-English-blue?style=flat-square" alt="English"/></a>
-</p>
-
-<p align="center">
   <img src="https://count.getloli.com/get/@heart?theme=rule34" alt="访客"/>
 </p>
 
@@ -40,7 +35,7 @@
 
 <br>
 
-> **心迹** 是一款开源的蓝牙心率监测工具，通过 BLE 连接心率设备，将实时心率展示在手机上，并通过 WiFi / USB / **MQTT** 多种方式推送到电脑。支持桌面悬浮窗、OBS 直播叠加、HRV 记录分析。**v3.1 新增引导页重构 & 权限获取更加清晰**，为用户提供直观的首次体验流程。
+> **心迹** 是一款开源的蓝牙心率监测工具，通过 BLE 连接心率设备，将实时心率展示在手机上，并通过 WiFi / USB / **MQTT** 多种方式推送到电脑。支持桌面悬浮窗、OBS 直播叠加、HRV 记录分析。**v3.0 新增 MQTT 远程推送**，突破局域网限制，随时随地查看心率。
 
 ---
 
@@ -50,11 +45,13 @@
 
 | 功能 | 说明 |
 |------|------|
-| **引导页 🚀** | 首次启动引导，分步骤展示功能并逐项请求权限，体验更友好 |
 | **蓝牙 BLE 连接** | 支持标准心率服务 (0x180D)，兼容 Polar、小米手环等 |
 | **已配对设备常驻** | 已连接过的设备独立列表常驻显示，不因扫描消失，长按可取消配对 |
 | **自动重连** | 断开后自动扫描并只连接已知设备，不会连到陌生设备 |
 | **实时心率图表** | MPAndroidChart 绘制心率曲线，支持手势交互 |
+| **📈 ECG 仿真波形** | P-QRS-T 生理模型仿真，每跳形态各异，基于 RR 间期动态调整 |
+| **📊 HRV 实时监测** | SDNN 实时计算，有 RR 数据时为真实值，无 RR 时基于心率估算 |
+| **📉 30 秒平均心率** | 滑动窗口计算，稳定显示不跟随瞬时跳变 |
 | **悬浮窗** | 5 种样式，支持自定义颜色/字号/透明度，位置自动记忆 |
 | **心率广播** | HTTP + SSE 协议推送至局域网，浏览器零配置查看 |
 | **📡 MQTT 远程推送** | 跨互联网推送心率，支持公共 Broker / Docker 自建 / 阿里云 / 华为云 |
@@ -63,7 +60,6 @@
 | **游戏模式** | 自动切换超小悬浮窗，退出后恢复用户样式 |
 | **手动 HRV 记录** | 手动启停，≥3 分钟自动保存并绘制 HRV 曲线 |
 | **USB 数据线直连** | 无 WiFi 时通过 ADB 端口转发传输数据 |
-| **权限管理 🛡️** | 首次使用分步引导权限（蓝牙/定位/悬浮窗/通知/电池优化），清晰可见 |
 
 ### 💻 PC
 
@@ -230,8 +226,6 @@ Base URL: `http://<手机IP>:9090`
 Heart/
 ├── app/                          # Android 模块 (Java)
 │   ├── src/main/java/com/xinji/heartbeat/
-│   │   ├── OnboardingActivity.java  # 🆕 引导页（分步权限请求）
-│   │   ├── OnboardingPageFragment.java # 🆕 引导页 Fragments
 │   │   ├── MainActivity.java     # 主界面 (ViewPager2 + BottomNav)
 │   │   ├── ConnectFragment.java  # 蓝牙扫描与连接
 │   │   ├── HomeFragment.java     # 心率首页
@@ -280,20 +274,24 @@ CC=x86_64-w64-mingw32-gcc CGO_ENABLED=1 GOOS=windows GOARCH=amd64 \
 
 ## 📋 更新日志
 
-### v3.1 — 引导页重构 & 权限获取更加清晰（当前版本）
+### v3.1 — ECG 仿真波形与 HRV 实时面板（当前版本）
 
 **✨ 新增**
-- 🚀 **全新引导页** — 首次启动 7 步引导，依次展示功能特色并逐项请求权限
-- 🛡️ **权限分步请求** — 蓝牙扫描 → 悬浮窗 → 通知 → 电池优化，每一步独立请求，清晰明了
-- 📖 **引导完成后自动跳转** — 引导结束后自动申请权限并跳转至开屏页，流程自然
-- 🎨 **引导页视觉优化** — ViewPager2 + 指示器动画，每页展示图标/标题/功能介绍
+- 📈 **ECG 仿真波形** — P-QRS-T 生理模型，每跳形态各异，收到心率数据时触发一次心跳，中间为平滑基线
+- 📊 **HRV 实时面板** — 首页显示 SDNN、RR 间期、30 秒平均心率
+- 🔗 **RR-Interval 解析** — BLE 心率特征 `0x2A37` 支持解析 RR 间期，有真实数据时 HRV 为真实值
+- 🧩 **EegWaveformBridge** — 解耦的 ECG 数据桥接层，连接 HeartRateManager 与 WebView 前端
+- ⚠️ **双重免责声明** — 首页 + 设置页底部 + README
+- 💾 **30 秒滑动平均** — 平均心率独立计算，不跟随瞬时跳变
 
 **🔧 优化**
-- **权限管理重构** — 引导页集中管理权限请求逻辑，requestBluetoothPermissions() / requestOverlayPermission() / requestNotificationPermission() / requestBatteryPermission() 独立清晰
-- **解耦设计** — 引导页通过 PermissionHelper 思想，页面只描述功能，权限由 OnboardingActivity 统一管理
-- **悬浮窗稳定性** — FloatWindowManager 逻辑优化，减少异常崩溃
-- **BleManager 扫描稳定性** — 优化蓝牙扫描回调逻辑，降低扫描失败概率
-- **设备特征码匹配优化** — DeviceProfileManager 逻辑调整，提高设备识别准确率
+- HRV 算法：基于 RR 历史缓存实时计算 SDNN，数据不足时返回 -1 而非 0
+- 波形引擎重构：从固定模板改为连续实时生成
+- BleManager 解耦：新接口 `onHeartRateUpdate(int hr, int[] rrIntervals)`，旧接口保留兼容
+
+**🐛 修复**
+- 未连接时不再生成假波形，显示待机基线
+- 一次蓝牙数据不再触发多次心跳动画
 
 ### v3.0 — MQTT 远程推送
 
@@ -335,6 +333,17 @@ CC=x86_64-w64-mingw32-gcc CGO_ENABLED=1 GOOS=windows GOARCH=amd64 \
 
 ### v2.0
 - UI 重构、蓝牙层重写、悬浮窗系统
+
+---
+
+## ⚠️ 免责声明
+
+本应用**仅作娱乐和参考用途**，**不可作为医疗诊断依据**。
+
+- 所有心率数据来源于蓝牙穿戴设备，仅供参考
+- ECG 波形基于心率数据与数学模型仿真生成，并非真实心电图信号
+- HRV 数据在有 RR 间期输入时为真实计算值，无 RR 数据时为估算值
+- 如有身体不适，请及时就医，不要依赖本应用做任何医疗决策
 
 ---
 
