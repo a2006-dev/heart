@@ -168,10 +168,67 @@
             width: 100%;
             position: relative;
         }
+        .wave-panel.standby {
+            opacity: 0.35;
+            border-color: rgba(120, 120, 130, 0.25);
+        }
+        .wave-panel.standby canvas {
+            filter: grayscale(0.8);
+        }
         canvas {
             width: 100%;
             height: 100%;
             display: block;
+        }
+
+        /* 实时数据面板 */
+        .data-panel {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 28px;
+            padding: 0.8rem 0.4rem;
+            backdrop-filter: blur(12px);
+            border: 0.5px solid rgba(200, 80, 95, 0.2);
+        }
+        .data-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            flex: 1;
+        }
+        .data-label {
+            font-size: 0.55rem;
+            color: #7a6a70;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .data-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: 'SF Mono', 'Inter', monospace;
+            color: #cbadbb;
+        }
+        .data-unit {
+            font-size: 0.5rem;
+            color: #5a4a50;
+        }
+        .data-divider {
+            width: 0.5px;
+            height: 32px;
+            background: rgba(200, 80, 95, 0.15);
+        }
+
+        /* 免责声明 */
+        .disclaimer {
+            text-align: center;
+            font-size: 0.5rem;
+            color: #4a3a40;
+            line-height: 1.6;
+            letter-spacing: 0.3px;
+            padding: 0.2rem 0;
         }
 
         .footnote {
@@ -307,6 +364,35 @@
             <div class="wave-panel">
                 <canvas id="ecgCanvas"></canvas>
             </div>
+
+            <!-- 实时数据面板 -->
+            <div class="data-panel">
+                <div class="data-item">
+                    <span class="data-label">HRV (SDNN)</span>
+                    <span class="data-value" id="sdnnValue">—</span>
+                    <span class="data-unit">ms</span>
+                </div>
+                <div class="data-divider"></div>
+                <div class="data-item">
+                    <span class="data-label">RR 间期</span>
+                    <span class="data-value" id="rrValue">—</span>
+                    <span class="data-unit">ms</span>
+                </div>
+                <div class="data-divider"></div>
+                <div class="data-item">
+                    <span class="data-label">平均心率</span>
+                    <span class="data-value" id="avgHrValue">—</span>
+                    <span class="data-unit">BPM</span>
+                </div>
+            </div>
+
+            <!-- 免责声明 -->
+            <div class="disclaimer">
+                本数据仅供参考，不可作为医疗诊断依据。<br>
+                ECG 波形基于心率数据与数学模型模拟生成，并非真实心电图信号。<br>
+                如有身体不适请及时就医。
+            </div>
+
             <div class="footnote" style="display:none !important;">
                 <span>♥ 真实心率传感</span>
                 <span>⚡ 每一次跳动都可见</span>
@@ -337,143 +423,367 @@
 </div>
 
 <script>
-    // ---------- 波形引擎（与你原版完全一致）----------
-    class StableECG {
+    // =====================================================
+    // ECG 波形引擎 — 收到数据才触发一次心跳波形，中间为平滑基线
+    // 每跳 P-QRS-T 形态各异，真实模拟 ECG 监护仪效果
+    // =====================================================
+    class RealECG {
         constructor(canvas) {
             this.canvas = canvas;
             this.ctx = canvas.getContext('2d');
             this.width = canvas.width;
             this.height = canvas.height;
-            this.baselineY = this.height * 0.7;
-            this.amplitude = this.height * 0.26;
-            this.bufferLength = this.width;
-            this.buffer = new Array(this.bufferLength).fill(0);
-            this.pulseActive = false;
-            this.pulseIndex = 0;
-            this.template = [
-                0.00, 0.01, 0.04, 0.11, 0.22, 0.38, 0.58, 0.79, 0.96, 1.09, 1.15, 1.13, 1.00, 0.76, 0.44, 0.14,
-                -0.10, -0.22, -0.18, -0.08, 0.00, 0.06, 0.10, 0.12, 0.10, 0.06, 0.02, 0.00
-            ];
-            this.templateLen = this.template.length;
+
+            this.baselineY = this.height * 0.70;
+            this.amplitude = this.height * 0.38;
+            this.maxSamples = this.width;
+            this.buffer = [];
+
+            // 连接状态
+            this._connected = false;
+
+            // 心率数据
+            this.hr = 0;
+            this.rrMs = -1;
+            this.sdnnMs = -1;
+
+            // ——— 心跳波形播放状态 ———
+            this.beatActive = false;        // 是否正在播放一次心跳
+            this.beatQueue = [];             // 待播放心跳序列
+            this.beatSamples = [];           // 当前心跳的样本数组
+            this.beatSampleIdx = 0;          // 当前播放到第几个样本
+            this.beatProgress = 0;           // 当前心跳内经过的时间 (ms)
+            this.beatTotalMs = 0;            // 当前心跳总时长
+
+            // 每跳的随机种子（用于波形变异）
+            this.beatSeed = 0.5;
+            this.beatCount = 0;
+
+            // 基线漂移
+            this.respPhase = 0;
+            this.standbyPhase = 0;
+
+            // 采样精度
+            this.sampleInterval = 5; // 5ms → 200Hz
         }
 
+        set connected(val) {
+            if (val === this._connected) return;
+            this._connected = val;
+            const panel = this.canvas.parentElement;
+            if (panel) {
+                if (!val) panel.classList.add('standby');
+                else panel.classList.remove('standby');
+            }
+            if (!val) {
+                this.buffer = [];
+                this.beatActive = false;
+                this.beatQueue = [];
+                this.beatSamples = [];
+                this.beatSampleIdx = 0;
+                this.hr = 0;
+                this.rrMs = -1;
+                this.sdnnMs = -1;
+                // 重置数据面板
+                ['sdnnValue','rrValue','avgHrValue'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerText = '—';
+                });
+            }
+        }
+        get connected() { return this._connected; }
+
+        // ========== P-QRS-T 各波（每跳加随机变异） ==========
+        pWave(t, seed) {
+            if (t < 0 || t > 105) return 0;
+            const x = t / 105;
+            const amp = 0.07 + 0.08 * seed;
+            return amp * Math.sin(Math.PI * x) * (1 - Math.pow(2 * x - 1, 2));
+        }
+
+        qWave(t) {
+            if (t < 0 || t > 16) return 0;
+            const x = t / 16;
+            return -0.10 * Math.sin(Math.PI * x * 0.8);
+        }
+
+        rWave(t, seed) {
+            if (t < 0 || t > 42) return 0;
+            const x = t / 42;
+            const amp = 0.85 + 0.45 * seed;
+            const sharp = 1 + 0.5 * (1 - seed);
+            return amp * Math.pow(Math.sin(Math.PI * x), sharp) * (1 + 0.2 * Math.sin(x * Math.PI * 3));
+        }
+
+        sWave(t, seed) {
+            if (t < 0 || t > 32) return 0;
+            const x = t / 32;
+            const depth = -0.12 - 0.28 * seed;
+            return depth * Math.sin(Math.PI * x) * (1 - 0.5 * x);
+        }
+
+        tWave(t, seed) {
+            if (t < 0 || t > 190) return 0;
+            const x = t / 190;
+            const peakPos = 0.28 + 0.12 * seed;
+            const amp = 0.10 + 0.12 * (1 - seed);
+            let val;
+            if (x < peakPos) {
+                val = Math.pow(x / peakPos, 1.5);
+            } else {
+                const decay = (x - peakPos) / (1 - peakPos);
+                val = Math.pow(1 - decay, 1.8) * (1 - 0.3 * decay);
+            }
+            return amp * val;
+        }
+
+        // ========== 生成一次完整心跳的波形样本 ==========
+        generateOneBeat(seed, nextRR) {
+            const totalMs = Math.max(300, nextRR); // 至少 300ms
+            const count = Math.ceil(totalMs / this.sampleInterval);
+            const samples = new Float32Array(count);
+
+            for (let i = 0; i < count; i++) {
+                const t = i * this.sampleInterval;
+                let val = 0;
+
+                // P 波 (0~105ms)
+                val += this.pWave(t - 8, seed);
+
+                // QRS 波群 (140ms 左右开始)
+                const qrsT = t - 135;
+                val += this.qWave(qrsT);
+                val += this.rWave(qrsT - 8, seed);
+                val += this.sWave(qrsT - 10, seed);
+
+                // T 波 (350ms 左右开始)
+                val += this.tWave(t - 350, seed);
+
+                // 微变异 (整跳幅度波动)
+                val *= (0.96 + 0.08 * Math.sin(this.beatCount * 0.7 + t * 0.01));
+
+                // ST 段起伏
+                const stT = t - 185;
+                if (stT > 0 && stT < 110) {
+                    val += 0.012 * Math.sin(this.beatCount * 1.2) * Math.sin(stT / 110 * Math.PI);
+                }
+
+                // 噪声
+                val += (Math.random() - 0.5) * 0.012;
+                if (Math.random() < 0.005) val += (Math.random() - 0.5) * 0.05;
+
+                samples[i] = val;
+            }
+            return { samples, totalMs };
+        }
+
+        // ========== 核心：收到心率数据时触发一次心跳 ==========
+        // 不论 RR 历史有多少条，只生成一次心跳波形
+        onEegData(hr, rr, avgRR, sdnn, rrHistory) {
+            this.hr = hr;
+            if (rr > 0) this.rrMs = rr;
+            if (sdnn >= 0) this.sdnnMs = sdnn;
+
+            // 确定本次心跳的 RR 间期
+            let nextRR = 600;
+            if (this.rrMs > 200 && this.rrMs < 3000) {
+                nextRR = this.rrMs;
+            } else if (hr > 30) {
+                nextRR = Math.round(60000 / hr);
+            }
+
+            // SDNN 加微小抖动（让每跳间隔略有不同）
+            if (this.sdnnMs > 0 && this.sdnnMs < 200) {
+                nextRR += Math.round((Math.random() - 0.5) * this.sdnnMs * 0.3);
+            } else {
+                nextRR += Math.round((Math.random() - 0.5) * 5);
+            }
+            nextRR = Math.max(350, Math.min(2000, nextRR));
+
+            // 生成一次心跳
+            this.beatSeed = 0.3 + Math.random() * 0.7;
+            this.beatCount++;
+            const beat = this.generateOneBeat(this.beatSeed, nextRR);
+            this.beatQueue.push(beat);
+            // 最多缓存 1 个待播，防止积压
+            if (this.beatQueue.length > 1) this.beatQueue.shift();
+
+            this.connected = true;
+            this.updateUI();
+        }
+
+        updateUI() {
+            const hrSpan = document.getElementById('heartRate');
+            if (hrSpan && this.hr > 30) hrSpan.innerText = this.hr;
+
+            const led = document.getElementById('pulseDot');
+            if (led) {
+                led.style.transform = 'scale(1.5)';
+                led.style.boxShadow = '0 0 28px #ff4468';
+                setTimeout(() => {
+                    if (led) { led.style.transform = ''; led.style.boxShadow = '0 0 18px #ff4d6e'; }
+                }, 160);
+            }
+
+            const statusEl = document.getElementById('statusText');
+            if (statusEl && this.hr > 0) {
+                const hrv = this.sdnnMs > 0 ? ` HRV:${this.sdnnMs}ms` : '';
+                statusEl.innerText = `❤️ ECG${hrv}`;
+            }
+
+            // 更新实时数据面板
+            const sdnnEl = document.getElementById('sdnnValue');
+            if (sdnnEl) sdnnEl.innerText = this.sdnnMs > 0 ? String(this.sdnnMs) : '—';
+
+            const rrEl = document.getElementById('rrValue');
+            if (rrEl) rrEl.innerText = this.rrMs > 0 ? String(Math.round(this.rrMs)) : '—';
+
+            const avgHrEl = document.getElementById('avgHrValue');
+            // 平均心率由 window.onEegData 更新，这里不再覆盖
+        }
+
+        // ========== 渲染循环 ==========
         resize(w, h) {
             if (this.width === w && this.height === h) return;
             this.width = w;
             this.height = h;
             this.canvas.width = w;
             this.canvas.height = h;
-            this.baselineY = this.height * 0.7;
-            this.amplitude = this.height * 0.26;
-            const newBuf = new Array(w).fill(0);
-            for (let i = 0; i < Math.min(this.buffer.length, w); i++) newBuf[i] = this.buffer[i];
-            this.buffer = newBuf;
-            this.bufferLength = w;
-            this.drawGrid();
-            this.render();
-        }
-
-        drawGrid() {
-            if (!this.ctx) return;
-            this.ctx.save();
-            this.ctx.strokeStyle = "rgba(200, 85, 100, 0.2)";
-            this.ctx.lineWidth = 0.5;
-            const refs = [this.baselineY, this.baselineY - this.amplitude * 0.7, this.baselineY + this.amplitude * 0.5];
-            refs.forEach(y => {
-                if (y > 5 && y < this.height - 5) {
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(0, y);
-                    this.ctx.lineTo(this.width, y);
-                    this.ctx.stroke();
-                }
-            });
-            const step = this.width / 8;
-            for (let x = step; x < this.width; x += step) {
-                this.ctx.beginPath();
-                this.ctx.moveTo(x, 0);
-                this.ctx.lineTo(x, this.height);
-                this.ctx.strokeStyle = "rgba(170, 70, 85, 0.08)";
-                this.ctx.stroke();
+            this.baselineY = this.height * 0.70;
+            this.amplitude = this.height * 0.38;
+            this.maxSamples = w;
+            if (this.buffer.length > w) {
+                this.buffer = this.buffer.slice(this.buffer.length - w);
             }
-            this.ctx.restore();
-        }
-
-        triggerBeat() {
-            this.pulseActive = true;
-            this.pulseIndex = 0;
-            const led = document.getElementById('pulseDot');
-            if (led) {
-                led.style.transform = 'scale(1.5)';
-                led.style.boxShadow = '0 0 28px #ff4468';
-                setTimeout(() => { if(led) { led.style.transform = ''; led.style.boxShadow = '0 0 18px #ff4d6e'; } }, 160);
-            }
-            const hrSpan = document.getElementById('heartRate');
-            if (hrSpan && hrSpan.innerText !== '—') {
-                hrSpan.style.textShadow = '0 0 20px #ff3a60';
-                setTimeout(() => { if(hrSpan) hrSpan.style.textShadow = '0 0 14px rgba(255, 70, 100, 0.5)'; }, 200);
-            }
-        }
-
-        updateAndDraw() {
-            for (let i = 0; i < this.bufferLength - 1; i++) this.buffer[i] = this.buffer[i+1];
-            let newVal = 0;
-            if (this.pulseActive) {
-                if (this.pulseIndex < this.templateLen) {
-                    newVal = this.template[this.pulseIndex];
-                    this.pulseIndex++;
-                } else {
-                    this.pulseActive = false;
-                }
-            }
-            this.buffer[this.bufferLength - 1] = newVal;
-            this.render();
         }
 
         render() {
-            if (!this.ctx || this.width <= 0 || this.buffer.length < 2) return;
+            if (!this.ctx || this.width <= 0) return;
             this.ctx.clearRect(0, 0, this.width, this.height);
-            this.drawGrid();
+
+            if (!this._connected || this.buffer.length < 2) {
+                // 待机：极淡的呼吸基线
+                this.ctx.beginPath();
+                this.ctx.strokeStyle = "rgba(160, 160, 170, 0.25)";
+                this.ctx.lineWidth = 1.0;
+                const cy = this.baselineY;
+                for (let x = 0; x < this.width; x++) {
+                    const dy = 0.008 * Math.sin(x * 0.02 + this.standbyPhase)
+                             + 0.004 * Math.sin(x * 0.03 + this.standbyPhase * 0.7);
+                    const y = cy - dy * this.amplitude * 0.5;
+                    if (x === 0) this.ctx.moveTo(x, y);
+                    else this.ctx.lineTo(x, y);
+                }
+                this.ctx.stroke();
+                return;
+            }
+
+            // 连接态：ECG 波形
             this.ctx.beginPath();
             this.ctx.lineWidth = 2.2;
             this.ctx.lineCap = 'round';
             this.ctx.lineJoin = 'round';
-            this.ctx.shadowBlur = 5;
-            this.ctx.shadowColor = "#e04266";
             const grad = this.ctx.createLinearGradient(0, 0, this.width, 0);
-            grad.addColorStop(0, "#ff90a5");
-            grad.addColorStop(0.5, "#f84e70");
-            grad.addColorStop(1, "#ff335f");
+            grad.addColorStop(0, "#4dd0e1");
+            grad.addColorStop(0.5, "#26c6da");
+            grad.addColorStop(1, "#80deea");
             this.ctx.strokeStyle = grad;
-            const stepX = this.width / (this.bufferLength - 1);
+            this.ctx.shadowBlur = 4;
+            this.ctx.shadowColor = "rgba(77, 208, 225, 0.3)";
+
+            const stepX = this.width / (this.buffer.length - 1);
             let first = true;
-            for (let i = 0; i < this.bufferLength; i++) {
-                let x = i * stepX;
-                let y = this.baselineY - (this.buffer[i] * this.amplitude);
-                y = Math.min(this.height - 12, Math.max(12, y));
+            for (let i = 0; i < this.buffer.length; i++) {
+                const x = i * stepX;
+                const y = this.baselineY - (this.buffer[i] * this.amplitude);
+                if (y < 2 || y > this.height - 2) continue;
                 if (first) { this.ctx.moveTo(x, y); first = false; }
                 else this.ctx.lineTo(x, y);
             }
             this.ctx.stroke();
             this.ctx.shadowBlur = 0;
-            const lastY = this.baselineY - (this.buffer[this.bufferLength-1] * this.amplitude);
-            this.ctx.beginPath();
-            this.ctx.arc(this.width - 5, lastY, 3, 0, 2 * Math.PI);
-            this.ctx.fillStyle = "#ff6f8c";
-            this.ctx.shadowBlur = 8;
-            this.ctx.fill();
-            this.ctx.shadowBlur = 0;
+
+            // 末端光点
+            if (this.buffer.length > 0) {
+                const lastY = this.baselineY - (this.buffer[this.buffer.length - 1] * this.amplitude);
+                if (lastY > 2 && lastY < this.height - 2) {
+                    this.ctx.beginPath();
+                    this.ctx.arc(this.width - 3, lastY, 2.5, 0, 2 * Math.PI);
+                    this.ctx.fillStyle = "#4dd0e1";
+                    this.ctx.shadowBlur = 10;
+                    this.ctx.shadowColor = "#4dd0e1";
+                    this.ctx.fill();
+                    this.ctx.shadowBlur = 0;
+                }
+            }
         }
 
-        startLoop() {
-            const loop = () => { this.updateAndDraw(); requestAnimationFrame(loop); };
-            requestAnimationFrame(loop);
+        // ========== 每帧更新缓冲区 ==========
+        updateBuffer() {
+            if (!this._connected) {
+                // 待机：平坦基线
+                this.standbyPhase += 0.003;
+                const v = 0.008 * Math.sin(this.standbyPhase) + 0.004 * Math.sin(this.standbyPhase * 0.7 + 1);
+                this.buffer.push(v);
+                while (this.buffer.length > this.maxSamples) this.buffer.shift();
+                return;
+            }
+
+            // ——— 检查是否有待播心跳 ———
+            if (!this.beatActive && this.beatQueue.length > 0) {
+                const next = this.beatQueue.shift();
+                this.beatSamples = next.samples;
+                this.beatTotalMs = next.totalMs;
+                this.beatSampleIdx = 0;
+                this.beatActive = true;
+            }
+
+            if (this.beatActive) {
+                // 播放当前心跳：每帧推进约 16ms 的样本
+                const samplesPerFrame = Math.ceil(16 / this.sampleInterval);
+                let pushed = 0;
+                for (let i = 0; i < samplesPerFrame && this.beatSampleIdx < this.beatSamples.length; i++) {
+                    const val = this.beatSamples[this.beatSampleIdx];
+                    // 叠加上基线漂移
+                    this.respPhase += 0.003;
+                    const baseVal = val + 0.015 * Math.sin(this.respPhase) + 0.010 * Math.sin(this.respPhase * 0.4 + 1);
+                    this.buffer.push(baseVal);
+                    this.beatSampleIdx++;
+                    pushed++;
+                }
+                // 补充到至少推进了 1 个样本
+                if (pushed === 0 && this.beatSamples.length > 0) {
+                    this.buffer.push(this.buffer[this.buffer.length - 1] || 0);
+                }
+                if (this.beatSampleIdx >= this.beatSamples.length) {
+                    this.beatActive = false;
+                    this.beatSamples = [];
+                }
+            } else {
+                // 心跳间隙：平滑基线（带呼吸漂移）
+                this.respPhase += 0.003;
+                const v = 0.015 * Math.sin(this.respPhase) + 0.010 * Math.sin(this.respPhase * 0.4 + 1)
+                        + (Math.random() - 0.5) * 0.006;
+                this.buffer.push(v);
+            }
+
+            while (this.buffer.length > this.maxSamples) this.buffer.shift();
+        }
+
+        loop() {
+            this.updateBuffer();
+            this.render();
+            requestAnimationFrame(() => this.loop());
+        }
+
+        start() {
+            this.loop();
         }
     }
 
-    // 初始化波形
+    // ========== 初始化 ==========
     const canvas = document.getElementById('ecgCanvas');
-    const ecgEngine = new StableECG(canvas);
-    window.ecgEngine = ecgEngine;
+    const ecgEngine = new RealECG(canvas);
 
     function resizeCanvas() {
         const container = canvas.parentElement;
@@ -484,32 +794,59 @@
     ro.observe(canvas.parentElement);
     window.addEventListener('resize', resizeCanvas);
     setTimeout(resizeCanvas, 100);
-    ecgEngine.startLoop();
+    ecgEngine.start();
 
-    // 心率数字动态光晕（与你原版一致）
-    let currentHr = null;
-    function animateGlow() {
-        if (currentHr && currentHr > 30) {
-            const intensity = Math.min(0.7, (currentHr - 50) / 150);
-            const glow = 8 + intensity * 18;
-            document.getElementById('heartRate').style.textShadow = `0 0 ${glow}px #ff4568`;
-        } else {
-            document.getElementById('heartRate').style.textShadow = `0 0 8px rgba(255, 70, 100, 0.6)`;
+    // 暴露到全局（供原生端调用）
+    window.ecgEngine = ecgEngine;
+
+    // ========== 原生桥接接口 ==========
+
+    /** 由 EegWaveformBridge 调用（带 RR/HRV 数据） */
+    window.onEegData = function(data) {
+        if (!data) return;
+        const hr = data.hr || 0;
+        const rr = data.rr || -1;
+        const avgRR = data.avgRR || -1;
+        const sdnn = data.sdnn || -1;
+        const avgHr = data.avgHr || -1;
+        const rrHistory = data.rrHistory || [];
+
+        if (ecgEngine) {
+            ecgEngine.onEegData(hr, rr, avgRR, sdnn, rrHistory);
         }
-        requestAnimationFrame(animateGlow);
-    }
-    animateGlow();
 
-    // ========== 与 MainActivity.java 原生蓝牙对接 ==========
-    // 这些函数会被原生端通过 evaluateJavascript 调用
+        // 同时保持旧接口兼容
+        if (hr > 30 && hr < 220) {
+            window.currentHr = hr;
+            document.getElementById('heartRate').innerText = hr;
+            document.getElementById('statusText').innerText = '❤️ ECG';
+        }
+
+        // 更新平均心率（30秒滑动平均）
+        const avgHrEl = document.getElementById('avgHrValue');
+        if (avgHrEl) avgHrEl.innerText = avgHr > 0 ? String(avgHr) : '—';
+    };
+
+    /** 旧接口兼容（仅心率数字，无 RR 数据时降级） */
     window.updateHeartRate = function(hr) {
         if (hr && hr > 30 && hr < 220) {
-            currentHr = hr;
+            window.currentHr = hr;
             document.getElementById('heartRate').innerText = hr;
-            if (ecgEngine) ecgEngine.triggerBeat();
-            document.getElementById('statusText').innerText = "❤️ 同步中";
+            if (ecgEngine) {
+                // 无 RR 数据时，用心率估算所有参数
+                const estRR = Math.round(60000 / hr);
+                // 无 RR 数据时：基于心率确定性地估算 SDNN，仅叠加微小自然变异
+                // 基础值: 60BPM→42ms, 80BPM→35ms, 100BPM→30ms, 120BPM→26ms
+                const base = Math.round(2500 / hr);
+                // 叠加 ±3ms 自然变异，模拟真实 HRV 波动
+                const jitter = Math.floor((hr * 7 + Date.now() / 2000) % 7) - 3;
+                const estSdnn = Math.max(15, Math.min(65, base + jitter));
+                ecgEngine.onEegData(hr, estRR, estRR, estSdnn, []);
+            }
+            document.getElementById('statusText').innerText = '❤️ 同步中';
         }
     };
+
     window.setDeviceName = function(name) {
         document.getElementById('deviceNameDisplay').innerText = name || "⚡ 未连接";
     };
@@ -519,10 +856,11 @@
     window.resetHeartRate = function() {
         document.getElementById('heartRate').innerText = '—';
         document.getElementById('statusText').innerText = '待机';
-        currentHr = null;
+        window.currentHr = null;
+        if (ecgEngine) ecgEngine.connected = false;
     };
 
-    // 悬浮窗相关按钮状态（供原生调用）
+    // 悬浮窗按钮
     window.setFloatButtonText = function(visible) {
         var btn = document.getElementById('floatToggleBtn');
         if (btn) btn.innerText = visible ? '✨ 关闭悬浮窗' : '✨ 开启悬浮窗';
@@ -536,7 +874,7 @@
         if (btn) btn.innerText = locked ? '🔓 解锁' : '🔒 锁定';
     };
 
-    // 连接设备按钮：调用原生接口
+    // 连接设备
     document.getElementById('connectBtn').onclick = function() {
         if (window.AndroidBluetooth) {
             window.AndroidBluetooth.showDeviceList();
@@ -544,11 +882,9 @@
             alert("原生接口未就绪");
         }
     };
-    // 悬浮窗开关
     document.getElementById('floatToggleBtn').onclick = function() {
         if (window.AndroidBluetooth) window.AndroidBluetooth.toggleFloatWindow();
     };
-    // 锁定/解锁
     document.getElementById('floatLockBtn').onclick = function() {
         if (window.AndroidBluetooth) window.AndroidBluetooth.lockFloatWindow();
     };
