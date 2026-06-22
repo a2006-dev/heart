@@ -568,5 +568,16 @@
             android:textSize="12sp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="32dp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="⚠ 本应用数据仅供参考，不作医疗诊断用途。如有身体不适请及时就医。"
+            android:textColor="#2a2428"
+            android:textSize="10sp"
+            android:gravity="center"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="16dp"
+            android:lineSpacingExtra="2dp"
+            android:paddingHorizontal="16dp"/>
     </LinearLayout>
 </ScrollView>
