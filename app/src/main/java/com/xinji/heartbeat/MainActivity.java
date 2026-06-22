@@ -329,6 +329,22 @@ public class MainActivity extends FragmentActivity {
         }
 
         @Override
+        public void onHeartRateUpdate(int hr, int[] rrIntervals) {
+            // 带 RR 数据的新回调：传入 HeartRateManager，由其计算 HRV 并通知 ECG 监听器
+            HeartRateManager.getInstance(MainActivity.this).notifyListeners(hr, rrIntervals);
+            HeartEventBus.getInstance().postOnMain(HeartEventBus.EVENT_HR_UPDATE, hr);
+            MqttManager mqtt = serviceLocator.getMqttManager();
+            if (mqtt != null) mqtt.onHeartRateReceived(hr);
+            runOnUiThread(() -> {
+                if (homeFragment != null) homeFragment.updateHR(hr);
+                FloatWindowManager fwm = serviceLocator.getFloatWindowManager();
+                if (fwm != null) fwm.updateHR(hr);
+                BroadcastServer server = serviceLocator.getBroadcastServer();
+                if (server != null && prefs.getBroadcastEnabled()) server.updateHR(hr);
+            });
+        }
+
+        @Override
         public void onConnectionFailed(String reason) {
             HeartEventBus.getInstance().postOnMain(HeartEventBus.EVENT_CONNECTION_FAILED, reason);
             runOnUiThread(() -> Toast.makeText(MainActivity.this, reason, Toast.LENGTH_LONG).show());
