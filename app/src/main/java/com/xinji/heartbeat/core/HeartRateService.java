@@ -109,8 +109,14 @@ public class HeartRateService extends Service {
         PendingIntent tapPending = PendingIntent.getActivity(this, 0, tapIntent,
             PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Notification.Builder builder = new Notification.Builder(this, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_menu_info_details)
+        Notification.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder = new Notification.Builder(this, CHANNEL_ID);
+        } else {
+            // API 24/25 没有 NotificationChannel，使用无 channel 的构造函数
+            builder = new Notification.Builder(this);
+        }
+        builder.setSmallIcon(android.R.drawable.ic_menu_info_details)
             .setContentTitle(title)
             .setContentText(text)
             .setContentIntent(tapPending)

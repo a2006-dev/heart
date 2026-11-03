@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-❤️ 心迹 v3.0 — 无头静默版（无需桌面环境，纯 Web 浏览器操作）
+❤️ 心迹 v3.3 — 无头静默版（无需桌面环境，纯 Web 浏览器操作）
 保存为 .pyw 无控制台运行，所有输出写入日志文件
 在云电脑/服务器上直接运行，通过浏览器访问 http://本机IP:9090
 """
 import json, threading, time, webbrowser, socket, os, sys, logging
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import HTTPServer, ThreadingHTTPServer, BaseHTTPRequestHandler
 from dataclasses import dataclass, field
 from typing import List
 
@@ -22,6 +22,12 @@ logging.basicConfig(
 _DEMO = False
 UNIFIED_PORT = 9090
 SRC_BLE, SRC_ADB, SRC_PUSH = 3, 2, 1
+
+# SSE 连接管理
+SSE_MAX_CLIENTS = 8
+_sse_lock = threading.Lock()
+_sse_count = [0]
+_server_stop = threading.Event()
 
 @dataclass
 class HeartState:
@@ -103,7 +109,7 @@ h1{text-align:center;color:#ff5d7c;font-size:28px;margin:10px 0;}
 </style></head>
 <body>
 <div class="container">
-<h1>❤️ 心迹 v3.0</h1>
+<h1>❤️ 心迹 v3.3</h1>
 <div class="card">
 <div class="hr-display">
 <div class="hr-number" id="hrVal">--</div>
@@ -133,7 +139,7 @@ h1{text-align:center;color:#ff5d7c;font-size:28px;margin:10px 0;}
 <div class="info" id="logArea">等待心跳数据...</div>
 </div>
 
-<div class="footer">心迹 v3.0 — 电脑端心率监测</div>
+<div class="footer">心迹 v3.3 — 电脑端心率监测</div>
 </div>
 <script>
 function updateDisplay(d){
@@ -185,16 +191,31 @@ def start_server():
             self.send_header("Access-Control-Allow-Origin","*"); self.end_headers()
             self.wfile.write(d.encode("utf-8"))
         def _sse(self):
-            self.send_response(200)
-            for k,v in {"Content-Type":"text/event-stream","Cache-Control":"no-cache",
-                        "Connection":"keep-alive","Access-Control-Allow-Origin":"*"}.items():
-                self.send_header(k,v)
-            self.end_headers()
+            with _sse_lock:
+                if _sse_count[0] >= SSE_MAX_CLIENTS:
+                    self.send_response(503)
+                    self.send_header("Content-Type","text/plain;charset=utf-8")
+                    self.send_header("Access-Control-Allow-Origin","*")
+                    self.end_headers()
+                    self.wfile.write(b"too many sse clients")
+                    return
+                _sse_count[0] += 1
             try:
-                while True:
+                self.send_response(200)
+                for k,v in {"Content-Type":"text/event-stream","Cache-Control":"no-cache",
+                            "Connection":"keep-alive","Access-Control-Allow-Origin":"*"}.items():
+                    self.send_header(k,v)
+                self.end_headers()
+                while not _server_stop.is_set():
                     self.wfile.write(f"data: {json.dumps(state.snapshot())}\n\n".encode("utf-8"))
-                    self.wfile.flush(); time.sleep(0.5)
-            except: pass
+                    self.wfile.flush()
+                    if _server_stop.wait(0.5):
+                        break
+            except Exception:
+                pass
+            finally:
+                with _sse_lock:
+                    _sse_count[0] -= 1
         def _push(self):
             l=int(self.headers.get("Content-Length",0))
             if l>0:
@@ -206,14 +227,15 @@ def start_server():
             self.send_response(200); self.send_header("Access-Control-Allow-Origin","*"); self.end_headers()
         def log_message(self,*a): pass
 
-    server = HTTPServer(("0.0.0.0", UNIFIED_PORT), Handler)
+    server = ThreadingHTTPServer(("0.0.0.0", UNIFIED_PORT), Handler)
+    server.daemon_threads = True
     threading.Thread(target=server.serve_forever, daemon=True).start()
     log(f"🌐 服务器启动: http://{ip()}:{UNIFIED_PORT}")
     log(f"📱 推送地址: http://{ip()}:{UNIFIED_PORT}/api/hr")
     log(f"🎬 OBS: http://{ip()}:{UNIFIED_PORT}/?transparent=1")
 
 # ═════════════════════ 启动 ═════════════════════
-log("❤️ 心迹 v3.0 无头静默版")
+log("❤️ 心迹 v3.3 无头静默版")
 log(f"📥 浏览器打开: http://{ip()}:{UNIFIED_PORT}")
 start_server()
 log(f"✅ 服务已启动！浏览器访问: http://{ip()}:{UNIFIED_PORT}")

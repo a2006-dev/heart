@@ -21,6 +21,13 @@ public class BroadcastServer {
     private static final long SSE_HEARTBEAT_INTERVAL_MS = 15000;
     private static final long ACCEPT_RETRY_DELAY_MS = 3000;
 
+    /** SSE 线程池：核心线程数 */
+    private static final int SSE_CORE_POOL = 2;
+    /** SSE 线程池：最大线程数，即同时允许的 SSE 连接上限 */
+    private static final int SSE_MAX_POOL = 16;
+    /** 允许的最大 SSE 客户端数量 */
+    private static final int SSE_MAX_CLIENTS = 16;
+
     private ServerSocket serverSocket;
     private volatile int actualPort = -1;
     private volatile boolean running = false;
@@ -81,7 +88,9 @@ public class BroadcastServer {
                 t.setDaemon(true);
                 return t;
             },
-            new ThreadPoolExecutor.DiscardPolicy()
+            // 队列满时由提交线程自行执行，保证 Socket 一定会被处理并关闭，
+            // 避免 DiscardPolicy 静默丢任务导致连接泄漏
+            new ThreadPoolExecutor.CallerRunsPolicy()
         );
 
         int port = preferredPort;
@@ -105,11 +114,17 @@ public class BroadcastServer {
             return;
         }
 
-        sseExecutor = Executors.newCachedThreadPool(r -> {
-            Thread t = new Thread(r, "HR-SSE");
-            t.setDaemon(true);
-            return t;
-        });
+        sseExecutor = new ThreadPoolExecutor(
+            SSE_CORE_POOL, SSE_MAX_POOL,
+            60L, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(SSE_MAX_CLIENTS),
+            r -> {
+                Thread t = new Thread(r, "HR-SSE");
+                t.setDaemon(true);
+                return t;
+            },
+            new ThreadPoolExecutor.AbortPolicy()
+        );
 
         heartbeatScheduler = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread t = new Thread(r, "HR-Heartbeat");
@@ -185,10 +200,13 @@ public class BroadcastServer {
 
     private void acceptLoop() {
         while (running) {
+            Socket client = null;
             try {
-                Socket client = serverSocket.accept();
-                threadPool.execute(() -> handleClient(client));
+                client = serverSocket.accept();
+                final Socket c = client;
+                threadPool.execute(() -> handleClient(c));
             } catch (SocketException e) {
+                safeClose(client);
                 if (!running) break;
                 Log.w(TAG, "ServerSocket异常，3秒后重试", e);
                 shouldRestart = true;
@@ -210,6 +228,7 @@ public class BroadcastServer {
                     }
                 }
             } catch (Exception e) {
+                safeClose(client);
                 if (running) {
                     Log.w(TAG, "接受连接异常", e);
                 }
@@ -247,9 +266,7 @@ public class BroadcastServer {
                 if (path.equals("/") || path.equals("/index.html") || path.equals("/api/sse")) {
                     if (path.equals("/api/sse") || accept.contains("text/event-stream")) {
                         isSse[0] = true;
-                        ExecutorService executor = sseExecutor;
-                        if (executor != null) executor.execute(() -> handleSSE(client, out));
-                        else safeClose(client);
+                        handleSseConnection(client, out);
                         return;
                     } else {
                         serveHtml(client, out);
@@ -270,6 +287,47 @@ public class BroadcastServer {
             safeClose(client);
         } catch (Exception e) {
             if (!isSse[0]) safeClose(client);
+        }
+    }
+
+    /**
+     * 统一管理 SSE 连接的提交：限制最大连接数，提交失败时关闭 Socket。
+     */
+    private void handleSseConnection(Socket client, OutputStream out) {
+        // 连接数已达上限，直接拒绝，返回 503
+        synchronized (sseClients) {
+            if (sseClients.size() >= SSE_MAX_CLIENTS) {
+                Log.w(TAG, "SSE 连接数已达上限(" + SSE_MAX_CLIENTS + ")，拒绝新连接");
+                try {
+                    PrintWriter pw = new PrintWriter(new OutputStreamWriter(
+                            out, java.nio.charset.StandardCharsets.UTF_8), false);
+                    pw.print("HTTP/1.1 503 Service Unavailable\r\n");
+                    pw.print("Content-Type: text/plain; charset=utf-8\r\n");
+                    pw.print("Access-Control-Allow-Origin: *\r\n");
+                    pw.print("Connection: close\r\n");
+                    pw.print("\r\n");
+                    pw.print("too many sse clients");
+                    pw.flush();
+                } catch (Exception ignored) {}
+                safeClose(client);
+                return;
+            }
+        }
+
+        ExecutorService executor = sseExecutor;
+        if (executor == null) {
+            safeClose(client);
+            return;
+        }
+        try {
+            executor.execute(() -> handleSSE(client, out));
+        } catch (RejectedExecutionException e) {
+            // 线程池已满/已关闭：必须关闭 Socket，避免连接泄漏
+            Log.w(TAG, "SSE 任务被拒绝，关闭连接");
+            safeClose(client);
+        } catch (Exception e) {
+            Log.w(TAG, "SSE 任务提交异常", e);
+            safeClose(client);
         }
     }
 

@@ -374,7 +374,21 @@ func connectSSE(url string) {
 }
 
 func connectSSEOnce(url string) error {
-	client := &http.Client{Timeout: 5 * time.Second}
+	// SSE 是长连接，不能设置整体超时，否则固定时间后会被强制断开。
+	// 只限制连接建立和响应头等待时间，数据流本身不设上限。
+	transport := &http.Transport{
+		DialContext: (&net.Dialer{
+			Timeout:   10 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).DialContext,
+		ResponseHeaderTimeout: 10 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		IdleConnTimeout:       0,
+	}
+	client := &http.Client{
+		Transport: transport,
+		// 不设 Timeout，SSE 流需要长期保持
+	}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return err

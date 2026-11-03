@@ -35,7 +35,7 @@
 
 <br>
 
-> **心迹** 是一款开源的蓝牙心率监测工具，通过 BLE 连接心率设备，将实时心率展示在手机上，并通过 WiFi / USB / **MQTT** 多种方式推送到电脑。支持桌面悬浮窗、OBS 直播叠加、HRV 记录分析。**v3.2 重点优化网络兼容性与连接稳定性**，修复了局域网广播在部分网络环境下无法识别的问题。
+> **心迹** 是一款开源的蓝牙心率监测工具，通过 BLE 连接心率设备，将实时心率展示在手机上，并通过 WiFi / USB / **MQTT** 多种方式推送到电脑。支持桌面悬浮窗、OBS 直播叠加、HRV 记录分析。**v3.3 为稳定性修复版**，修复了跨平台通信与长期运行中的多个问题。
 
 ---
 
@@ -189,11 +189,13 @@ Base URL: `http://<手机IP>:9090`
 
 | 端点 | 方法 | 说明 |
 |------|------|------|
-| `/` | GET | 广播页面（OBS 透明叠加） |
+| `/` | GET | 广播页面（OBS 透明叠加）|
 | `/api/hr` | GET | 返回当前心率 JSON |
-| `/api/hr` | POST | 接收心率推送 |
-| `/api/sse` | GET | SSE 实时流 |
-| `/api/info` | GET | 服务器信息 |
+| `/api/ip` | GET | 服务器 IP 与端口信息 |
+| `/api/profiles` | GET | 已保存的设备配置列表 |
+| `/` 或 `/api/sse` | GET（`Accept: text/event-stream`）| SSE 实时流 |
+
+> **注意**：Android 端 `/api/hr` 仅支持 GET。心率推送请使用 `POST /api/hr`（由 Python 客户端提供）或 MQTT。
 
 ```json
 // GET /api/hr 响应
@@ -203,6 +205,28 @@ Base URL: `http://<手机IP>:9090`
   "connected": true
 }
 ```
+
+```json
+// GET /api/ip 响应
+{
+  "ip": "192.168.1.5",
+  "port": 9090
+}
+```
+
+**PC 端（Go / Python）本地服务接口**（与手机端不同，请注意区分）：
+
+| 端点 | 方法 | 说明 |
+|------|------|------|
+| `/` | GET | PC 端 Web 页面 / OBS 叠加层 |
+| `/api/hr` | GET | 当前心率 JSON |
+| `/api/sse` | GET | SSE 实时流（PC 本地）|
+| `/api/ip` | GET | 本机 IP 与端口（仅 Python 版）|
+| `/api/info` | GET | 本机 IP 与端口（仅 Python 无头版）|
+| `/api/hr` | POST | 接收心率推送（仅 Python 版）|
+| `/api/mqtt/connect` | POST | 连接 MQTT（仅 Python 版）|
+| `/api/mqtt/disconnect` | POST | 断开 MQTT（仅 Python 版）|
+| `/api/mqtt/test` | POST | 测试 MQTT 连通性（仅 Python 版）|
 
 | 端口 | 用途 |
 |------|------|
@@ -274,7 +298,44 @@ CC=x86_64-w64-mingw32-gcc CGO_ENABLED=1 GOOS=windows GOARCH=amd64 \
 
 ## 📋 更新日志
 
-### v3.2 — 网络与连接稳定性修复（当前版本）
+### v3.3 — 稳定性修复版（当前版本）
+
+本版本聚焦于**长期运行稳定性**与**跨平台兼容性**，不引入新功能。
+
+**🔌 通信稳定性**
+- **修复 Go 客户端 SSE 每 5 秒断开** — 移除 `http.Client` 整体超时，改用 `Transport` 单独控制连接建立与响应头等待，SSE 流可长期保持
+- **修复 Python 客户端单线程阻塞** — 两个客户端均改用 `ThreadingHTTPServer`，SSE 长连接不再阻塞其他 HTTP 请求
+- Python SSE 增加并发上限（8 个连接），超限返回 503
+- Python SSE 改用 `Event.wait()` 替代 `sleep`，服务关闭时可立即退出，不留残余线程
+
+**📱 Android 兼容性**
+- **修复 Android 7.x 崩溃** — `Notification.Builder` 增加 API 26 分支判断，API 24/25 使用兼容构造函数。此前在 Android 7 上一启动即 `NoSuchMethodError`
+
+**🔵 蓝牙连接**
+- **修复自动重连中断** — 扫描结束但只发现陌生设备（未找到目标设备）时，原逻辑不会安排下一轮扫描，导致重连永久失效。现统一为「未找到目标且自动连接开启」即安排重试
+- 用户关闭自动连接时，立即停止扫描并取消已排队的重试任务
+
+**⚙️ 服务端资源管理**
+- **修复线程池静默丢任务** — `DiscardPolicy` 改为 `CallerRunsPolicy`，队列满时由提交线程执行，保证 Socket 一定被处理并关闭
+- **修复 SSE 无界线程池** — `newCachedThreadPool` 改为有界线程池（核心 2 / 最大 16），SSE 连接数达上限时返回 503
+- 任务被拒绝时显式关闭对应 Socket，避免连接泄漏
+
+**📖 文档**
+- 修正 README 中与实际实现不符的 API 说明：
+  - Android 端 `/api/hr` 仅支持 GET（原文档误写支持 POST）
+  - `/api/info` 更正为 `/api/ip`
+  - 补充 `/api/profiles`
+- 新增 PC 端（Go / Python）接口独立说明，与手机端接口明确区分
+
+**🔖 其他**
+- 版本号 3.2 → 3.3（versionCode 8）
+- 仓库清理：移除 `app/build/` 构建产物（约 2800 个文件）
+
+> ⚠️ **注意**：v3.2 起更换了签名密钥，从 v3.1 及更早版本升级需先卸载旧版。
+>
+> 📌 **已知未修复**（计划 v3.4）：HTTP 服务访问认证、Go 端监听范围收敛、MQTT TLS 与账号密码支持。这三项涉及跨端协议变更，需与客户端同步升级。
+
+### v3.2 — 网络与连接稳定性修复
 
 **🔧 网络与广播**
 - 补全 `ACCESS_NETWORK_STATE`、`ACCESS_WIFI_STATE` 权限，修复「连上 WiFi 仍显示未连接」

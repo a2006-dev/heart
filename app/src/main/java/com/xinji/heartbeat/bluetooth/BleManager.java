@@ -58,6 +58,11 @@ public class BleManager {
     private static final long CONNECT_TIMEOUT_MS = 15000;
     private boolean connectTimeoutTriggered = false;
 
+    /** 自动扫描单轮时长 */
+    private static final long AUTO_SCAN_DURATION_MS = 5000;
+    /** 未找到目标设备时，下一轮自动扫描的间隔 */
+    private static final long AUTO_SCAN_RETRY_MS = 10000;
+
     private BleListener listener;
 
     private boolean broadScan = false;
@@ -277,43 +282,50 @@ public class BleManager {
             stopLeScan(autoScanCb);
             isAutoScanning = false;
 
-            if (!deviceMap.isEmpty()) {
-                String savedName = getLastDeviceName();
-                String savedAddr = getLastDeviceAddress();
-                ScanDeviceInfo target = null;
+            String savedName = getLastDeviceName();
+            String savedAddr = getLastDeviceAddress();
+            ScanDeviceInfo target = null;
 
-                if (!savedAddr.isEmpty()) {
-                    for (ScanDeviceInfo d : scanResults) {
-                        if (savedAddr.equals(d.address)) {
-                            target = d;
-                            break;
-                        }
+            if (!savedAddr.isEmpty()) {
+                for (ScanDeviceInfo d : scanResults) {
+                    if (savedAddr.equals(d.address)) {
+                        target = d;
+                        break;
                     }
                 }
-                if (target == null && !savedName.isEmpty()) {
-                    for (ScanDeviceInfo d : scanResults) {
-                        if (savedName.equals(d.name)) {
-                            target = d;
-                            break;
-                        }
-                    }
-                }
-
-                if (target != null) {
-                    final ScanDeviceInfo finalTarget = target;
-                    connectHandler.postDelayed(() -> connectToDevice(finalTarget.address, finalTarget.name), 500);
-                }
-            } else if (autoConnectEnabled) {
-                autoScanHandler.postDelayed(this::startAutoScan, 10000);
             }
-        }, 5000);
+            if (target == null && !savedName.isEmpty()) {
+                for (ScanDeviceInfo d : scanResults) {
+                    if (savedName.equals(d.name)) {
+                        target = d;
+                        break;
+                    }
+                }
+            }
+
+            if (target != null) {
+                // 找到目标设备，尝试连接
+                final ScanDeviceInfo finalTarget = target;
+                connectHandler.postDelayed(() -> connectToDevice(finalTarget.address, finalTarget.name), 500);
+            } else if (autoConnectEnabled && !isConnected) {
+                // 未找到目标设备（可能只扫到陌生设备，或完全没扫到），
+                // 只要自动连接仍开启且未连上，就安排下一轮扫描
+                autoScanHandler.postDelayed(this::startAutoScan, AUTO_SCAN_RETRY_MS);
+            }
+        }, AUTO_SCAN_DURATION_MS);
     }
 
     public void stopAutoScan() {
-        if (!isAutoScanning) return;
+        if (!isAutoScanning) {
+            // 即使当前不在扫描，也要取消可能已排队的下一轮重试
+            autoScanHandler.removeCallbacksAndMessages(null);
+            return;
+        }
         isAutoScanning = false;
         stopLeScan(autoScanCb);
         autoScanCb = null;
+        // 取消已排队的下一轮自动扫描，避免用户关闭后仍然重试
+        autoScanHandler.removeCallbacksAndMessages(null);
     }
 
     public void stopAllScan() {
@@ -707,6 +719,10 @@ public class BleManager {
 
     public void setAutoConnectEnabled(boolean enabled) {
         this.autoConnectEnabled = enabled;
+        if (!enabled) {
+            // 用户关闭自动连接：停止正在进行的自动扫描，并取消已排队的重试
+            stopAutoScan();
+        }
     }
 
     public boolean isAutoConnectEnabled() {

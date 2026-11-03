@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-❤️ 心迹 v3.2 — 悬浮窗 + HRV + MQTT
+❤️ 心迹 v3.3 — 悬浮窗 + HRV + MQTT
 双击运行，支持桌面悬浮窗、HRV记录、MQTT远程、OBS叠加
 """
 import json, threading, time, socket, os, sys, subprocess, importlib, urllib.request, logging, webbrowser
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import HTTPServer, ThreadingHTTPServer, BaseHTTPRequestHandler
 from dataclasses import dataclass, field
 from typing import List, Optional
 
@@ -19,6 +19,12 @@ try:
 except: pass
 
 UNIFIED_PORT = 9090; SRC_MQTT = 2
+
+# SSE 连接管理
+SSE_MAX_CLIENTS = 8
+_sse_lock = threading.Lock()
+_sse_count = [0]
+_server_stop = threading.Event()
 
 @dataclass
 class HeartState:
@@ -248,13 +254,31 @@ else{{el.innerText='--';dn.innerText='等待连接...'}}}}catch(err){{}}}}
             self.send_header("Content-Type","application/json;charset=utf-8");self.send_header("Access-Control-Allow-Origin","*");self.end_headers()
             self.wfile.write(json.dumps(s).encode())
         def _sse(self):
-            self.send_response(200)
-            for k,v in {"Content-Type":"text/event-stream","Cache-Control":"no-cache","Connection":"keep-alive","Access-Control-Allow-Origin":"*"}.items():self.send_header(k,v)
-            self.end_headers()
+            # 限制并发 SSE 数量，避免无限堆积线程
+            with _sse_lock:
+                if _sse_count[0] >= SSE_MAX_CLIENTS:
+                    self.send_response(503)
+                    self.send_header("Content-Type", "text/plain; charset=utf-8")
+                    self.send_header("Access-Control-Allow-Origin", "*")
+                    self.end_headers()
+                    self.wfile.write("too many sse clients".encode())
+                    return
+                _sse_count[0] += 1
             try:
-                while True:
-                    self.wfile.write(f"data: {json.dumps(state.snapshot())}\n\n".encode());self.wfile.flush();time.sleep(0.5)
-            except: pass
+                self.send_response(200)
+                for k,v in {"Content-Type":"text/event-stream","Cache-Control":"no-cache","Connection":"keep-alive","Access-Control-Allow-Origin":"*"}.items():self.send_header(k,v)
+                self.end_headers()
+                while not _server_stop.is_set():
+                    self.wfile.write(f"data: {json.dumps(state.snapshot())}\n\n".encode())
+                    self.wfile.flush()
+                    # 用 Event.wait 代替 sleep，服务关闭时可立即退出
+                    if _server_stop.wait(0.5):
+                        break
+            except Exception:
+                pass
+            finally:
+                with _sse_lock:
+                    _sse_count[0] -= 1
         def _push(self):
             l=int(self.headers.get("Content-Length",0))
             if l>0:
@@ -285,9 +309,12 @@ else{{el.innerText='--';dn.innerText='等待连接...'}}}}catch(err){{}}}}
             self.send_response(200);self.send_header("Content-Type","application/json;charset=utf-8");self.send_header("Access-Control-Allow-Origin","*");self.end_headers()
             self.wfile.write(json.dumps({"msg":msg}).encode())
         def log_message(self,*a): pass
-    server=HTTPServer(("0.0.0.0",UNIFIED_PORT),H)
+    # 使用多线程服务器：SSE 长连接不会阻塞其他 HTTP 请求
+    server=ThreadingHTTPServer(("0.0.0.0",UNIFIED_PORT),H)
+    server.daemon_threads = True
     threading.Thread(target=server.serve_forever,daemon=True).start()
     log(f"🌐 http://{ip()}:{UNIFIED_PORT}  🎬OBS: http://{ip()}:{UNIFIED_PORT}/?transparent=1")
+    return server
 
 # ═══════════ GUI + 悬浮窗 + HRV ═══════════
 if _HAS_GUI:
@@ -306,7 +333,7 @@ if _HAS_GUI:
 
     class App:
         def __init__(self):
-            self.root=tk.Tk(); self.root.title("❤️ 心迹 v3.2")
+            self.root=tk.Tk(); self.root.title("❤️ 心迹 v3.3")
             self.root.geometry("520x820"); self.root.configure(bg='#1a1a24')
             self.root.resizable(False,False)
             s=ttk.Style();s.theme_use('clam')
@@ -576,7 +603,7 @@ if _HAS_GUI:
         def run(self): self.root.mainloop()
 
 # ═══════════ 启动 ═══════════
-log("❤️ 心迹 v3.2 (悬浮窗+HRV+MQTT)")
+log("❤️ 心迹 v3.3 (悬浮窗+HRV+MQTT)")
 _start_server()
 log(f"浏览器: http://{ip()}:{UNIFIED_PORT}")
 
