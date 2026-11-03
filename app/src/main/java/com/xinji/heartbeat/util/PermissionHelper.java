@@ -17,6 +17,38 @@ public class PermissionHelper {
     public static final int REQUEST_NOTIFICATION = 102;
     public static final int REQUEST_OVERLAY = 103;
     public static final int REQUEST_USAGE = 104;
+    public static final int REQUEST_NETWORK = 105;
+
+    public static boolean hasNetworkStatePermission(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_NETWORK_STATE)
+                    == PackageManager.PERMISSION_GRANTED;
+        }
+        return true;
+    }
+
+    public static boolean hasWifiStatePermission(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_WIFI_STATE)
+                    == PackageManager.PERMISSION_GRANTED;
+        }
+        return true;
+    }
+
+    public static boolean hasNetworkPermissions(Context context) {
+        return hasNetworkStatePermission(context) && hasWifiStatePermission(context);
+    }
+
+    public static void requestNetworkPermissions(Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            java.util.List<String> need = new java.util.ArrayList<>();
+            if (!hasNetworkStatePermission(activity)) need.add(Manifest.permission.ACCESS_NETWORK_STATE);
+            if (!hasWifiStatePermission(activity)) need.add(Manifest.permission.ACCESS_WIFI_STATE);
+            if (!need.isEmpty()) {
+                ActivityCompat.requestPermissions(activity, need.toArray(new String[0]), REQUEST_NETWORK);
+            }
+        }
+    }
 
     public static boolean hasBleScanPermission(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

@@ -11,15 +11,6 @@ import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 
-/**
- * ECG 波形桥接层 — 连接 HeartRateManager.EegDataListener 与前端 WebView。
- * <p>
- * 解耦设计：
- * - 纯桥接，不依赖任何 Fragment/Activity
- * - 通过 WeakReference 持有 WebView，避免内存泄漏
- * - 数据序列化为 JSON，通过 evaluateJavascript 传入前端
- * - 前端无需关心数据来源（蓝牙真实数据 或 仿真数据）
- */
 public class EegWaveformBridge implements HeartRateManager.EegDataListener {
 
     private final WeakReference<WebView> webViewRef;
@@ -41,7 +32,6 @@ public class EegWaveformBridge implements HeartRateManager.EegDataListener {
             json.put("avgRR", avgRRMs);
             json.put("sdnn", sdnnMs);
 
-            // 30 秒平均心率
             int avgHr = HeartRateManager.getInstance(
                     wv.getContext().getApplicationContext()).getAvgHR();
             json.put("avgHr", avgHr);

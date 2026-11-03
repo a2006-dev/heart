@@ -110,7 +110,7 @@ public class FloatWindowManager {
             } else {
                 floatHrView.setText(String.valueOf(hr));
             }
-            // 心电脉搏样式：❤️图标跳动
+
             if (style == 3 && pulseIconView != null && hr > 30) {
                 pulseIconView.animate().scaleX(1.3f).scaleY(1.3f).setDuration(80)
                     .withEndAction(() -> pulseIconView.animate().scaleX(1f).scaleY(1f).setDuration(120).start())

@@ -81,7 +81,6 @@ public class BleManager {
         void onConnecting(String name);
         void onConnected(String name, String address);
         void onDisconnected(String name);
-        /** @deprecated 使用 onHeartRateUpdate(int hr, int[] rrIntervals) */
         @Deprecated
         void onHeartRateUpdate(int hr);
         void onHeartRateUpdate(int hr, int[] rrIntervals);
@@ -102,7 +101,7 @@ public class BleManager {
         public String name;
         public String address;
         public int rssi;
-        public boolean isKnown = false; // 是否已连接过（由 BleManager 在扫描时标记）
+        public boolean isKnown = false;
 
         public List<String> serviceUuids = new ArrayList<>();
 
@@ -160,6 +159,10 @@ public class BleManager {
     }
 
     public void startManualScan() {
+        if (!hasRequiredPermissions()) {
+            notifyBleNotAvailable("缺少蓝牙扫描/连接权限");
+            return;
+        }
         if (!isAvailable()) {
             notifyBleNotAvailable("蓝牙未开启");
             return;
@@ -201,7 +204,6 @@ public class BleManager {
                     }
                 } else {
                     info = new ScanDeviceInfo(name, addr, result.getRssi(), svcUuids);
-                    // 标记已知设备（已连接过的优先展示）
                     info.isKnown = addr.equals(savedAddr) || name.equals(savedName);
                     deviceMap.put(addr, info);
                     scanResults.add(info);
@@ -236,7 +238,7 @@ public class BleManager {
     }
 
     public void startAutoScan() {
-        if (!isAvailable() || bluetoothGatt != null || isConnected) return;
+        if (!hasRequiredPermissions() || !isAvailable() || bluetoothGatt != null || isConnected) return;
         if (isAutoScanning) return;
 
         isAutoScanning = true;
@@ -280,7 +282,6 @@ public class BleManager {
                 String savedAddr = getLastDeviceAddress();
                 ScanDeviceInfo target = null;
 
-                // 只连接上次连过的设备
                 if (!savedAddr.isEmpty()) {
                     for (ScanDeviceInfo d : scanResults) {
                         if (savedAddr.equals(d.address)) {
@@ -297,7 +298,6 @@ public class BleManager {
                         }
                     }
                 }
-                // 不再自动连接未知设备（避免连到别人的手表）
 
                 if (target != null) {
                     final ScanDeviceInfo finalTarget = target;
@@ -361,7 +361,13 @@ public class BleManager {
 
     public void connectToDevice(String address, String name) {
         if (bluetoothAdapter == null || address == null) return;
+        if (!hasRequiredPermissions()) {
+            notifyBleNotAvailable("缺少蓝牙连接权限");
+            return;
+        }
 
+        connectHandler.removeCallbacksAndMessages(null);
+        stopAllScan();
         if (bluetoothGatt != null) {
             try {
                 bluetoothGatt.disconnect();
@@ -395,7 +401,11 @@ public class BleManager {
 
         try {
             BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
-            bluetoothGatt = device.connectGatt(context, false, gattCallback);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                bluetoothGatt = device.connectGatt(context, false, gattCallback, BluetoothDevice.TRANSPORT_LE);
+            } else {
+                bluetoothGatt = device.connectGatt(context, false, gattCallback);
+            }
         } catch (Exception e) {
             if (listener != null) {
                 listener.onConnectionFailed("连接失败: " + e.getMessage());
@@ -433,6 +443,10 @@ public class BleManager {
     private static final String[] HEART_KEYWORDS = {"heart", "hr", "rate", "心率", "pulse", "bpm"};
 
     public void connectAndFilterServices(String address, String name, FilterCallback callback) {
+        if (!hasRequiredPermissions()) {
+            if (callback != null) callback.onError("缺少蓝牙连接权限");
+            return;
+        }
         if (bluetoothAdapter == null || address == null) {
             if (callback != null) callback.onError("蓝牙适配器不可用");
             return;
@@ -445,6 +459,10 @@ public class BleManager {
         this.filterTotalServices = 0;
         this.filterTotalChars = 0;
         this.filterMatched = 0;
+        this.matchedServiceUuid = null;
+        this.matchedCharUuid = null;
+        connectHandler.removeCallbacksAndMessages(null);
+        stopAllScan();
 
         if (bluetoothGatt != null) {
             try {
@@ -474,7 +492,11 @@ public class BleManager {
 
         try {
             BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
-            bluetoothGatt = device.connectGatt(context, false, filterGattCallback);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                bluetoothGatt = device.connectGatt(context, false, filterGattCallback, BluetoothDevice.TRANSPORT_LE);
+            } else {
+                bluetoothGatt = device.connectGatt(context, false, filterGattCallback);
+            }
         } catch (Exception e) {
             filterMode = false;
             if (filterCallback != null) filterCallback.onError("连接失败: " + e.getMessage());
@@ -498,11 +520,21 @@ public class BleManager {
     private final BluetoothGattCallback filterGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            if (status != BluetoothGatt.GATT_SUCCESS) {
+                filterMode = false;
+                try { gatt.close(); } catch (Exception ignored) {}
+                if (bluetoothGatt == gatt) bluetoothGatt = null;
+                if (filterCallback != null) filterCallback.onError("GATT连接失败，状态码 " + status);
+                return;
+            }
             if (newState == BluetoothGatt.STATE_CONNECTED) {
                 connectTimeoutTriggered = true;
                 if (listener != null) listener.onConnected(currentDeviceName, currentDeviceAddress);
-                new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    try { gatt.discoverServices(); } catch (Exception e) {
+                connectHandler.postDelayed(() -> {
+                    if (bluetoothGatt != gatt || !filterMode) return;
+                    try {
+                        if (!gatt.discoverServices() && filterCallback != null) filterCallback.onError("服务发现启动失败");
+                    } catch (Exception e) {
                         if (filterCallback != null) filterCallback.onError("服务发现失败");
                     }
                 }, 600);
@@ -517,6 +549,12 @@ public class BleManager {
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            if (gatt != bluetoothGatt || !filterMode) return;
+            if (status != BluetoothGatt.GATT_SUCCESS) {
+                filterMode = false;
+                if (filterCallback != null) filterCallback.onError("服务发现失败，状态码 " + status);
+                return;
+            }
             List<BluetoothGattService> services = gatt.getServices();
             filterTotalServices = services.size();
 
@@ -624,7 +662,6 @@ public class BleManager {
                 if (hr > 20 && hr < 250) {
                     if (filterCallback != null) filterCallback.onHeartRateData(hr);
                     if (listener != null) {
-                        // filterGattCallback 也解析 RR
                         int[] rrInts = null;
                         if (data.length >= 3) {
                             int f = data[0] & 0xFF;
@@ -679,88 +716,139 @@ public class BleManager {
     private final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            if (gatt != bluetoothGatt && bluetoothGatt != null) {
+                try { gatt.close(); } catch (Exception ignored) {}
+                return;
+            }
+            if (status != BluetoothGatt.GATT_SUCCESS) {
+                isConnected = false;
+                if (bluetoothGatt == gatt) bluetoothGatt = null;
+                try { gatt.close(); } catch (Exception ignored) {}
+                connectHandler.removeCallbacksAndMessages(null);
+                if (listener != null) listener.onConnectionFailed("GATT连接失败，状态码 " + status);
+                if (autoConnectEnabled && currentDeviceAddress != null) {
+                    autoScanHandler.postDelayed(this::scheduleAutoReconnect, 3000);
+                }
+                return;
+            }
+
             if (newState == BluetoothGatt.STATE_CONNECTED) {
                 connectTimeoutTriggered = true;
-                if (listener != null) {
-                    listener.onConnected(currentDeviceName, currentDeviceAddress);
-                }
-
-                new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    try { gatt.discoverServices(); } catch (Exception e) { e.printStackTrace(); }
+                if (listener != null) listener.onConnected(currentDeviceName, currentDeviceAddress);
+                connectHandler.postDelayed(() -> {
+                    if (bluetoothGatt != gatt || !isAvailable()) return;
+                    try {
+                        if (!gatt.discoverServices()) Log.w(TAG, "discoverServices() 返回 false");
+                    } catch (Exception e) {
+                        Log.e(TAG, "服务发现失败", e);
+                        if (listener != null) listener.onConnectionFailed("服务发现失败");
+                    }
                 }, 600);
             } else if (newState == BluetoothGatt.STATE_DISCONNECTED) {
                 isConnected = false;
+                connectHandler.removeCallbacksAndMessages(null);
                 String lostName = currentDeviceName != null ? currentDeviceName : "设备";
                 try { gatt.close(); } catch (Exception ignored) {}
                 if (bluetoothGatt == gatt) bluetoothGatt = null;
-
-                if (listener != null) {
-                    listener.onDisconnected(lostName);
+                if (filterMode) {
+                    filterMode = false;
+                    if (filterCallback != null && filterMatched == 0) filterCallback.onError("设备已断开");
                 }
-
-                if (autoConnectEnabled) {
-                    autoScanHandler.postDelayed(() -> {
-                        if (currentDeviceAddress != null) {
-                            startAutoScan();
-                        }
-                    }, 3000);
+                if (listener != null) listener.onDisconnected(lostName);
+                if (autoConnectEnabled && currentDeviceAddress != null) {
+                    autoScanHandler.postDelayed(this::scheduleAutoReconnect, 3000);
                 }
             }
         }
 
+        private void scheduleAutoReconnect() {
+            if (autoConnectEnabled && !isConnected && bluetoothGatt == null) startAutoScan();
+        }
+
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            if (gatt != bluetoothGatt) return;
+            if (status != BluetoothGatt.GATT_SUCCESS) {
+                if (listener != null) listener.onConnectionFailed("服务发现失败，状态码 " + status);
+                return;
+            }
             BluetoothGattService svc = gatt.getService(HR_SERVICE);
-            if (svc != null) {
-                BluetoothGattCharacteristic ch = svc.getCharacteristic(HR_CHAR);
-                if (ch != null) {
-                    try {
-                        gatt.setCharacteristicNotification(ch, true);
-                        BluetoothGattDescriptor desc = ch.getDescriptor(CCCD);
-                        if (desc != null) {
-                            desc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                            gatt.writeDescriptor(desc);
-                        }
-                        isConnected = true;
-                    } catch (Exception ignored) {}
+            if (svc == null) {
+                if (listener != null) listener.onConnectionFailed("未找到标准心率服务");
+                return;
+            }
+            BluetoothGattCharacteristic ch = svc.getCharacteristic(HR_CHAR);
+            if (ch == null) {
+                if (listener != null) listener.onConnectionFailed("未找到标准心率特征");
+                return;
+            }
+            int props = ch.getProperties();
+            boolean notify = (props & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0;
+            boolean indicate = (props & BluetoothGattCharacteristic.PROPERTY_INDICATE) != 0;
+            if (!notify && !indicate) {
+                if (listener != null) listener.onConnectionFailed("心率特征不支持通知");
+                return;
+            }
+            try {
+                if (!gatt.setCharacteristicNotification(ch, true)) {
+                    throw new IllegalStateException("setCharacteristicNotification 失败");
                 }
+                BluetoothGattDescriptor desc = ch.getDescriptor(CCCD);
+                if (desc == null) {
+                    isConnected = true;
+                    return;
+                }
+                desc.setValue(notify ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                        : BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
+                if (!gatt.writeDescriptor(desc)) throw new IllegalStateException("writeDescriptor 返回 false");
+            } catch (Exception e) {
+                Log.e(TAG, "订阅心率通知失败", e);
+                if (listener != null) listener.onConnectionFailed("订阅心率通知失败");
+            }
+        }
+
+        @Override
+        public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+            if (gatt != bluetoothGatt || !CCCD.equals(descriptor.getUuid())) return;
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                isConnected = true;
+            } else if (listener != null) {
+                listener.onConnectionFailed("心率通知订阅失败，状态码 " + status);
             }
         }
 
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic ch) {
+            if (gatt != bluetoothGatt) return;
             byte[] data = ch.getValue();
             if (data == null || data.length < 2) return;
             try {
                 int flags = data[0] & 0xFF;
-                int hr = (flags & 0x01) == 0
-                    ? (data[1] & 0xFF)
-                    : ((data[1] & 0xFF) | ((data[2] & 0xFF) << 8));
+                int hrBytes = (flags & 0x01) == 0 ? 1 : 2;
+                if (data.length < 1 + hrBytes) return;
+                int hr = hrBytes == 1 ? (data[1] & 0xFF)
+                        : ((data[1] & 0xFF) | ((data[2] & 0xFF) << 8));
+                if (hr <= 20 || hr >= 250) return;
 
-                // 解析 RR-Interval（标准心率特征格式）
-                int[] rrIntervals = null;
-                boolean hasRR = (flags & 0x10) != 0; // Bit4=RR-Interval flag
-                if (hasRR) {
-                    int hrBytes = (flags & 0x01) == 0 ? 1 : 2;
-                    int rrCount = (data.length - 1 - hrBytes) / 2;
-                    if (rrCount > 0) {
-                        rrIntervals = new int[rrCount];
-                        for (int i = 0; i < rrCount; i++) {
-                            int offset = 1 + hrBytes + i * 2;
-                            if (offset + 1 < data.length) {
-                                // RR-Interval 单位: 1/1024 秒
-                                rrIntervals[i] = (data[offset] & 0xFF) | ((data[offset + 1] & 0xFF) << 8);
-                            }
-                        }
-                    }
-                }
-
-                if (listener != null) {
-                    listener.onHeartRateUpdate(hr, rrIntervals);
-                }
-            } catch (Exception ignored) {}
+                int[] rrIntervals = parseRrIntervals(data, flags, hrBytes);
+                if (listener != null) listener.onHeartRateUpdate(hr, rrIntervals);
+            } catch (Exception e) {
+                Log.w(TAG, "解析心率数据失败", e);
+            }
         }
     };
+
+    private static int[] parseRrIntervals(byte[] data, int flags, int hrBytes) {
+        if ((flags & 0x10) == 0) return null;
+        int count = (data.length - 1 - hrBytes) / 2;
+        if (count <= 0) return null;
+        int[] rr = new int[count];
+        for (int i = 0; i < count; i++) {
+            int off = 1 + hrBytes + i * 2;
+            rr[i] = (data[off] & 0xFF) | ((data[off + 1] & 0xFF) << 8);
+        }
+        return rr;
+    }
 
     private static final String PREFS_NAME = "ble_prefs";
     private static final String KEY_LAST_DEVICE_NAME = "last_device_name";
@@ -774,8 +862,6 @@ public class BleManager {
             .apply();
     }
 
-    /** 获取已配对设备列表（地址 -> 名称） */
-    /** 获取已配对设备列表（地址 -> 名称），只包含 SharedPreferences 中保存的最新设备 */
     public java.util.Map<String, String> getPairedDevices() {
         java.util.Map<String, String> result = new java.util.HashMap<>();
         String name = getLastDeviceName();
@@ -786,7 +872,6 @@ public class BleManager {
         return result;
     }
 
-    /** 清除已保存的设备记录（取消配对/忘记设备） */
     public void clearLastDevice() {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()

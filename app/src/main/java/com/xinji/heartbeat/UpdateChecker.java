@@ -72,7 +72,7 @@ public class UpdateChecker {
             String tag = redirectUrl.substring(redirectUrl.indexOf("/releases/tag/") + "/releases/tag/".length());
             if (tag.contains("?")) tag = tag.substring(0, tag.indexOf("?"));
 
-            return mirrorPrefix + "/" + REPO + "/releases/download/" + tag + "/heart-v2.3.apk";
+            return mirrorPrefix + "/" + REPO + "/releases/download/" + tag + "/heart-" + tag + ".apk";
         } catch (Exception e) {
             return null;
         }

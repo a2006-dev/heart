@@ -31,6 +31,7 @@ public class BroadcastServer {
     private final Context context;
 
     private ExecutorService threadPool;
+    private ExecutorService sseExecutor;
     private ScheduledExecutorService heartbeatScheduler;
 
     private final List<SseClient> sseClients = Collections.synchronizedList(new ArrayList<>());
@@ -48,12 +49,11 @@ public class BroadcastServer {
     private static class SseClient {
         final Socket socket;
         final PrintWriter writer;
-        volatile long lastHeartbeat;
+        final Object writeLock = new Object();
 
         SseClient(Socket socket, PrintWriter writer) {
             this.socket = socket;
             this.writer = writer;
-            this.lastHeartbeat = System.currentTimeMillis();
         }
     }
 
@@ -105,6 +105,12 @@ public class BroadcastServer {
             return;
         }
 
+        sseExecutor = Executors.newCachedThreadPool(r -> {
+            Thread t = new Thread(r, "HR-SSE");
+            t.setDaemon(true);
+            return t;
+        });
+
         heartbeatScheduler = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread t = new Thread(r, "HR-Heartbeat");
             t.setDaemon(true);
@@ -143,6 +149,11 @@ public class BroadcastServer {
             if (serverSocket != null) serverSocket.close();
         } catch (Exception ignored) {}
         serverSocket = null;
+
+        if (sseExecutor != null) {
+            sseExecutor.shutdownNow();
+            sseExecutor = null;
+        }
 
         if (threadPool != null) {
             threadPool.shutdownNow();
@@ -227,14 +238,18 @@ public class BroadcastServer {
             String[] parts = requestLine.split(" ");
             String method = parts.length > 0 ? parts[0] : "";
             String path = parts.length > 1 ? parts[1] : "/";
+            int queryIndex = path.indexOf('?');
+            if (queryIndex >= 0) path = path.substring(0, queryIndex);
             OutputStream out = client.getOutputStream();
             String accept = headers.getOrDefault("accept", "");
 
             if ("GET".equals(method)) {
-                if (path.equals("/") || path.equals("/index.html")) {
-                    if (accept.contains("text/event-stream")) {
+                if (path.equals("/") || path.equals("/index.html") || path.equals("/api/sse")) {
+                    if (path.equals("/api/sse") || accept.contains("text/event-stream")) {
                         isSse[0] = true;
-                        handleSSE(client, out);
+                        ExecutorService executor = sseExecutor;
+                        if (executor != null) executor.execute(() -> handleSSE(client, out));
+                        else safeClose(client);
                         return;
                     } else {
                         serveHtml(client, out);
@@ -258,77 +273,86 @@ public class BroadcastServer {
         }
     }
 
-    private void handleSSE(Socket client, OutputStream out) throws IOException {
-        PrintWriter pw = new PrintWriter(out, true);
-        pw.print("HTTP/1.1 200 OK\r\n");
-        pw.print("Content-Type: text/event-stream\r\n");
-        pw.print("Cache-Control: no-cache\r\n");
-        pw.print("Connection: keep-alive\r\n");
-        pw.print("Access-Control-Allow-Origin: *\r\n");
-        pw.print("X-Accel-Buffering: no\r\n");
-        pw.print("\r\n");
-        pw.flush();
-
-        SseClient sseClient = new SseClient(client, pw);
-        sseClients.add(sseClient);
-        sendSSEData(pw);
-
-        pw.print(": connected\n\n");
-        pw.flush();
-
+    private void handleSSE(Socket client, OutputStream out) {
+        SseClient sseClient = null;
         try {
-            client.setSoTimeout(30000);
-            BufferedReader r = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            while (running && !Thread.currentThread().isInterrupted()) {
-                String s = r.readLine();
-                if (s == null) break;
-                sseClient.lastHeartbeat = System.currentTimeMillis();
+            client.setSoTimeout(0);
+            PrintWriter pw = new PrintWriter(new OutputStreamWriter(out, java.nio.charset.StandardCharsets.UTF_8), false);
+            pw.print("HTTP/1.1 200 OK\r\n");
+            pw.print("Content-Type: text/event-stream; charset=utf-8\r\n");
+            pw.print("Cache-Control: no-cache, no-store\r\n");
+            pw.print("Connection: keep-alive\r\n");
+            pw.print("Access-Control-Allow-Origin: *\r\n");
+            pw.print("X-Accel-Buffering: no\r\n");
+            pw.print("\r\n");
+            pw.flush();
+
+            sseClient = new SseClient(client, pw);
+            synchronized (sseClients) { sseClients.add(sseClient); }
+            sendSSEData(sseClient);
+            sendSSEHeartbeat(sseClient);
+
+
+            while (running && !client.isClosed() && !Thread.currentThread().isInterrupted()
+                    && isSseClientPresent(sseClient)) {
+                try { Thread.sleep(1000); }
+                catch (InterruptedException e) { Thread.currentThread().interrupt(); break; }
             }
-        } catch (SocketTimeoutException e) {
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            Log.d(TAG, "SSE 连接结束: " + e.getMessage());
         } finally {
-            sseClients.remove(sseClient);
-            try { pw.close(); } catch (Exception ignored) {}
-            try { client.close(); } catch (Exception ignored) {}
+            if (sseClient != null) removeSseClient(sseClient);
+            safeClose(client);
         }
     }
 
+    private boolean isSseClientPresent(SseClient client) {
+        synchronized (sseClients) { return sseClients.contains(client); }
+    }
+
     private void checkSseClients() {
-        long now = System.currentTimeMillis();
         synchronized (sseClients) {
-            Iterator<SseClient> it = sseClients.iterator();
-            while (it.hasNext()) {
-                SseClient client = it.next();
-                if (now - client.lastHeartbeat > SSE_HEARTBEAT_INTERVAL_MS * 3) {
-                    try { client.writer.close(); } catch (Exception ignored) {}
-                    try { client.socket.close(); } catch (Exception ignored) {}
-                    it.remove();
-                    Log.d(TAG, "清理僵尸 SSE 连接");
+            for (SseClient client : new ArrayList<>(sseClients)) {
+                if (!sendSSEHeartbeat(client)) {
+                    removeSseClient(client);
                 }
             }
         }
     }
 
-    private void sendSSEData(PrintWriter pw) {
-        try {
-            pw.print("data: ");
-            pw.print(buildJSON());
-            pw.print("\n\n");
-            pw.flush();
-        } catch (Exception ignored) {}
+    private boolean sendSSEHeartbeat(SseClient client) {
+        synchronized (client.writeLock) {
+            if (client.socket.isClosed()) return false;
+            client.writer.print(": heartbeat\n\n");
+            client.writer.flush();
+            return !client.writer.checkError();
+        }
+    }
+
+    private boolean sendSSEData(SseClient client) {
+        synchronized (client.writeLock) {
+            if (client.socket.isClosed()) return false;
+            client.writer.print("data: ");
+            client.writer.print(buildJSON());
+            client.writer.print("\n\n");
+            client.writer.flush();
+            return !client.writer.checkError();
+        }
     }
 
     private void broadcastSSE() {
         synchronized (sseClients) {
-            Iterator<SseClient> it = sseClients.iterator();
-            while (it.hasNext()) {
-                SseClient client = it.next();
-                try {
-                    sendSSEData(client.writer);
-                } catch (Exception e) {
-                    it.remove();
-                }
+            for (SseClient client : new ArrayList<>(sseClients)) {
+                if (!sendSSEData(client)) removeSseClient(client);
             }
+        }
+    }
+
+    private void removeSseClient(SseClient client) {
+        synchronized (sseClients) { sseClients.remove(client); }
+        synchronized (client.writeLock) {
+            try { client.writer.close(); } catch (Exception ignored) {}
+            safeClose(client.socket);
         }
     }
 
@@ -465,53 +489,104 @@ public class BroadcastServer {
         return status.startsWith("USB:") || status.startsWith("WiFi:");
     }
 
+
+    private static String classifyInterface(String name) {
+        if (name == null || name.isEmpty()) return "UNKNOWN";
+        String n = name.toLowerCase(java.util.Locale.ROOT);
+
+
+        if (n.startsWith("rmnet") || n.startsWith("ccmni") || n.startsWith("pdp")
+                || n.startsWith("wwan") || n.startsWith("seth")) {
+            return "CELLULAR";
+        }
+
+
+        if (n.startsWith("rndis") || n.startsWith("usb") || n.startsWith("ncm")) {
+            return "USB";
+        }
+
+
+        if (matchesPrefixWithIndex(n, "wlan") || matchesPrefixWithIndex(n, "wifi")
+                || matchesPrefixWithIndex(n, "swlan") || matchesPrefixWithIndex(n, "p2p")
+                || matchesPrefixWithIndex(n, "ap")) {
+            return "WIFI";
+        }
+
+
+        if (matchesPrefixWithIndex(n, "eth")) {
+            return "ETHERNET";
+        }
+
+        return "UNKNOWN";
+    }
+
+
+    private static boolean matchesPrefixWithIndex(String n, String prefix) {
+        if (!n.startsWith(prefix)) return false;
+        if (n.length() == prefix.length()) return true;
+        char next = n.charAt(prefix.length());
+
+        return Character.isDigit(next) || next == '-' || next == '_';
+    }
+
+
     public String getNetworkStatus() {
         try {
-            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            if (cm != null) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    Network activeNetwork = cm.getActiveNetwork();
-                    if (activeNetwork == null) return "未连接";
-                } else {
-                    NetworkInfo activeInfo = cm.getActiveNetworkInfo();
-                    if (activeInfo == null || !activeInfo.isConnected()) return "未连接";
-                }
-            }
-
             String fallbackIp = null;
+            String fallbackType = null;
+
             Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces();
-            while (nis.hasMoreElements()) {
+            while (nis != null && nis.hasMoreElements()) {
                 NetworkInterface ni = nis.nextElement();
-                if (!ni.isUp() || ni.isLoopback()) continue;
+                if (ni == null) continue;
+                try {
+                    if (!ni.isUp() || ni.isLoopback()) continue;
+                } catch (Exception ignored) {
+                    continue;
+                }
+
                 Enumeration<InetAddress> addrs = ni.getInetAddresses();
-                while (addrs.hasMoreElements()) {
+                while (addrs != null && addrs.hasMoreElements()) {
                     InetAddress addr = addrs.nextElement();
-                    if (!(addr instanceof Inet4Address) || addr.isLoopbackAddress()) continue;
+                    if (!(addr instanceof Inet4Address)) continue;
+
+
+                    if (addr.isLoopbackAddress()) continue;
+                    if (addr.isAnyLocalAddress()) continue;
+                    if (addr.isMulticastAddress()) continue;
+                    if (addr.isLinkLocalAddress()) continue;
+
                     String ip = addr.getHostAddress();
-                    if (ip == null || ip.startsWith("0.") || ip.startsWith("127.") || "0.0.0.0".equals(ip)) continue;
-                    String name = ni.getName().toLowerCase();
+                    if (ip == null || ip.isEmpty()) continue;
 
-                    if (fallbackIp == null && !ip.startsWith("169.254.")) {
-                        fallbackIp = "WiFi:" + ip;
+                    if (ip.startsWith("0.")) continue;
+
+                    String name = ni.getName() != null ? ni.getName().toLowerCase() : "";
+                    String type = classifyInterface(name);
+
+
+                    if ("CELLULAR".equals(type)) continue;
+
+                    if ("USB".equals(type)) {
+
+                        return "USB:" + ip;
+                    }
+                    if ("WIFI".equals(type) || "ETHERNET".equals(type)) {
+                        return "WiFi:" + ip;
                     }
 
-                    boolean isLocalIp = false;
-                    if (ip.startsWith("192.168.") || ip.startsWith("10.")) {
-                        isLocalIp = true;
-                    } else if (ip.startsWith("172.")) {
-                        try {
-                            int second = Integer.parseInt(ip.split("\\.")[1]);
-                            isLocalIp = second >= 16 && second <= 31;
-                        } catch (Exception ignored) {}
-                    }
-                    if (!isLocalIp) continue;
 
-                    boolean isUsb = name.contains("usb") || name.contains("rndis")
-                                || name.contains("eth") || name.contains("ccmni");
-                    return isUsb ? "USB:" + ip : "WiFi:" + ip;
+                    if (fallbackIp == null) {
+                        fallbackIp = ip;
+                        fallbackType = type;
+                    }
                 }
             }
-            if (fallbackIp != null) return fallbackIp;
+
+
+            if (fallbackIp != null) {
+                return ("USB".equals(fallbackType) ? "USB:" : "WiFi:") + fallbackIp;
+            }
         } catch (Exception e) {
             Log.e(TAG, "检测网络状态失败", e);
         }

@@ -35,7 +35,7 @@ public class SettingsFragment extends Fragment {
     private Switch swAutoConnect, swFloatMemory, swFloatVisible, swFloatLocked;
     private TextView tvFloatStyleName, tvBroadcastStatus;
 
-    // MQTT
+
     private MqttManager mqttManager;
     private Switch swMqttEnabled;
     private TextView tvMqttStatus, tvMqttTag, tvMqttCode;
@@ -43,6 +43,14 @@ public class SettingsFragment extends Fragment {
     private View mqttConfigBody, mqttCodeSection;
     private Button btnCopyCode, btnShareCode, btnMqttTest;
     private final Handler handler = new Handler(Looper.getMainLooper());
+
+    private boolean suppressMqttCallback = false;
+
+    private void setMqttSwitchSilently(boolean checked) {
+        suppressMqttCallback = true;
+        swMqttEnabled.setChecked(checked);
+        suppressMqttCallback = false;
+    }
 
     @Nullable @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -97,7 +105,7 @@ public class SettingsFragment extends Fragment {
         v.findViewById(R.id.btnContact).setOnClickListener(this::contactAuthor);
         v.findViewById(R.id.btnBroadcast).setOnClickListener(this::openBroadcastPage);
 
-        // MQTT 初始化
+
         mqttManager = serviceLocator.getMqttManager();
         swMqttEnabled = v.findViewById(R.id.swMqttEnabled);
         tvMqttStatus = v.findViewById(R.id.tvMqttStatus);
@@ -118,34 +126,86 @@ public class SettingsFragment extends Fragment {
         etMqttPort.setText(String.valueOf(mqttManager.getBrokerPort()));
         etMqttTopic.setText(mqttManager.getTopic());
         if (mqttManager.isRunning()) {
-            swMqttEnabled.setChecked(true);
+            setMqttSwitchSilently(true);
             mqttConfigBody.setVisibility(View.VISIBLE);
             showConnCode();
         }
         updateMqttStatus();
 
         swMqttEnabled.setOnCheckedChangeListener((b, c) -> {
+            if (suppressMqttCallback) return;
+
             if (c) {
+
                 mqttConfigBody.setVisibility(View.VISIBLE);
+                swMqttEnabled.setEnabled(false);
+                tvMqttStatus.setText("⏳ 正在启动...");
+
                 saveMqttConfig();
-                if (!mqttManager.start()) { swMqttEnabled.setChecked(false); return; }
-                showConnCode();
+                final MqttManager mgr = mqttManager;
+
+
+                new Thread(() -> {
+                    final boolean ok;
+                    try {
+                        ok = mgr.start();
+                    } catch (Exception e) {
+                        handler.post(() -> {
+                            if (!isAdded()) return;
+                            swMqttEnabled.setEnabled(true);
+                            setMqttSwitchSilently(false);
+                            Toast.makeText(getActivity(), "启动失败: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        });
+                        return;
+                    }
+                    handler.post(() -> {
+                        if (!isAdded()) return;
+                        swMqttEnabled.setEnabled(true);
+                        if (!ok) {
+
+                            setMqttSwitchSilently(false);
+                            mqttConfigBody.setVisibility(View.GONE);
+                        } else {
+                            showConnCode();
+                        }
+                        updateMqttStatus();
+                    });
+                }, "MQTT-Start").start();
             } else {
-                try {
-                    mqttManager.stop();
-                } catch (Exception ignored) {}
+
                 mqttConfigBody.setVisibility(View.GONE);
                 mqttCodeSection.setVisibility(View.GONE);
+                tvMqttStatus.setText("⏳ 正在停止...");
+
+                final MqttManager mgr = mqttManager;
+                new Thread(() -> {
+                    try {
+                        mgr.stop();
+                    } catch (Exception ignored) {}
+                    handler.post(() -> {
+                        if (!isAdded()) return;
+                        updateMqttStatus();
+                    });
+                }, "MQTT-Stop").start();
             }
-            updateMqttStatus();
         });
 
         View.OnFocusChangeListener onBlur = (v2, hasFocus) -> {
             if (!hasFocus && swMqttEnabled.isChecked()) {
                 saveMqttConfig();
-                mqttManager.restart();
-                showConnCode();
-                updateMqttStatus();
+
+                tvMqttStatus.setText("⏳ 正在重启...");
+                final MqttManager mgr = mqttManager;
+                new Thread(() -> {
+                    try {
+                        mgr.restart();
+                    } catch (Exception ignored) {}
+                    handler.post(() -> {
+                        if (!isAdded()) return;
+                        showConnCode();
+                        updateMqttStatus();
+                    });
+                }, "MQTT-Restart").start();
             }
         };
         etMqttBroker.setOnFocusChangeListener(onBlur);
@@ -192,7 +252,7 @@ public class SettingsFragment extends Fragment {
             @Override public void onError(String msg) { handler.post(() -> tvMqttStatus.setText("⚠️ " + msg)); }
         });
 
-        // 定时刷新发送统计
+
         handler.postDelayed(new Runnable() {
             @Override public void run() {
                 if (mqttManager.isRunning()) updateMqttStatus();
@@ -312,7 +372,6 @@ public class SettingsFragment extends Fragment {
         }
     }
 
-    // ==================== MQTT 辅助 ====================
 
     private void saveMqttConfig() {
         String host = etMqttBroker.getText().toString().trim();

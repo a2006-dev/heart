@@ -27,7 +27,7 @@ public class HeartServiceLocator {
     public boolean floatMemoryEnabled = true;
     public boolean broadcastEnabled = false;
 
-    
+
     private int bleErrorCount = 0;
     private int serverErrorCount = 0;
 
@@ -56,12 +56,16 @@ public class HeartServiceLocator {
 
     public void setActivity(Activity activity) {
         this.activityRef = activity;
-        
-        if (floatWindowManager != null && activity != null) {
+        if (activity != null) {
             try {
+                if (floatWindowManager != null) {
+                    try { floatWindowManager.hide(); } catch (Exception ignored) {}
+                }
                 floatWindowManager = new FloatWindowManager(activity);
                 floatWindowManager.setMemoryEnabled(floatMemoryEnabled);
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                floatWindowManager = null;
+            }
         }
     }
 

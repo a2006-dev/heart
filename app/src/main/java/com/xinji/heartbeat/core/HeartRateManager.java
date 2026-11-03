@@ -4,20 +4,9 @@ import android.os.Handler;
 import android.os.Looper;
 
 import java.lang.ref.WeakReference;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-/**
- * 心率数据管理中心。
- * <p>
- * 解耦设计：
- * - 通过 HeartRateListener 通知 UI 层心率变更
- * - 通过 EegDataListener 通知 ECG 波形消费者
- * - RR 间期缓存：最多保留最近 100 个，支持 HRV 计算
- * - 30 秒心率滑动窗口：用于计算平均心率
- * - 无 RR 数据时自动降级为基于心率的仿真波形参数
- */
 public class HeartRateManager {
     private static volatile HeartRateManager instance;
     private Context context;
@@ -26,26 +15,23 @@ public class HeartRateManager {
 
     private volatile int currentHR = 0;
     private volatile long lastHRTime = 0;
-    private Handler timeoutHandler;
-    private TimeoutListener timeoutListener;
+    private final Handler timeoutHandler;
+    private volatile TimeoutListener timeoutListener;
+    private boolean timeoutCheckRunning = false;
     private static final long TIMEOUT_MS = 5 * 60 * 1000;
 
-    // RR 间期缓存 (单位: 1/1024 秒)
     private static final int MAX_RR_HISTORY = 100;
     private final LinkedList<Integer> rrHistory = new LinkedList<>();
 
-    // 最近一次收到的原始 RR 数据
     private volatile int[] lastRRIntervals = null;
 
-    // 30 秒心率滑动窗口 (记录 {时间戳, 心率})
     private static final long AVG_HR_WINDOW_MS = 30 * 1000;
-    private final LinkedList<long[]> hrHistory = new LinkedList<>(); // [timestamp, hr]
+    private final LinkedList<long[]> hrHistory = new LinkedList<>();
 
     public interface HeartRateListener {
         void onHeartRateChanged(int hr);
     }
 
-    /** ECG 波形数据消费者接口 */
     public interface EegDataListener {
         void onEegData(int hr, int rrMs, int avgRRMs, int sdnnMs);
     }
@@ -74,7 +60,6 @@ public class HeartRateManager {
         return currentHR;
     }
 
-    /** 计算 30 秒内平均心率，-1 表示数据不足 */
     public synchronized int getAvgHR() {
         long now = System.currentTimeMillis();
         long cutoff = now - AVG_HR_WINDOW_MS;
@@ -101,7 +86,8 @@ public class HeartRateManager {
     }
 
     public int[] getLastRRIntervals() {
-        return lastRRIntervals;
+        int[] rr = lastRRIntervals;
+        return rr != null ? rr.clone() : null;
     }
 
     public synchronized int getSDNN() {
@@ -121,7 +107,6 @@ public class HeartRateManager {
 
     public synchronized int getAvgRRMs() {
         if (rrHistory.isEmpty()) return -1;
-        if (currentHR > 0) return 60000 / currentHR;
         int sum = 0;
         for (int rr : rrHistory) sum += rr;
         return sum / rrHistory.size();
@@ -131,19 +116,29 @@ public class HeartRateManager {
         this.timeoutListener = listener;
     }
 
-    public void startTimeoutCheck() {
-        timeoutHandler.removeCallbacksAndMessages(null);
+    public synchronized void startTimeoutCheck() {
+        timeoutCheckRunning = true;
+        timeoutHandler.removeCallbacks(timeoutCheck);
         timeoutHandler.postDelayed(timeoutCheck, TIMEOUT_MS);
     }
 
-    public void stopTimeoutCheck() {
-        timeoutHandler.removeCallbacksAndMessages(null);
+    public synchronized void stopTimeoutCheck() {
+        timeoutCheckRunning = false;
+        timeoutHandler.removeCallbacks(timeoutCheck);
     }
 
-    private final Runnable timeoutCheck = () -> {
-        if (lastHRTime > 0 && System.currentTimeMillis() - lastHRTime >= TIMEOUT_MS) {
-            if (timeoutListener != null) {
-                timeoutListener.onHeartRateTimeout();
+    private final Runnable timeoutCheck = new Runnable() {
+        @Override
+        public void run() {
+            TimeoutListener callback = timeoutListener;
+            if (timeoutCheckRunning && lastHRTime > 0
+                    && System.currentTimeMillis() - lastHRTime >= TIMEOUT_MS) {
+                if (callback != null) callback.onHeartRateTimeout();
+            }
+            synchronized (HeartRateManager.this) {
+                if (timeoutCheckRunning) {
+                    timeoutHandler.postDelayed(this, TIMEOUT_MS);
+                }
             }
         }
     };
@@ -158,12 +153,9 @@ public class HeartRateManager {
     }
 
     public void removeListener(HeartRateListener listener) {
-        Iterator<WeakReference<HeartRateListener>> it = listeners.iterator();
-        while (it.hasNext()) {
-            HeartRateListener l = it.next().get();
-            if (l == null || l == listener) {
-                it.remove();
-            }
+        for (WeakReference<HeartRateListener> ref : listeners) {
+            HeartRateListener l = ref.get();
+            if (l == null || l == listener) listeners.remove(ref);
         }
     }
 
@@ -177,12 +169,9 @@ public class HeartRateManager {
     }
 
     public void removeEegListener(EegDataListener listener) {
-        Iterator<WeakReference<EegDataListener>> it = eegListeners.iterator();
-        while (it.hasNext()) {
-            EegDataListener l = it.next().get();
-            if (l == null || l == listener) {
-                it.remove();
-            }
+        for (WeakReference<EegDataListener> ref : eegListeners) {
+            EegDataListener l = ref.get();
+            if (l == null || l == listener) eegListeners.remove(ref);
         }
     }
 
@@ -201,7 +190,6 @@ public class HeartRateManager {
             this.lastHRTime = System.currentTimeMillis();
         }
 
-        // 记录心率到30秒滑动窗口
         if (hr > 20 && hr < 250) {
             long now = System.currentTimeMillis();
             synchronized (this) {
@@ -215,7 +203,7 @@ public class HeartRateManager {
 
         int rrMs = -1;
         if (rrIntervals != null && rrIntervals.length > 0) {
-            this.lastRRIntervals = rrIntervals;
+            this.lastRRIntervals = rrIntervals.clone();
             synchronized (this) {
                 for (int rr : rrIntervals) {
                     int rrMsVal = rr * 1000 / 1024;
@@ -232,11 +220,10 @@ public class HeartRateManager {
             this.lastRRIntervals = null;
         }
 
-        Iterator<WeakReference<HeartRateListener>> it = listeners.iterator();
-        while (it.hasNext()) {
-            HeartRateListener listener = it.next().get();
+        for (WeakReference<HeartRateListener> ref : listeners) {
+            HeartRateListener listener = ref.get();
             if (listener == null) {
-                it.remove();
+                listeners.remove(ref);
                 continue;
             }
             try {
@@ -248,11 +235,10 @@ public class HeartRateManager {
 
         int avgRR = getAvgRRMs();
         int sdnn = getSDNN();
-        Iterator<WeakReference<EegDataListener>> eit = eegListeners.iterator();
-        while (eit.hasNext()) {
-            EegDataListener el = eit.next().get();
+        for (WeakReference<EegDataListener> ref : eegListeners) {
+            EegDataListener el = ref.get();
             if (el == null) {
-                eit.remove();
+                eegListeners.remove(ref);
                 continue;
             }
             try {

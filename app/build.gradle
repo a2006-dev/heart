@@ -15,8 +15,8 @@ android {
         applicationId "com.xinji.heartbeat"
         minSdk 24
         targetSdk 34
-        versionCode 6
-        versionName "3.1"
+        versionCode 7
+        versionName "3.2"
     }
 
     signingConfigs {
@@ -26,38 +26,24 @@ android {
             keyAlias "androiddebugkey"
             keyPassword "android"
         }
-        // ❌ release 不再默认用 debug.keystore（严重安全风险）
-        // 如需发布 Release 版本，请按以下步骤：
-        // 1. 生成你自己的密钥：
-        //    keytool -genkey -v -keystore release.keystore -alias my-release-key -keyalg RSA -keysize 2048 -validity 10000
-        // 2. 将 release.keystore 放在项目根目录（不要提交到 Git）
-        // 3. 创建 app/release-signing.properties 文件，内容：
-        //    storeFile=../release.keystore
-        //    storePassword=你的密码
-        //    keyAlias=my-release-key
-        //    keyPassword=你的密码
-        // 4. 移除下方 release 签名的注释
-        /*
         release {
             def props = new Properties()
-            def propFile = file('release-signing.properties')
+            def propFile = rootProject.file('keystore.properties')
             if (propFile.exists()) {
-                props.load(new FileInputStream(propFile))
-                storeFile file(props['storeFile'])
+                propFile.withInputStream { props.load(it) }
+                storeFile rootProject.file(props['storeFile'])
                 storePassword props['storePassword']
                 keyAlias props['keyAlias']
                 keyPassword props['keyPassword']
             }
         }
-        */
     }
 
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources true
-            // ⚠️ 安全提醒：release 签名请见上方 signingConfigs.release 注释
-            // signingConfig signingConfigs.release
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

@@ -116,18 +116,34 @@ public class MainActivity extends FragmentActivity {
     protected void onDestroy() {
         super.onDestroy();
         try { unregisterReceiver(broadcastControlReceiver); } catch (Exception ignored) {}
-        BroadcastServer server = serviceLocator.getBroadcastServer();
-        if (server != null) {
-            if (server.isRunning()) server.stop();
-            server.setListener(null);
+
+        boolean isFinishing = isFinishing();
+        boolean isChangingConfig = isChangingConfigurations();
+
+        if (serviceLocator == null) {
+            return;
         }
-        MqttManager mqtt = serviceLocator.getMqttManager();
-        if (mqtt != null) mqtt.stop();
-        BleManager ble = serviceLocator.getBleManager();
-        if (ble != null) {
-            ble.setListener(null);
-            ble.destroy();
+
+        if (isFinishing && !isChangingConfig) {
+            BroadcastServer server = serviceLocator.getBroadcastServer();
+            if (server != null) {
+                if (server.isRunning()) server.stop();
+                server.setListener(null);
+            }
+            MqttManager mqtt = serviceLocator.getMqttManager();
+            if (mqtt != null) mqtt.stop();
+            BleManager ble = serviceLocator.getBleManager();
+            if (ble != null) {
+                ble.setListener(null);
+                ble.destroy();
+            }
+        } else {
+            BroadcastServer server = serviceLocator.getBroadcastServer();
+            if (server != null) server.setListener(null);
+            BleManager ble = serviceLocator.getBleManager();
+            if (ble != null) ble.setListener(null);
         }
+
         serviceLocator.setActivity(null);
         serviceLocator = null;
     }
@@ -265,7 +281,6 @@ public class MainActivity extends FragmentActivity {
             BleManager bleManager = serviceLocator.getBleManager();
             if (bleManager != null) bleManager.saveLastDevice(name, address);
             HeartEventBus.getInstance().postOnMain(HeartEventBus.EVENT_CONNECTED, name);
-            // 启动5分钟无心率超时检测
             HeartRateManager hrMgr = HeartRateManager.getInstance(MainActivity.this);
             hrMgr.setTimeoutListener(() -> {
                 runOnUiThread(() -> {
@@ -287,7 +302,6 @@ public class MainActivity extends FragmentActivity {
                     server.updateDevice(name);
                     server.setConnected(true);
                 }
-                // MQTT 同步蓝牙设备名（解耦：通过 setter 设置）
                 MqttManager mqtt = serviceLocator.getMqttManager();
                 if (mqtt != null) {
                     mqtt.setBleDeviceName(name);
@@ -305,7 +319,6 @@ public class MainActivity extends FragmentActivity {
                 if (fwm != null && fwm.isVisible()) fwm.setOffline();
                 BroadcastServer server = serviceLocator.getBroadcastServer();
                 if (server != null) server.setConnected(false);
-                // MQTT 清空设备名
                 MqttManager mqtt = serviceLocator.getMqttManager();
                 if (mqtt != null) mqtt.setBleDeviceName("");
                 showDisconnectNotification(name);
@@ -316,7 +329,6 @@ public class MainActivity extends FragmentActivity {
         public void onHeartRateUpdate(int hr) {
             HeartRateManager.getInstance(MainActivity.this).notifyListeners(hr);
             HeartEventBus.getInstance().postOnMain(HeartEventBus.EVENT_HR_UPDATE, hr);
-            // 转发心率到 MQTT（解耦：通过公开方法调用，不直接注册 listener）
             MqttManager mqtt = serviceLocator.getMqttManager();
             if (mqtt != null) mqtt.onHeartRateReceived(hr);
             runOnUiThread(() -> {
@@ -330,7 +342,6 @@ public class MainActivity extends FragmentActivity {
 
         @Override
         public void onHeartRateUpdate(int hr, int[] rrIntervals) {
-            // 带 RR 数据的新回调：传入 HeartRateManager，由其计算 HRV 并通知 ECG 监听器
             HeartRateManager.getInstance(MainActivity.this).notifyListeners(hr, rrIntervals);
             HeartEventBus.getInstance().postOnMain(HeartEventBus.EVENT_HR_UPDATE, hr);
             MqttManager mqtt = serviceLocator.getMqttManager();

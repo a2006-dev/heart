@@ -34,23 +34,26 @@ public class OnboardingPageFragment extends Fragment {
                 icon.setText(data.icon);
                 title.setText(data.title);
                 desc.setText(data.desc);
-                // 权限页：显示授权按钮，点击后请求蓝牙权限
                 if ("permission".equals(data.type)) {
                     btnAction.setVisibility(View.VISIBLE);
                     switch (pos) {
                         case 2:
+                            btnAction.setText("🌐 授予网络状态权限");
+                            btnAction.setOnClickListener(v2 -> ((OnboardingActivity) act).requestNetworkPermissions());
+                            break;
+                        case 3:
                             btnAction.setText("📍 授予位置权限");
                             btnAction.setOnClickListener(v2 -> ((OnboardingActivity) act).requestBluetoothPermissions());
                             break;
-                        case 3:
+                        case 4:
                             btnAction.setText("🖥️ 授予悬浮窗权限");
                             btnAction.setOnClickListener(v2 -> ((OnboardingActivity) act).requestOverlayPermission());
                             break;
-                        case 4:
+                        case 5:
                             btnAction.setText("🔔 授予通知权限");
                             btnAction.setOnClickListener(v2 -> ((OnboardingActivity) act).requestNotificationPermission());
                             break;
-                        case 5:
+                        case 6:
                             btnAction.setText("🔋 授予电池优化");
                             btnAction.setOnClickListener(v2 -> ((OnboardingActivity) act).requestBatteryPermission());
                             break;

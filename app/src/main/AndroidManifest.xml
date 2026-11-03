@@ -2,22 +2,52 @@
  <manifest xmlns:android="http://schemas.android.com/apk/res/android"
      xmlns:tools="http://schemas.android.com/tools">
 
-     <uses-permission android:name="android.permission.BLUETOOTH" />
-     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+     <!-- ========== 蓝牙 ========== -->
+     <uses-permission android:name="android.permission.BLUETOOTH"
+         android:maxSdkVersion="30" />
+     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+         android:maxSdkVersion="30" />
+     <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+         android:usesPermissionFlags="neverForLocation"
+         tools:targetApi="s" />
      <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+     <!-- 后台定位权限：部分国产ROM后台扫描蓝牙需要 -->
+     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+     <!-- ========== 网络状态（广播功能必需）========== -->
+     <uses-permission android:name="android.permission.INTERNET" />
+     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+
+     <!-- ========== 悬浮窗 ========== -->
      <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+     <!-- ========== 后台保活 ========== -->
      <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+     <uses-permission android:name="android.permission.WAKE_LOCK" />
+     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+     <!-- ========== 通知 ========== -->
      <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+     <!-- ========== 前台服务 ========== -->
      <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
      <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
      <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
-     <uses-permission android:name="android.permission.INTERNET" />
-     <!-- 后台定位权限：部分国产ROM后台扫描蓝牙需要 -->
-     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-     <!-- 防止在某些ROM上被杀死 -->
-     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
+     <!-- ========== 包可见性（Android 11+ 读取其他App名称）========== -->
+     <queries>
+         <intent>
+             <action android:name="android.intent.action.MAIN" />
+             <category android:name="android.intent.category.LAUNCHER" />
+         </intent>
+     </queries>
+
+     <!-- 蓝牙硬件声明 -->
+     <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
 
     <application
          android:allowBackup="true"
@@ -27,6 +57,7 @@
          android:theme="@style/Theme.App.Starting"
          android:supportsRtl="true"
          android:persistent="false"
+         android:usesCleartextTraffic="true"
          tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute">
 
 <activity
@@ -55,19 +86,27 @@
                android:name=".core.GameModeService"
                android:enabled="true"
                android:exported="false"
-               android:foregroundServiceType="connectedDevice|dataSync" />
+               android:foregroundServiceType="connectedDevice|dataSync|specialUse">
+               <property
+                   android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                   android:value="Tracks foreground game packages to record heart rate sessions" />
+           </service>
 
           <service
                android:name=".core.HeartRateService"
                android:enabled="true"
                android:exported="false"
-               android:foregroundServiceType="connectedDevice|dataSync" />
-              
+               android:foregroundServiceType="connectedDevice|dataSync|specialUse">
+               <property
+                   android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                   android:value="Keeps BLE heart rate connection alive for continuous monitoring" />
+           </service>
+
           <activity
               android:name=".GameRecordsActivity"
               android:exported="false"
               android:theme="@style/AppTheme" />
-          
+
           <activity
               android:name=".BroadcastActivity"
               android:exported="false"

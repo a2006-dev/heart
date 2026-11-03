@@ -18,12 +18,18 @@ import com.xinji.heartbeat.MainActivity;
 public class HeartRateService extends Service {
     private static final int NOTIFICATION_ID = 1;
     private static final String CHANNEL_ID = "heart_rate_service";
+    private static final String PREFS_NAME = "app_settings";
+    private static final String KEY_USER_STOPPED = "hr_service_user_stopped";
+
     private String currentText = "心率监测中";
     private boolean isInGame = false;
+    private boolean userStopped = false;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        userStopped = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                .getBoolean(KEY_USER_STOPPED, false);
 
         IntentFilter filter = new IntentFilter("com.xinji.heartbeat.UPDATE_NOTIFICATION");
         if (Build.VERSION.SDK_INT >= 33) {
@@ -31,6 +37,12 @@ public class HeartRateService extends Service {
         } else {
             registerReceiver(notifUpdateReceiver, filter);
         }
+    }
+
+    private void setUserStopped(boolean stopped) {
+        userStopped = stopped;
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                .edit().putBoolean(KEY_USER_STOPPED, stopped).apply();
     }
 
     private final BroadcastReceiver notifUpdateReceiver = new BroadcastReceiver() {
@@ -57,10 +69,12 @@ public class HeartRateService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && "com.xinji.heartbeat.STOP_FOREGROUND".equals(intent.getAction())) {
+            setUserStopped(true);
             stopForeground(true);
             stopSelf();
             return START_NOT_STICKY;
         }
+        setUserStopped(false);
         initNotification();
         return START_STICKY;
     }
@@ -68,12 +82,13 @@ public class HeartRateService extends Service {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
-
+        if (userStopped) return;
         Intent restartIntent = new Intent(this, HeartRateService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(restartIntent);
-        } else {
-            startService(restartIntent);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startForegroundService(restartIntent);
+            else startService(restartIntent);
+        } catch (Exception e) {
+            android.util.Log.w("HeartRateService", "任务移除后重启服务失败", e);
         }
     }
 
@@ -102,12 +117,11 @@ public class HeartRateService extends Service {
             .setOngoing(true);
 
         int[] serviceTypes;
-        if (Build.VERSION.SDK_INT >= 34) {
+        if (Build.VERSION.SDK_INT >= 29) {
             serviceTypes = new int[]{
+                android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE,
                 android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC,
-                android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE};
-        } else if (Build.VERSION.SDK_INT >= 29) {
-            serviceTypes = new int[]{android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC, 0};
+                0};
         } else {
             serviceTypes = new int[]{0};
         }

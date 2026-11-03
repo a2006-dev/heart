@@ -24,6 +24,8 @@ public class BroadcastActivity extends AppCompatActivity {
     private TextView tvServerStatus, tvNetworkInfo, tvWifiName, tvLocalIP, tvAccessURL;
     private View btnBack;
     private Handler handler = new Handler(Looper.getMainLooper());
+    private ConnectivityManager connectivityManager;
+    private ConnectivityManager.NetworkCallback networkCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +62,11 @@ public class BroadcastActivity extends AppCompatActivity {
 
     private void registerNetworkCallback() {
         try {
-            ConnectivityManager cm = (ConnectivityManager)
+            connectivityManager = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
-            if (cm == null) return;
+            if (connectivityManager == null) return;
 
-            ConnectivityManager.NetworkCallback callback = new ConnectivityManager.NetworkCallback() {
+            networkCallback = new ConnectivityManager.NetworkCallback() {
                 @Override
                 public void onAvailable(Network network) {
                     runOnUiThread(() -> { updateNetworkInfo(); updateStatus(); });
@@ -79,11 +81,22 @@ public class BroadcastActivity extends AppCompatActivity {
                 }
             };
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                cm.registerDefaultNetworkCallback(callback);
+                connectivityManager.registerDefaultNetworkCallback(networkCallback);
             } else {
-                cm.registerNetworkCallback(new NetworkRequest.Builder().build(), callback);
+                connectivityManager.registerNetworkCallback(new NetworkRequest.Builder().build(), networkCallback);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            networkCallback = null;
+        }
+    }
+
+    private void unregisterNetworkCallback() {
+        if (connectivityManager != null && networkCallback != null) {
+            try {
+                connectivityManager.unregisterNetworkCallback(networkCallback);
+            } catch (Exception ignored) {}
+            networkCallback = null;
+        }
     }
 
     private void updateNetworkInfo() {
@@ -95,7 +108,6 @@ public class BroadcastActivity extends AppCompatActivity {
         if (!"未连接".equals(ip)) {
             tvLocalIP.setText("本机IP: " + ip + " (" + type + ")");
             tvNetworkInfo.setText("已连接 · " + type);
-            // 电脑端会自动扫描本网段，告知用户无需手动输入
             if (swServer.isChecked()) {
                 tvAccessURL.setText("http://" + ip + ":" + getActualServerPort());
             }
@@ -162,7 +174,6 @@ public class BroadcastActivity extends AppCompatActivity {
 
     private void shareExeClient() {
         try {
-            // 先从 assets 复制 exe 到缓存目录
             java.io.File cacheDir = new java.io.File(getCacheDir(), "share");
             if (!cacheDir.exists()) cacheDir.mkdirs();
             java.io.File destFile = new java.io.File(cacheDir, "heart_client.exe");
@@ -232,6 +243,7 @@ public class BroadcastActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregisterNetworkCallback();
         handler.removeCallbacksAndMessages(null);
     }
 }

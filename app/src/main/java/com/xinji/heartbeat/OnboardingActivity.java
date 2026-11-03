@@ -17,10 +17,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
-/**
- * 引导页 — 精简版 v2
- * 解耦设计：权限请求通过 PermissionHelper 统一管理，页面只描述功能
- */
+
 public class OnboardingActivity extends FragmentActivity {
     private ViewPager2 viewPager;
     private LinearLayout dotsLayout;
@@ -32,6 +29,7 @@ public class OnboardingActivity extends FragmentActivity {
     private final PageData[] pages = {
         new PageData("❤️", "心迹", "连接蓝牙心率设备\n实时查看每一次心跳"),
         new PageData("📡", "多端同步", "WiFi/USB/MQTT 推送到电脑\n支持 OBS 直播叠加"),
+        new PageData("🌐", "网络状态", "读取当前 WiFi / 移动网络状态\n用于广播地址检测与网络诊断", "permission"),
         new PageData("📍", "位置权限", "扫描发现附近的心率设备", "permission"),
         new PageData("🖥️", "悬浮窗权限", "心率悬浮窗显示在其他应用上层", "permission"),
         new PageData("🔔", "通知权限", "设备断开时发送通知提醒", "permission"),
@@ -107,24 +105,55 @@ public class OnboardingActivity extends FragmentActivity {
         }
     }
 
-    /** 统一请求所有蓝牙相关权限（解耦：由 OnboardingActivity 集中处理） */
+
+    public void requestNetworkPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            java.util.List<String> need = new java.util.ArrayList<>();
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_NETWORK_STATE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                need.add(android.Manifest.permission.ACCESS_NETWORK_STATE);
+            }
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_WIFI_STATE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                need.add(android.Manifest.permission.ACCESS_WIFI_STATE);
+            }
+            if (!need.isEmpty()) {
+                ActivityCompat.requestPermissions(this, need.toArray(new String[0]), PERM_REQ);
+                return;
+            }
+        }
+        android.widget.Toast.makeText(this, "网络状态权限已授予", android.widget.Toast.LENGTH_SHORT).show();
+    }
+
+
+    public boolean hasNetworkPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_NETWORK_STATE)
+                    == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_WIFI_STATE)
+                    == PackageManager.PERMISSION_GRANTED;
+        }
+        return true;
+    }
+
+
     public void requestBluetoothPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            // Android 12+：使用 BLUETOOTH_SCAN + BLUETOOTH_CONNECT
+
             ActivityCompat.requestPermissions(this, new String[]{
                 android.Manifest.permission.BLUETOOTH_SCAN,
                 android.Manifest.permission.BLUETOOTH_CONNECT,
                 android.Manifest.permission.ACCESS_FINE_LOCATION
             }, PERM_REQ);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // Android 6-11：需要定位权限来扫描蓝牙
+
             ActivityCompat.requestPermissions(this, new String[]{
                 android.Manifest.permission.ACCESS_FINE_LOCATION
             }, PERM_REQ);
         }
     }
 
-    /** 请求悬浮窗权限 */
+
     public void requestOverlayPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !android.provider.Settings.canDrawOverlays(this)) {
             startActivity(new Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -132,7 +161,7 @@ public class OnboardingActivity extends FragmentActivity {
         }
     }
 
-    /** 请求通知权限 */
+
     public void requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= 33) {
             if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
@@ -144,7 +173,7 @@ public class OnboardingActivity extends FragmentActivity {
         }
     }
 
-    /** 请求忽略电池优化权限 */
+
     public void requestBatteryPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Intent intent = new Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
@@ -155,7 +184,7 @@ public class OnboardingActivity extends FragmentActivity {
         }
     }
 
-    /** 检查蓝牙权限是否已全部授予 */
+
     public boolean hasBluetoothPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             return ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
@@ -171,12 +200,13 @@ public class OnboardingActivity extends FragmentActivity {
         getSharedPreferences("app_settings", MODE_PRIVATE)
             .edit().putBoolean("onboarding_done", true).apply();
 
-        // 权限请求
+
+        requestNetworkPermissions();
         requestBluetoothPermissions();
         requestOverlayPermission();
         requestNotificationPermission();
 
-        // 走开屏动画
+
         startActivity(new Intent(this, SplashActivity.class));
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         finish();

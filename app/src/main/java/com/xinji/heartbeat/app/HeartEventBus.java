@@ -5,7 +5,6 @@ import android.os.Looper;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -61,11 +60,10 @@ public class HeartEventBus {
     }
 
     public void post(int type, Object data) {
-        Iterator<WeakReference<EventListener>> it = listeners.iterator();
-        while (it.hasNext()) {
-            EventListener listener = it.next().get();
+        for (WeakReference<EventListener> ref : listeners) {
+            EventListener listener = ref.get();
             if (listener == null) {
-                it.remove();
+                listeners.remove(ref);
                 continue;
             }
             try {

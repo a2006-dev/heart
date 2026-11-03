@@ -21,6 +21,7 @@ public class GameModeService extends Service {
     private CheckHandler checkHandler;
     private SharedPreferences gamePrefs, recordPrefs;
     private boolean isGameRunning = false;
+    private boolean checking = false;
     private String currentGamePackage = null, currentGameName = "";
     private long gameStartTime = 0;
 
@@ -75,12 +76,13 @@ public class GameModeService extends Service {
     }
 
     private void startChecking() {
-        if (checkHandler == null) return;
+        if (checkHandler == null || checking) return;
+        checking = true;
         WeakReference<GameModeService> ref = checkHandler.serviceRef;
         checkHandler.postDelayed(new Runnable() {
             @Override public void run() {
                 GameModeService s = ref.get();
-                if (s == null) return;
+                if (s == null || !s.checking) return;
                 s.checkForegroundApp();
                 s.checkHandler.postDelayed(this, 1000);
             }
@@ -207,7 +209,14 @@ public class GameModeService extends Service {
             sb.append(hrBuffer[(si + i) % MAX_HR_RECORDS]);
         }
         String data = sb.toString();
-        if (data.length() > 500 * 1024) { int p = data.lastIndexOf(",", 500 * 1024); if (p > 0) data = data.substring(0, p); else data = data.substring(0, 500 * 1024); }
+        if (data.length() > 500 * 1024) {
+            int p = data.lastIndexOf(",", 500 * 1024);
+            if (p > 0) {
+                data = data.substring(0, p);
+            } else {
+                Log.w(TAG, "记录超长但未找到分隔符，跳过截断");
+            }
+        }
         recordPrefs.edit().putString(pkg + "_latest", data).apply();
         String hk = pkg + "_history", hr = recordPrefs.getString(hk, "");
         String[] parts = hr.isEmpty() ? new String[0] : hr.split(";;");
@@ -232,6 +241,7 @@ public class GameModeService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        checking = false;
         checkHandler.removeCallbacksAndMessages(null);
         if (myListener != null) HeartRateManager.getInstance(this).removeListener(myListener);
         updateNotif(false, "心率监测中");

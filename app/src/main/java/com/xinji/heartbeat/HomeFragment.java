@@ -21,7 +21,6 @@ public class HomeFragment extends Fragment {
         webView.setLongClickable(false);
         webView.setWebViewClient(new WebViewClient());
 
-        // ECG 波形桥接：将 HeartRateManager 的 EegDataListener 注册到前端
         eegBridge = new EegWaveformBridge(webView);
         HeartRateManager.getInstance(requireContext()).registerEegListener(eegBridge);
 
@@ -49,7 +48,6 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        // 取消注册 ECG 监听器
         if (eegBridge != null) {
             HeartRateManager.getInstance(requireContext()).removeEegListener(eegBridge);
             eegBridge = null;

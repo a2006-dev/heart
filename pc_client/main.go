@@ -1,317 +1,6 @@
 package main
 
-/*
-#include <windows.h>
 
-int g_connectReq = 0;
-int g_disconnectReq = 0;
-HWND g_hFloatWnd = NULL; // 悬浮窗句柄，供 Go 更新数字用
-
-// 悬��窗窗口过程
-LRESULT CALLBACK FloatWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    static int dragX = 0, dragY = 0;
-    static int isDragging = 0;
-
-    switch(msg) {
-        case WM_LBUTTONDOWN:
-            isDragging = 1;
-            dragX = LOWORD(lParam);
-            dragY = HIWORD(lParam);
-            SetCapture(hwnd);
-            return 0;
-        case WM_MOUSEMOVE:
-            if (isDragging) {
-                RECT rect;
-                GetWindowRect(hwnd, &rect);
-                int x = rect.left + LOWORD(lParam) - dragX;
-                int y = rect.top + HIWORD(lParam) - dragY;
-                SetWindowPos(hwnd, NULL, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-            }
-            return 0;
-        case WM_LBUTTONUP:
-            isDragging = 0;
-            ReleaseCapture();
-            return 0;
-        case WM_CLOSE:
-            ShowWindow(hwnd, SW_HIDE);
-            return 0;
-    }
-    return DefWindowProcW(hwnd, msg, wParam, lParam);
-}
-
-// 主窗口过程
-LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    static HWND hFloatWnd = NULL;
-
-    switch(msg) {
-        case WM_DESTROY:
-            if (hFloatWnd) DestroyWindow(hFloatWnd);
-            PostQuitMessage(0);
-            return 0;
-        case WM_CTLCOLORSTATIC:
-            SetTextColor((HDC)wParam, RGB(226, 194, 207));
-            SetBkColor((HDC)wParam, RGB(12, 12, 16));
-            return (LRESULT)GetStockObject(NULL_BRUSH);
-        case WM_COMMAND:
-            if (HIWORD(wParam) == BN_CLICKED) {
-                switch(LOWORD(wParam)) {
-                    case 17: // MQTT 连接
-                        PostMessageW(hwnd, WM_APP + 1, 0, 0);
-                        return 0;
-                    case 18: // MQTT 断开
-                        PostMessageW(hwnd, WM_APP + 2, 0, 0);
-                        return 0;
-                    case 20: // 显示悬浮窗
-                        if (hFloatWnd) {
-                            ShowWindow(hFloatWnd, SW_SHOW);
-                            SetWindowPos(hFloatWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-                        }
-                        return 0;
-                }
-            }
-case WM_APP + 1: // MQTT 连接按钮被点击
-            g_connectReq = 1;
-            return 0;
-        case WM_APP + 2: // MQTT 断开
-            g_disconnectReq = 1;
-            return 0;
-            return 0;
-        case WM_APP + 10: // MQTT 连接结果回调（来自后台 goroutine）
-            if (wParam == 1) {
-                SetWindowTextA(GetDlgItem(hwnd, 17), "\xF0\x9F\x94\x97 连接");
-                EnableWindow(GetDlgItem(hwnd, 17), 1);
-                SetWindowTextA(GetDlgItem(hwnd, 19), "\xF0\x9F\x9F\xA2 MQTT 已连接");
-            } else {
-                SetWindowTextA(GetDlgItem(hwnd, 17), "\xF0\x9F\x94\x97 连接");
-                EnableWindow(GetDlgItem(hwnd, 17), 1);
-                SetWindowTextA(GetDlgItem(hwnd, 19), "\xE2\x9A\xAA MQTT 连接失败");
-            }
-            return 0;
-        case WM_APP + 11: // 显示连接中（来自 tryConnectMQTT）
-            SetWindowTextA(GetDlgItem(hwnd, 17), "\xE2\x8F\xB3 连接中...");
-            EnableWindow(GetDlgItem(hwnd, 17), 0);
-            return 0;
-        case WM_APP + 12: // 重置按钮状态（来自 tryDisconnectMQTT）
-            SetWindowTextA(GetDlgItem(hwnd, 17), "\xF0\x9F\x94\x97 连接");
-            EnableWindow(GetDlgItem(hwnd, 17), 1);
-            return 0;
-        case WM_APP + 13: // 更新心率数字（来自后台 goroutine）
-            {
-                int hr = (int)wParam;
-                wchar_t buf[16];
-                if (hr > 30 && hr < 220) {
-                    wsprintfW(buf, L"%d", hr);
-                } else {
-                    wcscpy(buf, L"--");
-                }
-                SetWindowTextW(GetDlgItem(hwnd, 2), buf);
-                InvalidateRect(GetDlgItem(hwnd, 2), NULL, TRUE);
-                UpdateWindow(GetDlgItem(hwnd, 2));
-                // 同时更新悬浮窗
-                if (g_hFloatWnd) {
-                    SetWindowTextW(GetDlgItem(g_hFloatWnd, 101), buf);
-                }
-            }
-            return 0;
-        case WM_APP + 14: // 更新状态/设备名（来自后台 goroutine）
-            SetWindowTextA(GetDlgItem(hwnd, 4), (const char*)wParam);
-            SetWindowTextA(GetDlgItem(hwnd, 32), (const char*)lParam);
-            free((void*)wParam);
-            free((void*)lParam);
-            return 0;
-        case WM_APP + 15: // 更新悬浮窗数字
-            {
-                int hr = (int)wParam;
-                wchar_t buf[16];
-                if (hr > 30 && hr < 220) {
-                    wsprintfW(buf, L"%d", hr);
-                } else {
-                    wcscpy(buf, L"--");
-                }
-                if (g_hFloatWnd) {
-                    SetWindowTextW(GetDlgItem(g_hFloatWnd, 101), buf);
-                }
-            }
-            return 0;
-        case WM_APP + 3: // 创建悬浮窗
-            {
-                // 注册悬浮窗类
-                const wchar_t FLOAT_CLASS[] = L"HeartFloatWindowClass";
-                WNDCLASSW fwc = {0};
-                fwc.lpfnWndProc = FloatWndProc;
-                fwc.hInstance = GetModuleHandleW(NULL);
-                fwc.hbrBackground = CreateSolidBrush(RGB(12, 12, 16));
-                fwc.lpszClassName = FLOAT_CLASS;
-                RegisterClassW(&fwc);
-
-                // 创建置顶悬浮窗
-                hFloatWnd = CreateWindowExW(
-                    WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
-                    FLOAT_CLASS, L"❤️ 心率",
-                    WS_POPUP | WS_BORDER,
-                    GetSystemMetrics(SM_CXSCREEN) - 180, 40,
-                    150, 90,
-                    NULL, NULL, GetModuleHandleW(NULL), NULL
-                );
-
-                if (hFloatWnd) {
-                    g_hFloatWnd = hFloatWnd; // 保存全局句柄
-                    HFONT hFloatFont = CreateFontW(52, 0, 0, 0, FW_BOLD, 0, 0, 0, DEFAULT_CHARSET,
-                        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, L"Consolas");
-
-                    // 心率数字
-                    HWND hHR = CreateWindowW(L"STATIC", L"--",
-                        WS_VISIBLE | WS_CHILD | SS_CENTER,
-                        0, 5, 150, 55, hFloatWnd, (HMENU)101, GetModuleHandleW(NULL), NULL);
-                    SendMessageW(hHR, WM_SETFONT, (WPARAM)hFloatFont, 0);
-                    SetTextColor(GetDC(hHR), RGB(255, 93, 124));
-
-                    // BPM
-                    HFONT hSmall = CreateFontW(14, 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
-                        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, L"Segoe UI");
-                    HWND hBPM = CreateWindowW(L"STATIC", L"BPM",
-                        WS_VISIBLE | WS_CHILD | SS_CENTER,
-                        0, 55, 150, 18, hFloatWnd, (HMENU)102, GetModuleHandleW(NULL), NULL);
-                    SendMessageW(hBPM, WM_SETFONT, (WPARAM)hSmall, 0);
-
-                    ShowWindow(hFloatWnd, SW_SHOW);
-                    SetWindowPos(hFloatWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-                }
-            }
-            return 0;
-    }
-    return DefWindowProcW(hwnd, msg, wParam, lParam);
-}
-
-// 创建主窗口（含悬浮窗触发按钮）
-HWND CreateAppWindow(HINSTANCE hInstance, int nCmdShow) {
-    const wchar_t CLASS_NAME[] = L"HeartAppWindowClass";
-    WNDCLASSW wc = {0};
-    wc.lpfnWndProc = WndProc;
-    wc.hInstance = hInstance;
-    wc.hIcon = LoadIconW(NULL, (LPCWSTR)IDI_APPLICATION);
-    wc.hCursor = LoadCursorW(NULL, (LPCWSTR)IDC_ARROW);
-    wc.hbrBackground = CreateSolidBrush(RGB(12, 12, 16));
-    wc.lpszClassName = CLASS_NAME;
-    RegisterClassW(&wc);
-
-    HWND hwnd = CreateWindowExW(
-        0, CLASS_NAME, L"❤️ 心迹 - PC 心率监测",
-        WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME,
-        CW_USEDEFAULT, CW_USEDEFAULT, 440, 660,
-        NULL, NULL, hInstance, NULL
-    );
-
-    if (hwnd) {
-        HFONT hBigFont = CreateFontW(48, 0, 0, 0, FW_BOLD, 0, 0, 0, DEFAULT_CHARSET,
-            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, L"Consolas");
-        HFONT hFont = CreateFontW(18, 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
-            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, L"Segoe UI");
-        HFONT hSmallFont = CreateFontW(13, 0, 0, 0, FW_NORMAL, 0, 0, 0, DEFAULT_CHARSET,
-            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, L"Consolas");
-
-        // ─── 标题 ───
-        CreateWindowW(L"STATIC", L"❤️ 心迹",
-            WS_VISIBLE | WS_CHILD | SS_CENTER, 0, 8, 420, 28, hwnd, (HMENU)1, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 1), WM_SETFONT, (WPARAM)hFont, 0);
-
-        // 心率
-        CreateWindowW(L"STATIC", L"--",
-            WS_VISIBLE | WS_CHILD | SS_CENTER, 0, 38, 420, 55, hwnd, (HMENU)2, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 2), WM_SETFONT, (WPARAM)hBigFont, 0);
-
-        CreateWindowW(L"STATIC", L"BPM",
-            WS_VISIBLE | WS_CHILD | SS_CENTER, 0, 90, 420, 16, hwnd, (HMENU)3, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 3), WM_SETFONT, (WPARAM)hSmallFont, 0);
-
-	CreateWindowW(L"STATIC", L"\x25CF 等待连接...",
-			WS_VISIBLE | WS_CHILD | SS_CENTER, 20, 112, 380, 22, hwnd, (HMENU)4, hInstance, NULL);
-		SendMessageW(GetDlgItem(hwnd, 4), WM_SETFONT, (WPARAM)hFont, 0);
-
-		// 设备名称
-		CreateWindowW(L"STATIC", L"未连接",
-			WS_VISIBLE | WS_CHILD | SS_CENTER, 20, 132, 380, 18, hwnd, (HMENU)32, hInstance, NULL);
-		SendMessageW(GetDlgItem(hwnd, 32), WM_SETFONT, (WPARAM)hSmallFont, 0);
-
-		// ─── 本地模式 ───
-		CreateWindowW(L"STATIC", L"\xE2\x9A\xA1 本地模式",
-			WS_VISIBLE | WS_CHILD | SS_CENTER, 0, 155, 420, 18, hwnd, (HMENU)13, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 13), WM_SETFONT, (WPARAM)hSmallFont, 0);
-
-        CreateWindowW(L"STATIC", L"本地端口:",
-            WS_VISIBLE | WS_CHILD | SS_LEFT, 20, 168, 150, 18, hwnd, (HMENU)5, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 5), WM_SETFONT, (WPARAM)hSmallFont, 0);
-
-        CreateWindowW(L"EDIT", L"9091",
-            WS_VISIBLE | WS_CHILD | WS_BORDER | ES_READONLY, 20, 186, 380, 22, hwnd, (HMENU)6, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 6), WM_SETFONT, (WPARAM)hSmallFont, 0);
-
-        CreateWindowW(L"STATIC", L"\x1F4E5 手机推送:",
-            WS_VISIBLE | WS_CHILD | SS_LEFT, 20, 215, 380, 18, hwnd, (HMENU)7, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 7), WM_SETFONT, (WPARAM)hSmallFont, 0);
-
-        CreateWindowW(L"EDIT", L"http://---:9090/api/hr",
-            WS_VISIBLE | WS_CHILD | WS_BORDER | ES_READONLY, 20, 233, 380, 22, hwnd, (HMENU)8, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 8), WM_SETFONT, (WPARAM)hSmallFont, 0);
-
-        CreateWindowW(L"STATIC", L"\x1F4FA OBS 叠加:",
-            WS_VISIBLE | WS_CHILD | SS_LEFT, 20, 262, 380, 18, hwnd, (HMENU)9, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 9), WM_SETFONT, (WPARAM)hSmallFont, 0);
-
-        CreateWindowW(L"EDIT", L"http://---:9091?transparent=1",
-            WS_VISIBLE | WS_CHILD | WS_BORDER | ES_READONLY, 20, 280, 380, 22, hwnd, (HMENU)10, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 10), WM_SETFONT, (WPARAM)hSmallFont, 0);
-
-        // ─── MQTT 远程 ───
-        CreateWindowW(L"STATIC", L"\xF0\x9F\x94\x97 MQTT 远程（粘贴连接码自动连接）",
-            WS_VISIBLE | WS_CHILD | SS_CENTER, 0, 315, 420, 18, hwnd, (HMENU)14, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 14), WM_SETFONT, (WPARAM)hSmallFont, 0);
-
-        CreateWindowW(L"EDIT", L"",
-            WS_VISIBLE | WS_CHILD | WS_BORDER, 20, 340, 380, 26, hwnd, (HMENU)15, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 15), WM_SETFONT, (WPARAM)hSmallFont, 0);
-
-        CreateWindowW(L"BUTTON", L"🔗 连接",
-            WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 20, 372, 150, 26, hwnd, (HMENU)17, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 17), WM_SETFONT, (WPARAM)hSmallFont, 0);
-
-        CreateWindowW(L"BUTTON", L"⏹ 断开",
-            WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 180, 372, 120, 26, hwnd, (HMENU)18, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 18), WM_SETFONT, (WPARAM)hSmallFont, 0);
-
-        CreateWindowW(L"BUTTON", L"悬浮窗",
-            WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON, 310, 372, 90, 26, hwnd, (HMENU)20, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 20), WM_SETFONT, (WPARAM)hSmallFont, 0);
-
-        CreateWindowW(L"STATIC", L"\xE2\x9A\xAA MQTT 未连接",
-            WS_VISIBLE | WS_CHILD | SS_LEFT, 20, 405, 380, 18, hwnd, (HMENU)19, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 19), WM_SETFONT, (WPARAM)hSmallFont, 0);
-
-        // ─── 提示 ───
-        CreateWindowW(L"STATIC", L"\xE2\x93\x98 默认使用国内公共 Broker，也可自建或使用阿里云 IoT / EMQX",
-            WS_VISIBLE | WS_CHILD | SS_LEFT, 20, 452, 380, 14, hwnd, (HMENU)21, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 21), WM_SETFONT, (WPARAM)hSmallFont, 0);
-
-        CreateWindowW(L"STATIC", L"\xE2\x93\x98 校园网通常不会拦截 MQTT，如连不上请检查网络或更换 Broker",
-            WS_VISIBLE | WS_CHILD | SS_LEFT, 20, 468, 380, 14, hwnd, (HMENU)22, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 22), WM_SETFONT, (WPARAM)hSmallFont, 0);
-
-        // ─── 日志 ───
-        CreateWindowW(L"STATIC", L"\x1F4CB 日志:",
-            WS_VISIBLE | WS_CHILD | SS_LEFT, 20, 490, 380, 18, hwnd, (HMENU)11, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 11), WM_SETFONT, (WPARAM)hSmallFont, 0);
-
-        CreateWindowW(L"EDIT", L"",
-            WS_VISIBLE | WS_CHILD | WS_BORDER | ES_MULTILINE | ES_READONLY | WS_VSCROLL | ES_AUTOVSCROLL,
-            20, 510, 380, 110, hwnd, (HMENU)12, hInstance, NULL);
-        SendMessageW(GetDlgItem(hwnd, 12), WM_SETFONT, (WPARAM)hSmallFont, 0);
-
-        // 创建悬浮窗
-        PostMessageW(hwnd, WM_APP + 3, 0, 0);
-    }
-    return hwnd;
-}
-*/
 import "C"
 import (
 	"bufio"
@@ -328,7 +17,7 @@ import (
 	"unsafe"
 )
 
-// setTextW 正确设置 UTF-8 文本到 Windows 控件（解决中文乱码）
+
 func setTextW(hwnd C.HWND, text string) {
 	if hwnd == nil {
 		return
@@ -361,7 +50,7 @@ var (
 	mqttActive = false
 	mqttModeOn = false
 
-	// UI 频率限制
+
 	lastUIUpdate time.Time
 	lastLogUpdate time.Time
 )
@@ -388,15 +77,21 @@ func main() {
 		}
 	}
 
-	if usbMode {
-		setupUSB()
-	}
 
 	localPort = portCheck(9091)
 	mainHTTPAddr = fmt.Sprintf("127.0.0.1:%d", localPort)
 
+	if usbMode {
+		if !setupUSB() {
+
+			usbMode = false
+		}
+	}
+
 	go startLocalServer()
-	connectSSE(fmt.Sprintf("http://%s/api/sse", phoneAddr))
+
+
+	connectSSE(fmt.Sprintf("http://%s/", phoneAddr))
 
 	hInstance := C.GetModuleHandleW(nil)
 	hwnd = C.CreateAppWindow(hInstance, C.int(1))
@@ -408,7 +103,7 @@ func main() {
 
 	updateUIPorts()
 
-	// 后台轮询按钮状态
+
 	go watchButtons()
 
 	var msg C.MSG
@@ -422,14 +117,98 @@ func main() {
 	}
 }
 
-func setupUSB() {
-	cmd := exec.Command("adb", "forward", fmt.Sprintf("tcp:%d", localPort), "tcp:9090")
-	out, err := cmd.CombinedOutput()
-	_ = out
-	if err != nil {
-		os.Exit(1)
+
+func setupUSB() bool {
+
+	if _, err := exec.LookPath("adb"); err != nil {
+		addLogForce("❌ 未找到 adb.exe —— 请将 adb.exe 放在本程序同目录，或加入系统 PATH")
+		addLogForce("   下载：https://developer.android.com/studio/releases/platform-tools")
+		return false
 	}
+	addLogForce("🔍 正在检测 adb 设备...")
+
+
+	devCmd := exec.Command("adb", "devices")
+	devOut, devErr := devCmd.CombinedOutput()
+	if devErr != nil {
+		addLogForce("❌ adb devices 执行失败：" + devErr.Error())
+		return false
+	}
+	devText := string(devOut)
+	addLogForce("adb devices 输出:\n" + strings.TrimSpace(devText))
+	if !strings.Contains(devText, "\tdevice") {
+		addLogForce("❌ 未检测到已授权设备。请检查：")
+		addLogForce("   1. 手机已开启「USB 调试」")
+		addLogForce("   2. 手机弹出的「允许USB调试」已点确定")
+		addLogForce("   3. 数据线连接正常（非仅充电模式）")
+		return false
+	}
+
+
+	phonePort := probePhoneBroadcastPort()
+	if phonePort <= 0 {
+		addLogForce("⚠️ 未探测到手机广播端口，默认使用 9090")
+		addLogForce("   请确认手机端广播服务已启动")
+		phonePort = 9090
+	} else {
+		addLogForce(fmt.Sprintf("✅ 探测到手机广播端口: %d", phonePort))
+	}
+
+
+	target := fmt.Sprintf("tcp:%d", phonePort)
+	local := fmt.Sprintf("tcp:%d", localPort)
+	cmd := exec.Command("adb", "forward", local, target)
+	out, err := cmd.CombinedOutput()
+	msg := strings.TrimSpace(string(out))
+	if err != nil {
+		addLogForce("❌ adb forward 失败：" + err.Error())
+		if msg != "" {
+			addLogForce("   adb 输出: " + msg)
+		}
+		addLogForce("   可能原因：")
+		addLogForce("   - 端口 " + local + " 已被其他程序占用")
+		addLogForce("   - adb 服务异常，尝试执行 adb kill-server 后重试")
+		return false
+	}
+	if msg != "" {
+		addLogForce("adb forward 输出: " + msg)
+	}
+
 	phoneAddr = fmt.Sprintf("127.0.0.1:%d", localPort)
+	addLogForce(fmt.Sprintf("✅ USB 模式就绪：本机 %d → 手机 %d", localPort, phonePort))
+	return true
+}
+
+
+func probePhoneBroadcastPort() int {
+
+	for p := 9090; p <= 9099; p++ {
+		if quickPortAlive(p) {
+			return p
+		}
+	}
+	return -1
+}
+
+
+func quickPortAlive(phonePort int) bool {
+	testLocal := localPort
+	cmd := exec.Command("adb", "forward",
+		fmt.Sprintf("tcp:%d", testLocal), fmt.Sprintf("tcp:%d", phonePort))
+	if out, err := cmd.CombinedOutput(); err != nil {
+		_ = out
+		return false
+	}
+	ok := false
+	conn, err := net.DialTimeout("tcp", fmt.Sprintf("127.0.0.1:%d", testLocal), 800*time.Millisecond)
+	if err == nil {
+		ok = true
+		conn.Close()
+	}
+
+	rm := exec.Command("adb", "forward", "--remove", fmt.Sprintf("tcp:%d", testLocal))
+	_ = rm.Run()
+	return ok
 }
 
 func watchButtons() {
@@ -439,7 +218,7 @@ func watchButtons() {
 			continue
 		}
 
-		// 轮询 C 代码设置的全局标志
+
 		if C.g_connectReq != 0 {
 			C.g_connectReq = 0
 			tryConnectMQTT()
@@ -471,7 +250,7 @@ func tryConnectMQTT() {
 		return
 	}
 
-	// 解析连接码
+
 	broker, topic := parseCode(code)
 	if broker == "" || topic == "" {
 		addLog("连接码格式无效，请检查")
@@ -480,10 +259,10 @@ func tryConnectMQTT() {
 	}
 
 	addLog(fmt.Sprintf("正在连接 MQTT: %s topic: %s", broker, topic))
-	// UI 操作通过 PostMessage 回到主线程
-	C.PostMessageW(hwnd, 0x040B, 0, 0) // 显示"连接中..."
 
-	// 后台连接，防止卡界面
+	C.PostMessageW(hwnd, 0x040B, 0, 0)
+
+
 	go func() {
 		err := startMQTT(broker, topic)
 		result := C.WPARAM(0)
@@ -503,7 +282,7 @@ func tryConnectMQTT() {
 	}()
 }
 
-// 后台连接完成后的回调
+
 func onMQTTConnectResult() {
 	if mqttClient == nil {
 		addLog("MQTT 连接失败，请检查网络和连接码")
@@ -521,8 +300,7 @@ func onMQTTConnectResult() {
 	updateMQTTStatus(true)
 }
 
-// 解析连接码，返回 (broker, topic)
-// 格式: HEARTBEAT#V1#设备标识#host:port#topic
+
 func parseCode(code string) (string, string) {
 	if !strings.HasPrefix(code, "HEARTBEAT#") {
 		return "", ""
@@ -546,7 +324,7 @@ func parseCode(code string) (string, string) {
 	host := hostPort[:idx]
 	port := hostPort[idx+1:]
 
-	// Topic 末尾加上设备标识
+
 	fullTopic := topicBase
 	if !strings.HasSuffix(fullTopic, "/"+tag) {
 		fullTopic = fullTopic + "/" + tag
@@ -559,7 +337,7 @@ func tryDisconnectMQTT() {
 	stopMQTT()
 	mqttActive = false
 	mqttModeOn = false
-	// 重置按钮状态
+
 	C.PostMessageW(hwnd, 0x040C, 0, 0)
 	addLog("MQTT 已断开，已切换回本地模式")
 	updateMQTTStatus(false)
@@ -579,7 +357,7 @@ func updateMQTTStatus(ok bool) {
 func doUpdateMQTTStatus(ok bool) {
 }
 
-// ─── 本地 SSE 连接 ───
+
 func connectSSE(url string) {
 	go func() {
 		for {
@@ -639,7 +417,7 @@ func connectSSEOnce(url string) error {
 	}
 }
 
-// ─── UI 更新（全部通过 PostMessage 在主线程执行） ───
+
 func updateUIHR() {
 	if hwnd == nil {
 		return
@@ -649,17 +427,17 @@ func updateUIHR() {
 		return
 	}
 	lastUIUpdate = now
-	// 加锁读取最新值
+
 	mu.Lock()
 	hr := currentHR
 	dev := deviceName
 	conn := connected
 	mu.Unlock()
-	// 投递到主线程
+
 	postHRToUI(hr, dev, conn)
 }
 
-// forceUpdateHR 强制更新 UI，不经过频率限制
+
 func forceUpdateHR() {
 	if hwnd == nil {
 		return
@@ -673,16 +451,16 @@ func forceUpdateHR() {
 }
 
 func postHRToUI(hr int, dev string, conn bool) {
-	// 直接更新主窗口数字（跨线程，但 Windows 对 SetWindowTextW 有保护）
+
 	hrText := "--"
 	if conn && hr > 30 && hr < 220 {
 		hrText = fmt.Sprintf("%d", hr)
 	}
 	setTextW(C.GetDlgItem(hwnd, 2), hrText)
-	// 强制刷新擦除残留
+
 	C.InvalidateRect(C.GetDlgItem(hwnd, 2), nil, 1)
 	C.UpdateWindow(C.GetDlgItem(hwnd, 2))
-	
+
 	statusText := "\xE2\x97\x8B 等待连接..."
 	deviceText := "未连接"
 	if conn && hr > 30 {
@@ -694,7 +472,7 @@ func postHRToUI(hr int, dev string, conn bool) {
 	}
 	setTextW(C.GetDlgItem(hwnd, 4), statusText)
 	setTextW(C.GetDlgItem(hwnd, 32), deviceText)
-	// 悬浮窗
+
 	hwndFloat := C.g_hFloatWnd
 	if hwndFloat != nil {
 		setTextW(C.GetDlgItem(hwndFloat, 101), hrText)
@@ -738,17 +516,21 @@ func getLocalIP() string {
 }
 
 func addLog(msg string) {
-	// 限制日志更新频率，最多每 300ms 一次
+
 	now := time.Now()
 	if now.Sub(lastLogUpdate) < 300*time.Millisecond {
 		return
 	}
 	lastLogUpdate = now
-	
+	addLogForce(msg)
+}
+
+
+func addLogForce(msg string) {
 	t := time.Now().Format("15:04:05")
 	logContent = fmt.Sprintf("[%s] %s\r\n", t, msg) + logContent
-	if len(logContent) > 2000 {
-		logContent = logContent[:2000]
+	if len(logContent) > 4000 {
+		logContent = logContent[:4000]
 	}
 	if hwnd != nil {
 		setTextW(C.GetDlgItem(hwnd, 12), logContent)

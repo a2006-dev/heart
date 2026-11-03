@@ -61,17 +61,26 @@ public class DeviceProfileManager {
         } catch (Exception ignored) {}
     }
 
-    private void save() {
+    private synchronized void save() {
         try {
             File parent = file.getParentFile();
             if (parent != null && !parent.exists()) parent.mkdirs();
-            FileWriter fw = new FileWriter(file);
-            fw.write(profiles.toString(2));
-            fw.close();
+            File tmp = new File(file.getPath() + ".tmp");
+            try (FileWriter fw = new FileWriter(tmp)) {
+                fw.write(profiles.toString(2));
+                fw.flush();
+            }
+            if (!tmp.renameTo(file)) {
+                try (FileWriter fw = new FileWriter(file)) {
+                    fw.write(profiles.toString(2));
+                }
+                //noinspection ResultOfMethodCallIgnored
+                tmp.delete();
+            }
         } catch (Exception ignored) {}
     }
 
-    public void addOrUpdateProfile(String name, String address, String serviceUuid, String charUuid) {
+    public synchronized void addOrUpdateProfile(String name, String address, String serviceUuid, String charUuid) {
         if (name == null || address == null) return;
 
         for (int i = 0; i < profiles.length(); i++) {
@@ -101,13 +110,11 @@ public class DeviceProfileManager {
         } catch (Exception ignored) {}
     }
 
-    /** 只记录设备名和地址（连接成功后调用），不要求特征码 */
-    public void recordDevice(String name, String address) {
+    public synchronized void recordDevice(String name, String address) {
         addOrUpdateProfile(name, address, "", "");
     }
 
-    /** 根据地址删除设备 profile（取消配对时调用） */
-    public void removeProfileByAddress(String address) {
+    public synchronized void removeProfileByAddress(String address) {
         if (address == null) return;
         for (int i = 0; i < profiles.length(); i++) {
             try {
@@ -121,11 +128,11 @@ public class DeviceProfileManager {
         }
     }
 
-    public String getProfilesJson() {
+    public synchronized String getProfilesJson() {
         return profiles.toString();
     }
 
-    public List<DeviceProfile> getProfiles() {
+    public synchronized List<DeviceProfile> getProfiles() {
         List<DeviceProfile> list = new ArrayList<>();
         for (int i = 0; i < profiles.length(); i++) {
             try {

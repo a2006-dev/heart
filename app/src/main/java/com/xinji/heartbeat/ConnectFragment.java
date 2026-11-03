@@ -44,7 +44,7 @@ import java.util.Locale;
 public class ConnectFragment extends Fragment implements HeartEventBus.EventListener {
     private HeartServiceLocator serviceLocator;
     private List<BleManager.ScanDeviceInfo> deviceList = new ArrayList<>();
-    private List<BleManager.ScanDeviceInfo> pairedList = new ArrayList<>(); // 已配对设备（常驻）
+    private List<BleManager.ScanDeviceInfo> pairedList = new ArrayList<>();
     private Button btnScan, btnDisconnect, btnClearLog;
     private TextView tvDevice, tvStatus, tvScanCount, tvLog, tvBroadSearchHint;
     private ScrollView logScrollView;
@@ -157,7 +157,7 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
     public void onResume() {
         super.onResume();
         syncConnectionStatus();
-        // 同步扫描状态：如果BleManager在扫描但UI认为没在扫，更新
+
         BleManager ble = serviceLocator.getBleManager();
         if (ble != null && ble.isManualScanning() && !isScanning) {
             isScanning = true;
@@ -169,6 +169,10 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
     public void onDestroyView() {
         super.onDestroyView();
         stopScanInternal();
+        if (currentDetector != null) {
+            currentDetector.stop();
+            currentDetector = null;
+        }
         handler.removeCallbacksAndMessages(null);
         HeartEventBus.getInstance().unregister(this);
     }
@@ -302,7 +306,7 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
                 if (data instanceof String) {
                     String devName = (String) data;
                     handler.post(() -> updateStatus(devName, "已连接"));
-                    // 记录已连接设备到JSON
+
                     BleManager ble = serviceLocator.getBleManager();
                     if (ble != null) {
                         String addr = ble.getCurrentDeviceAddress();
@@ -387,11 +391,11 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
 
         private BleManager.ScanDeviceInfo getItem(int pos) {
             if (hasPaired()) {
-                if (pos == 0 || pos == pairedList.size() + 1) return null; // header
+                if (pos == 0 || pos == pairedList.size() + 1) return null;
                 if (pos < pairedList.size() + 1) return pairedList.get(pos - 1);
                 return deviceList.get(pos - pairedList.size() - 2);
             }
-            if (pos == 0) return null; // header
+            if (pos == 0) return null;
             return deviceList.get(pos - 1);
         }
 
@@ -456,7 +460,7 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
                 updateStatus("📡 " + name, "连接中...");
             });
 
-            // 长按：取消配对（仅已配对设备）
+
             dh.itemView.setOnLongClickListener(v -> {
                 if (getContext() == null) return false;
                 if (type != TYPE_PAIRED_DEVICE) return false;
@@ -473,8 +477,8 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
         @Override
         public int getItemCount() {
             int count = 0;
-            if (hasPaired()) count += pairedList.size() + 1; // header + devices
-            if (hasScan()) count += deviceList.size() + 1; // header + devices
+            if (hasPaired()) count += pairedList.size() + 1;
+            if (hasScan()) count += deviceList.size() + 1;
             return count;
         }
     }
@@ -540,62 +544,123 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
             .show();
     }
 
+    private com.xinji.heartbeat.bluetooth.HeartRateDetector currentDetector;
+
     private void startFilterMode(BleManager.ScanDeviceInfo dev) {
-        BleManager ble = serviceLocator.getBleManager();
-        if (ble == null) return;
-
         String name = dev.name != null && !dev.name.isEmpty() ? dev.name : "未知设备";
-        appendLog("🔍 [筛选模式] 开始分析 " + name + " ...", 0xFF4CAF50);
-        appendLog("🔍 [筛选模式] 正在连接并发现所有服务...", 0xFFcbadbb);
-
+        appendLog("🔍 [手动检测] 连接 " + name + " 并列出所有特征...", 0xFF4CAF50);
         if (isScanning) {
-            ble.stopManualScan();
+            BleManager ble = serviceLocator.getBleManager();
+            if (ble != null) ble.stopManualScan();
             isScanning = false;
             btnScan.setText("🔍 开始搜索");
         }
-
         handler.removeCallbacks(scanTimeoutRunnable);
 
-        ble.connectAndFilterServices(dev.address, dev.name, new BleManager.FilterCallback() {
-            @Override
-            public void onServiceDiscovered(String serviceUuid, String charUuid) {
-                handler.post(() -> appendLog("🔍 [筛选] 发现服务: " + serviceUuid + " / 特征: " + charUuid, 0xFFcbadbb));
+
+        BleManager ble = serviceLocator.getBleManager();
+        if (ble != null) {
+            if (ble.isConnected()) {
+                ble.disconnect();
+                appendLog("🔌 已断开当前连接", 0xFFffaa33);
             }
-            @Override
-            public void onHeartRateCharFound(String serviceUuid, String charUuid) {
-                handler.post(() -> appendLog("✅ [筛选] 匹配到心率特征! 服务=" + serviceUuid + " 特征=" + charUuid, 0xFF4CAF50));
-            }
-            @Override
-            public void onSubscribed(String serviceUuid, String charUuid) {
-                handler.post(() -> {
-                    appendLog("✅ [筛选] 已订阅通知: " + charUuid + " → 等待心率数据...", 0xFF4CAF50);
-                    updateStatus(name, "已连接（筛选模式）");
-                });
-                if (ble != null) ble.saveLastDevice(dev.name, dev.address);
-                HeartEventBus.getInstance().post(HeartEventBus.EVENT_CONNECTED, name);
-            }
-            @Override
-            public void onFilterComplete(int totalServices, int totalChars, int matched) {
-                handler.post(() -> {
-                    appendLog("🔍 [筛选] 扫描完成: " + totalServices + " 个服务, " + totalChars + " 个特征, 匹配到 " + matched + " 个心率相关特征", 0xFFcbadbb);
-                    if (matched == 0) {
-                        appendLog("⚠️ [筛选] 未找到匹配的心率特征 — 可以查看「广播服务UUID」手动选择", 0xFFffaa33);
-                        updateStatus(name, "未匹配到心率特征");
+        }
+
+        appendLog("🔗 正在连接: " + name, 0xFFcbadbb);
+        updateStatus("📡 " + name, "检测中...");
+
+
+        currentDetector = new com.xinji.heartbeat.bluetooth.HeartRateDetector(
+                requireContext(), dev.address, dev.name,
+                new com.xinji.heartbeat.bluetooth.HeartRateDetector.DetectCallback() {
+                    @Override
+                    public void onConnecting() {}
+
+                    @Override
+                    public void onDataReceived(String svcUuid, String charUuid, byte[] data) {
+                        StringBuilder hex = new StringBuilder();
+                        for (byte b : data) hex.append(String.format("%02X ", b));
+                        handler.post(() -> appendLog("📥 " + (charUuid.length() > 8 ? charUuid.substring(4, 8) : charUuid) + " → " + hex.toString().trim(), 0xFF4CAF50));
+                    }
+
+                    @Override
+                    public void onResult(java.util.List<com.xinji.heartbeat.bluetooth.DetectResult> results) {
+                        handler.post(() -> showCharPicker(results, dev));
+                    }
+
+                    @Override
+                    public void onError(String reason) {
+                        handler.post(() -> {
+                            appendLog("❌ " + reason, 0xFFff5d7c);
+                            updateStatus(name, "检测失败");
+                        });
                     }
                 });
-            }
-            @Override
-            public void onError(String msg) {
-                handler.post(() -> {
-                    appendLog("❌ [筛选] " + msg, 0xFFff5d7c);
-                    updateStatus(name, "筛选失败");
-                });
-            }
-            @Override
-            public void onHeartRateData(int hr) {
-                handler.post(() -> appendLog("❤️ 心率数据: " + hr + " BPM", 0xFFff5d7c));
-            }
-        });
+        currentDetector.start();
+    }
+
+
+    private void showCharPicker(java.util.List<com.xinji.heartbeat.bluetooth.DetectResult> results,
+                                 BleManager.ScanDeviceInfo dev) {
+        if (results == null || results.isEmpty()) {
+            appendLog("⚠️ 未检测到任何特征", 0xFFffaa33);
+            return;
+        }
+
+
+        java.util.List<com.xinji.heartbeat.bluetooth.DetectResult> active = new java.util.ArrayList<>();
+        for (com.xinji.heartbeat.bluetooth.DetectResult r : results) {
+            if (r.rawSamples != null && !r.rawSamples.isEmpty()) active.add(r);
+        }
+        if (active.isEmpty()) {
+            appendLog("⚠️ 连接成功但未收到数据，尝试重新检测", 0xFFffaa33);
+            return;
+        }
+
+
+        active.sort((a, b) -> b.confidence.compareTo(a.confidence));
+
+        String[] items = new String[active.size()];
+        String[] svcUuids = new String[active.size()];
+        String[] charUuids = new String[active.size()];
+
+        for (int i = 0; i < active.size(); i++) {
+            com.xinji.heartbeat.bluetooth.DetectResult r = active.get(i);
+            String shortSvc = r.serviceUuid.length() > 8 ? r.serviceUuid.substring(4, 8) : r.serviceUuid;
+            String shortChar = r.charUuid.length() > 8 ? r.charUuid.substring(4, 8) : r.charUuid;
+            int n = r.rawSamples != null ? r.rawSamples.size() : 0;
+            byte[] last = r.rawSamples.get(r.rawSamples.size() - 1);
+            StringBuilder hex = new StringBuilder();
+            for (byte b : last) hex.append(String.format("%02X ", b));
+            String conf = r.confidence == com.xinji.heartbeat.bluetooth.DetectResult.Confidence.HIGH ? "✅" :
+                          r.confidence == com.xinji.heartbeat.bluetooth.DetectResult.Confidence.MEDIUM ? "⚠️" : "❓";
+            String hint = r.candidateHr > 0 ? " ~" + r.candidateHr + "bpm" : "";
+            items[i] = conf + " " + shortSvc + "/" + shortChar + hint + " (" + n + "包) " + hex.toString().trim();
+            svcUuids[i] = r.serviceUuid;
+            charUuids[i] = r.charUuid;
+        }
+
+        new AlertDialog.Builder(requireContext())
+            .setTitle("📋 选择心率特征")
+            .setMessage("检测到 " + active.size() + " 个有数据的特征，\n请选择发送心率数据的那个：")
+            .setItems(items, (dialog, which) -> {
+                String svc = svcUuids[which];
+                String ch = charUuids[which];
+                appendLog("✅ 已选择: " + svc + "/" + ch, 0xFF4CAF50);
+
+                try {
+                    DeviceProfileManager mgr = serviceLocator.getDeviceProfileManager();
+                    if (mgr != null) mgr.addOrUpdateProfile(dev.name, dev.address, svc, ch);
+                } catch (Exception ignored) {}
+                BleManager ble = serviceLocator.getBleManager();
+                if (ble != null) {
+                    ble.saveLastDevice(dev.name, dev.address);
+                    ble.connectToDevice(dev.address, dev.name);
+                    updateStatus("📡 " + (dev.name != null ? dev.name : ""), "连接中...");
+                }
+            })
+            .setNegativeButton("取消", null)
+            .show();
     }
 
     public static String formatRssi(int rssi) {
@@ -612,7 +677,7 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
     public void onScanResult(List<BleManager.ScanDeviceInfo> devices) {
         handler.post(() -> {
             deviceList.clear();
-            // 过滤掉已配对的设备
+
             java.util.Set<String> pairedAddrs = new java.util.HashSet<>();
             for (BleManager.ScanDeviceInfo p : pairedList) {
                 pairedAddrs.add(p.address);
@@ -638,11 +703,11 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
         });
     }
 
-    /** 加载已配对设备列表（常驻显示） */
+
     private void loadPairedDevices() {
         pairedList.clear();
         try {
-            // 从 BleManager 获取最近连接的设备
+
             BleManager ble = serviceLocator.getBleManager();
             if (ble != null) {
                 java.util.Map<String, String> paired = ble.getPairedDevices();
@@ -652,7 +717,7 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
                     pairedList.add(info);
                 }
             }
-            // 从 DeviceProfileManager 获取更多已保存设备（解耦：由 UI 层直接调用）
+
             try {
                 com.xinji.heartbeat.core.DeviceProfileManager mgr = serviceLocator.getDeviceProfileManager();
                 if (mgr != null) {
@@ -660,7 +725,7 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
                     if (profiles != null) {
                         for (com.xinji.heartbeat.core.DeviceProfileManager.DeviceProfile p : profiles) {
                             if (p.address != null && p.name != null && !p.address.isEmpty()) {
-                                // 避免重复
+
                                 boolean exists = false;
                                 for (BleManager.ScanDeviceInfo info : pairedList) {
                                     if (info.address.equals(p.address)) {
@@ -682,7 +747,7 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
         deviceAdapter.notifyDataSetChanged();
     }
 
-    /** 取消配对：从已配对列表中移除 */
+
     private void unpairDevice(BleManager.ScanDeviceInfo dev) {
         BleManager ble = serviceLocator.getBleManager();
         if (ble != null) {
@@ -691,7 +756,7 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
             }
             ble.clearLastDevice();
         }
-        // 从 DeviceProfileManager 中删除该设备的 profile（解耦：UI 层直接调用）
+
         try {
             DeviceProfileManager mgr = serviceLocator.getDeviceProfileManager();
             if (mgr != null && dev.address != null) {
@@ -706,7 +771,7 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
 
     private int getDevicePriority(BleManager.ScanDeviceInfo dev) {
         if (dev.name == null || dev.name.isEmpty() || "未知设备".equals(dev.name)) return 0;
-        // 已连接过的设备优先展示
+
         if (dev.isKnown) return 200;
         String n = dev.name.toLowerCase(Locale.ROOT);
         if (n.contains("heart")) return 100;
