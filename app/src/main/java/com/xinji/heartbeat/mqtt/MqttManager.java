@@ -235,13 +235,13 @@ public class MqttManager {
         if (hostPort.startsWith("[")) {
             int close = hostPort.indexOf(']');
             if (close < 0 || close + 1 >= hostPort.length() || hostPort.charAt(close + 1) != ':') return null;
-            host = hostPort.substring(1, close);
-            portStr = hostPort.substring(close + 2);
+            host = hostPort.substring(1, close).trim();
+            portStr = hostPort.substring(close + 2).trim();
         } else {
             int colon = hostPort.lastIndexOf(':');
             if (colon <= 0) return null;
-            host = hostPort.substring(0, colon);
-            portStr = hostPort.substring(colon + 1);
+            host = hostPort.substring(0, colon).trim();
+            portStr = hostPort.substring(colon + 1).trim();
         }
 
         int port;
