@@ -451,6 +451,7 @@ public class MainActivity extends FragmentActivity {
                 NOTIF_CHANNEL_ID, "设备断开", NotificationManager.IMPORTANCE_HIGH);
             channel.setDescription("手表端断开连接时通知");
             channel.enableVibration(true);
+            channel.setShowBadge(true);
             NotificationManager nm = getSystemService(NotificationManager.class);
             if (nm != null) nm.createNotificationChannel(channel);
         }
@@ -475,7 +476,7 @@ public class MainActivity extends FragmentActivity {
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
             Notification notif = new Notification.Builder(this, NOTIF_CHANNEL_ID)
-                .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                .setSmallIcon(R.drawable.ic_stat_heart)
                 .setContentTitle("设备已断开")
                 .setContentText(name + " 已断开连接")
                 .setContentIntent(pi)

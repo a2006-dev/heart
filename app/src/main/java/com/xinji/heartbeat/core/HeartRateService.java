@@ -97,6 +97,10 @@ public class HeartRateService extends Service {
             NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID, "心率监测", NotificationManager.IMPORTANCE_LOW);
             channel.setDescription("后台心率监测保活");
+            channel.setShowBadge(false);
+            channel.setSound(null, null);
+            channel.enableVibration(false);
+            channel.setLockscreenVisibility(android.app.Notification.VISIBILITY_PRIVATE);
             NotificationManager nm = getSystemService(NotificationManager.class);
             if (nm != null) nm.createNotificationChannel(channel);
         }
@@ -116,11 +120,14 @@ public class HeartRateService extends Service {
             // API 24/25 没有 NotificationChannel，使用无 channel 的构造函数
             builder = new Notification.Builder(this);
         }
-        builder.setSmallIcon(android.R.drawable.ic_menu_info_details)
+        builder.setSmallIcon(com.xinji.heartbeat.R.drawable.ic_stat_heart)
             .setContentTitle(title)
             .setContentText(text)
             .setContentIntent(tapPending)
-            .setOngoing(true);
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .setSilent(true)
+            .setCategory(android.app.Notification.CATEGORY_SERVICE);
 
         int[] serviceTypes;
         if (Build.VERSION.SDK_INT >= 29) {
