@@ -674,23 +674,8 @@ public class BleManager {
                 if (hr > 20 && hr < 250) {
                     if (filterCallback != null) filterCallback.onHeartRateData(hr);
                     if (listener != null) {
-                        int[] rrInts = null;
-                        if (data.length >= 3) {
-                            int f = data[0] & 0xFF;
-                            boolean hasRR = (f & 0x10) != 0;
-                            if (hasRR) {
-                                int hrBytes = (f & 0x01) == 0 ? 1 : 2;
-                                int rrCnt = (data.length - 1 - hrBytes) / 2;
-                                if (rrCnt > 0) {
-                                    rrInts = new int[rrCnt];
-                                    for (int ri = 0; ri < rrCnt; ri++) {
-                                        int off = 1 + hrBytes + ri * 2;
-                                        if (off + 1 < data.length)
-                                            rrInts[ri] = (data[off] & 0xFF) | ((data[off + 1] & 0xFF) << 8);
-                                    }
-                                }
-                            }
-                        }
+                HeartRatePacket packet = HeartRatePacket.parse(data);
+                        int[] rrInts = packet != null ? packet.getRrIntervals() : null;
                         listener.onHeartRateUpdate(hr, rrInts);
                     }
                 }
@@ -839,14 +824,11 @@ public class BleManager {
             byte[] data = ch.getValue();
             if (data == null || data.length < 2) return;
             try {
-                int flags = data[0] & 0xFF;
-                int hrBytes = (flags & 0x01) == 0 ? 1 : 2;
-                if (data.length < 1 + hrBytes) return;
-                int hr = hrBytes == 1 ? (data[1] & 0xFF)
-                        : ((data[1] & 0xFF) | ((data[2] & 0xFF) << 8));
+                HeartRatePacket packet = HeartRatePacket.parse(data);
+                if (packet == null) return;
+                int hr = packet.getHeartRate();
                 if (hr <= 20 || hr >= 250) return;
-
-                int[] rrIntervals = parseRrIntervals(data, flags, hrBytes);
+                int[] rrIntervals = packet.getRrIntervals();
                 if (listener != null) listener.onHeartRateUpdate(hr, rrIntervals);
             } catch (Exception e) {
                 Log.w(TAG, "解析心率数据失败", e);
@@ -854,17 +836,6 @@ public class BleManager {
         }
     };
 
-    private static int[] parseRrIntervals(byte[] data, int flags, int hrBytes) {
-        if ((flags & 0x10) == 0) return null;
-        int count = (data.length - 1 - hrBytes) / 2;
-        if (count <= 0) return null;
-        int[] rr = new int[count];
-        for (int i = 0; i < count; i++) {
-            int off = 1 + hrBytes + i * 2;
-            rr[i] = (data[off] & 0xFF) | ((data[off + 1] & 0xFF) << 8);
-        }
-        return rr;
-    }
 
     private static final String PREFS_NAME = "ble_prefs";
     private static final String KEY_LAST_DEVICE_NAME = "last_device_name";

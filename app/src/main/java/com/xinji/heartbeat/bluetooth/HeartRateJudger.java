@@ -71,14 +71,10 @@ public class HeartRateJudger {
     }
 
     private static int tryParseStandardHr(byte[] data) {
-        if (data == null || data.length < 2) return -1;
-        try {
-            int flags = data[0] & 0xFF;
-            int hr = (flags & 0x01) == 0
-                    ? (data[1] & 0xFF)
-                    : ((data[1] & 0xFF) | ((data[2] & 0xFF) << 8));
-            if (hr > HR_MIN && hr < HR_MAX) return hr;
-        } catch (Exception ignored) {}
+        HeartRatePacket packet = HeartRatePacket.parse(data);
+        if (packet == null) return -1;
+        int hr = packet.getHeartRate();
+        if (hr > HR_MIN && hr < HR_MAX) return hr;
         return -1;
     }
 
