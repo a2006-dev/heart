@@ -5,10 +5,18 @@ import android.net.Uri;
 import android.os.Build;
 import androidx.core.content.FileProvider;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.MessageDigest;
 
 public class UpdateChecker {
     public static final String REPO = "a2006-dev/heart";
@@ -24,12 +32,7 @@ public class UpdateChecker {
 
     public static final Mirror[] MIRRORS = {
         new Mirror("GitHub 直连", "https://github.com", 0),
-        new Mirror("ghproxy.com", "https://ghproxy.com/https://github.com", 0),
-        new Mirror("moeyy.cn", "https://github.moeyy.cn/https://github.com", 0),
-        new Mirror("gh-proxy.com", "https://gh-proxy.com/https://github.com", 0),
-        new Mirror("gh.idayer.com", "https://gh.idayer.com/https://github.com", 0),
-        new Mirror("gh.ddlc.top", "https://gh.ddlc.top/https://github.com", 0),
-        new Mirror("kkgithub.com", "https://kkgithub.com", 0)
+        new Mirror("gh-proxy.com", "https://gh-proxy.com/https://github.com", 0)
     };
 
     public static void testAllMirrors() {
