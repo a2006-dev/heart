@@ -1,137 +1,268 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>MQTT接收</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT 接收</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.js"
+            integrity="sha384-re/MqgVc3EnlGboyalOS/u4SWmaBGtL/N+BiAwLVaddPVuMvZCcgvXpQWyts+f28"
+            crossorigin="anonymous"></script>
     <style>
-        body{font-family:monospace;padding:15px;background:#1e1e1e;color:#ccc}
-        input{width:100%;padding:8px;margin:5px 0;box-sizing:border-box;background:#333;color:#fff;border:1px solid #555}
-        button{padding:10px 20px;background:#0a84ff;border:none;color:#fff;cursor:pointer}
-        #log{margin-top:15px;white-space:pre-wrap;background:#111;color:#0f0;padding:10px;height:300px;overflow-y:auto}
-        .hint{color:#ff0}
-        .info{color:#0af;margin:4px 0}
+        body { font-family: monospace; padding: 15px; margin: 0; background: #1e1e1e; color: #ccc; }
+        input { width: 100%; padding: 8px; margin: 5px 0; box-sizing: border-box;
+                background: #333; color: #fff; border: 1px solid #555; border-radius: 4px; }
+        input[type=number] { width: 110px; }
+        button { padding: 10px 20px; background: #0a84ff; border: none; color: #fff;
+                 cursor: pointer; border-radius: 4px; margin-right: 8px; }
+        button:disabled { background: #444; cursor: not-allowed; }
+        #log { margin-top: 15px; white-space: pre-wrap; background: #111; color: #0f0;
+               padding: 10px; height: 300px; overflow-y: auto; border-radius: 4px; }
+        .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+        .hint { color: #777; font-size: 12px; }
+        .info { color: #0af; margin: 4px 0; }
+        #banner { display: none; margin: 10px 0; padding: 10px; border-radius: 4px;
+                  background: #4a1f1f; color: #ffb4b4; border: 1px solid #7a2b2b; }
+        #status { font-weight: bold; }
+        .s-idle { color: #888; }
+        .s-connecting { color: #ffb400; }
+        .s-ok { color: #34c759; }
+        .s-err { color: #ff453a; }
+        @media (prefers-color-scheme: light) {
+            body { background: #f5f5f7; color: #333; }
+            input { background: #fff; color: #111; border: 1px solid #ccc; }
+            #log { background: #fff; color: #067a06; border: 1px solid #ddd; }
+            .hint { color: #888; }
+            .info { color: #0a5cbf; }
+            #banner { background: #fdecea; color: #a12622; border: 1px solid #f5c2c0; }
+            button:disabled { background: #ddd; color: #888; }
+        }
     </style>
 </head>
 <body>
-    <input id="connStr" placeholder="粘贴连接码，如 HEARTBEAT#V1#...#heart/rate" value="HEARTBEAT#V1#N7TYKY8Q#broker-cn.emqx.io:1883#heart/rate"><br>
-    <button onclick="connect()">连接并接收</button> <span id="status"></span>
+    <div id="banner"></div>
+    <input id="connStr" autocomplete="off" spellcheck="false"
+           placeholder="粘贴连接码，如 HEARTBEAT#V1#ABC#host:1883#heart/rate">
+    <div class="row">
+        <label class="hint">WebSocket 端口</label>
+        <input type="number" id="wsPort" placeholder="留空自动">
+        <label class="hint"><input type="checkbox" id="wsTls" style="width:auto"> 使用 wss</label>
+        <button id="btnConnect" onclick="connect()">连接并接收</button>
+        <button id="btnClear" onclick="clearCode()">清除连接码</button>
+        <span id="status" class="s-idle">未连接</span>
+    </div>
+    <div class="hint">WebSocket 端口因 Broker 而异，EMQX 公共实例为 8083(ws) / 8084(wss)，其他服务请按实际填写。</div>
     <div class="info" id="topicInfo"></div>
     <div id="log"></div>
-
     <script>
-        let client;
+        var STORAGE_KEY = 'heart_mqtt_code';
+        var client = null;
+        var connected = false;
 
-        function log(msg) { 
-            const el = document.getElementById('log');
+        function log(msg) {
+            var el = document.getElementById('log');
             el.textContent += msg + '\n';
             el.scrollTop = el.scrollHeight;
         }
 
-        /**
-         * 解析连接码：
-         *   HEARTBEAT#V1#设备标识#host:port#topicBase
-         * 返回 { wsUrl, fullTopic }
-         */
+        function setStatus(text, cls) {
+            var el = document.getElementById('status');
+            el.textContent = text;
+            el.className = cls || 's-idle';
+        }
+
+        function showBanner(text) {
+            var b = document.getElementById('banner');
+            b.textContent = text;
+            b.style.display = text ? 'block' : 'none';
+        }
+
+        function saveCode(raw) {
+            try {
+                if (raw) localStorage.setItem(STORAGE_KEY, raw);
+                else localStorage.removeItem(STORAGE_KEY);
+            } catch (e) {}
+        }
+
+        function loadCode() {
+            try {
+                return localStorage.getItem(STORAGE_KEY) || '';
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function clearCode() {
+            document.getElementById('connStr').value = '';
+            saveCode('');
+            log('已清除保存的连接码');
+        }
+
         function parseConnCode(raw) {
-            if (!raw.startsWith('HEARTBEAT#')) return null;
-            const body = raw.substring('HEARTBEAT#'.length);
-            const parts = body.split('#');
+            if (!raw || raw.indexOf('HEARTBEAT#') !== 0) return null;
+            var body = raw.substring('HEARTBEAT#'.length);
+            var parts = body.split('#');
             if (parts.length < 4) return null;
-            if (parts[0] !== 'V1') return null;
+            var version = parts[0];
+            if (version !== 'V1' && version !== 'V2') return null;
+            var tag = parts[1].trim();
+            var hostPort = parts[2].trim();
+            var topicBase = parts[3].trim();
+            if (!tag || !hostPort || !topicBase) return null;
 
-            const tag = parts[1];
-            const hostPort = parts[2];
-            const topicBase = parts[3];
+            var host, port;
+            if (hostPort.charAt(0) === '[') {
+                var closeIdx = hostPort.indexOf(']');
+                if (closeIdx < 0 || hostPort.charAt(closeIdx + 1) !== ':') return null;
+                host = hostPort.substring(0, closeIdx + 1);
+                port = hostPort.substring(closeIdx + 2);
+            } else {
+                var idx = hostPort.lastIndexOf(':');
+                if (idx <= 0) return null;
+                host = hostPort.substring(0, idx);
+                port = hostPort.substring(idx + 1);
+            }
+            if (!host || !port || !/^[0-9]+$/.test(port)) return null;
+            var portNum = parseInt(port, 10);
+            if (portNum < 1 || portNum > 65535) return null;
 
-            const colonIdx = hostPort.lastIndexOf(':');
-            if (colonIdx <= 0) return null;
-            const host = hostPort.substring(0, colonIdx);
-            const port = hostPort.substring(colonIdx + 1);
+            var fullTopic = topicBase;
+            if (fullTopic.slice(-(tag.length + 1)) !== '/' + tag) fullTopic = fullTopic + '/' + tag;
 
-            // 构造完整 topic（末尾加上设备标识）
-            let fullTopic = topicBase;
-            if (!fullTopic.endsWith('/' + tag)) fullTopic = fullTopic + '/' + tag;
+            return {
+                version: version,
+                tls: version === 'V2',
+                tag: tag,
+                host: host,
+                port: portNum,
+                fullTopic: fullTopic
+            };
+        }
 
-            // 确定 WebSocket 地址
-            let wsUrl;
-            if (port === '1883') wsUrl = `ws://${host}:8083/mqtt`;
-            else if (port === '8883') wsUrl = `wss://${host}:8084/mqtt`;
-            else wsUrl = `ws://${host}:${port}/mqtt`;
+        function buildWsUrl(info) {
+            var portEl = document.getElementById('wsPort');
+            var tlsEl = document.getElementById('wsTls');
+            var manualPort = parseInt(portEl.value, 10);
+            var useTls = tlsEl.checked;
 
-            return { wsUrl, fullTopic, tag, host, port };
+            if (!isNaN(manualPort) && manualPort > 0 && manualPort <= 65535) {
+                return (useTls ? 'wss://' : 'ws://') + info.host + ':' + manualPort + '/mqtt';
+            }
+            if (info.tls) {
+                return 'wss://' + info.host + ':' + info.port + '/mqtt';
+            }
+            return 'ws://' + info.host + ':' + info.port + '/mqtt';
         }
 
         function connect() {
-            const raw = document.getElementById('connStr').value.trim();
-            if (!raw) return;
+            var rawEl = document.getElementById('connStr');
+            var raw = rawEl.value.trim();
+            if (!raw) {
+                showBanner('请先粘贴手机端生成的连接码');
+                return;
+            }
+            var info = parseConnCode(raw);
+            if (!info) {
+                showBanner('连接码格式无效，正确格式: HEARTBEAT#V1 或 V2#设备标识#host:port#topic');
+                setStatus('连接码无效', 's-err');
+                return;
+            }
+            saveCode(raw);
+            showBanner('');
 
-            const info = parseConnCode(raw);
-            if (!info) { log('❌ 无法解析连接码，格式: HEARTBEAT#V1#标识#host:port#topic'); return; }
-
-            // 精确订阅，不通配符
-            const subTopic = info.fullTopic;
-
-            document.getElementById('log').textContent = '';
-            document.getElementById('topicInfo').textContent = '🔔 订阅: ' + subTopic;
-
-            log('🔗 WebSocket: ' + info.wsUrl);
-            log('📡 完整Topic: ' + info.fullTopic);
-            log('🔔 订阅: ' + subTopic);
-            log('连接中...');
-
-            if (client && client.isConnected()) {
-                client.disconnect();
+            var wsUrl = buildWsUrl(info);
+            var pageIsHttps = location.protocol === 'https:';
+            if (pageIsHttps && wsUrl.indexOf('ws://') === 0) {
+                showBanner('当前页面是 https，浏览器会拦截不加密的 ws:// 连接。' +
+                           '请填入 Broker 的 wss 端口，或勾选"使用 wss"，或改用本机文件打开此页面。');
+                setStatus('被浏览器拦截', 's-err');
+                return;
             }
 
-            client = new Paho.MQTT.Client(info.wsUrl, 'r_' + Math.random().toString(16).slice(2, 8));
-            
-            client.onConnectionLost = (resp) => {
-                log('⚠️ 连接断开' + (resp.errorMessage ? ': ' + resp.errorMessage : ''));
-                document.getElementById('status').textContent = '断开';
+            document.getElementById('log').textContent = '';
+            document.getElementById('topicInfo').textContent = '订阅: ' + info.fullTopic;
+
+            var btn = document.getElementById('btnConnect');
+            btn.disabled = true;
+            btn.textContent = '连接中…';
+            setStatus('连接中', 's-connecting');
+
+            if (client && connected) {
+                try { client.disconnect(); } catch (e) {}
+            }
+
+            log('WebSocket: ' + wsUrl);
+            log('完整 Topic: ' + info.fullTopic);
+            log('连接中...');
+
+            var clientId = 'r_' + Math.random().toString(16).slice(2, 10);
+            client = new Paho.MQTT.Client(wsUrl, clientId);
+            connected = false;
+
+            client.onConnectionLost = function (resp) {
+                connected = false;
+                btn.disabled = false;
+                btn.textContent = '连接并接收';
+                setStatus('连接断开', 's-err');
+                showBanner('连接已断开' + (resp && resp.errorMessage ? ': ' + resp.errorMessage : '，请重新点击连接'));
+                log('连接断开' + (resp && resp.errorMessage ? ': ' + resp.errorMessage : ''));
             };
-            
-            client.onMessageArrived = (msg) => {
-                window._lastMsgTime = Date.now();
-                log(`📩 [${msg.destinationName}] ${msg.payloadString}`);
+
+            client.onMessageArrived = function (msg) {
+                log('[' + msg.destinationName + '] ' + msg.payloadString);
             };
 
             client.connect({
-                onSuccess: () => {
-                    log('✅ 已连接！');
-                    document.getElementById('status').textContent = '已连接';
-                    
-                    client.subscribe(subTopic, {
-                        onSuccess: () => {
-                            log('✅ 已订阅 ' + subTopic);
-                            log('等待数据中...');
-                            // 10秒超时检测
-                            setTimeout(() => {
-                                if (window._lastMsgTime === undefined) {
-                                    log('⏰ 10秒未收到数据，链接可能已过期');
-                                    log('💡 请重新复制手机端最新的连接码');
-                                    document.getElementById('status').textContent = '已过期';
-                                }
-                            }, 10000);
-                            window._lastMsgTime = undefined;
+                timeout: 10,
+                onSuccess: function () {
+                    connected = true;
+                    btn.disabled = false;
+                    btn.textContent = '重新连接';
+                    setStatus('已连接', 's-ok');
+                    log('已连接');
+                    client.subscribe(info.fullTopic, {
+                        onSuccess: function () {
+                            log('已订阅 ' + info.fullTopic + '，等待数据…');
                         },
-                        onFailure: (err) => {
-                            log('❌ 订阅失败: ' + err.errorMessage);
-                            // 备用：尝试订阅具体 topic
-                            log('尝试订阅具体 topic: ' + info.fullTopic);
-                            client.subscribe(info.fullTopic, {
-                                onSuccess: () => log('✅ 已订阅 ' + info.fullTopic),
-                                onFailure: (e) => log('❌ 也失败了: ' + e.errorMessage)
-                            });
+                        onFailure: function (err) {
+                            setStatus('订阅失败', 's-err');
+                            showBanner('订阅被拒绝' + (err && err.errorMessage ? ': ' + err.errorMessage : ''));
+                            log('订阅失败: ' + (err && err.errorMessage ? err.errorMessage : 'unknown'));
                         }
                     });
                 },
-                onFailure: (err) => {
-                    log('❌ 连接失败: ' + err.errorMessage);
-                    document.getElementById('status').textContent = '失败';
+                onFailure: function (err) {
+                    connected = false;
+                    btn.disabled = false;
+                    btn.textContent = '连接并接收';
+                    setStatus('连接失败', 's-err');
+                    var msg = err && err.errorMessage ? err.errorMessage : 'unknown';
+                    showBanner('无法连接到 Broker: ' + msg + '。请确认 WebSocket 端口是否正确。');
+                    log('连接失败: ' + msg);
                 }
             });
         }
+
+        (function init() {
+            var saved = loadCode();
+            if (saved) {
+                document.getElementById('connStr').value = saved;
+                log('已载入上次保存的连接码');
+            }
+            var params = new URLSearchParams(location.search);
+            var fromUrl = params.get('code');
+            if (fromUrl) {
+                document.getElementById('connStr').value = fromUrl;
+                saveCode(fromUrl);
+                log('已从链接参数载入连接码');
+            }
+            var portParam = params.get('wsPort');
+            if (portParam && /^[0-9]+$/.test(portParam)) {
+                document.getElementById('wsPort').value = portParam;
+            }
+            if (params.get('wss') === '1') {
+                document.getElementById('wsTls').checked = true;
+            }
+        })();
     </script>
 </body>
 </html>
