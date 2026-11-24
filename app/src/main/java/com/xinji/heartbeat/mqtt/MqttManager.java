@@ -35,6 +35,7 @@ public class MqttManager {
     private static final String KEY_PORT = "mqtt_port";
     private static final String KEY_TOPIC = "mqtt_topic";
     private static final String KEY_CLIENT_ID = "mqtt_client_id";
+    private static final String KEY_DEVICE_TAG = "mqtt_device_tag";
     private static final String KEY_TLS = "mqtt_tls";
 
     private static final String DEFAULT_BROKER = "broker-cn.emqx.io";
@@ -62,6 +63,7 @@ public class MqttManager {
     private volatile String clientId = "";
     private volatile String bleDeviceName = "";
 
+    private volatile ExecutorService publishExecutor;
     private volatile long publishCount;
     private volatile long lastPublishTime;
     private volatile boolean publishFailed;
@@ -110,7 +112,11 @@ public class MqttManager {
         brokerTls = prefs.getBoolean(KEY_TLS, false);
         topic = prefs.getString(KEY_TOPIC, "heart/rate");
         clientId = prefs.getString(KEY_CLIENT_ID, generateClientId());
-        deviceTag = null;
+        deviceTag = prefs.getString(KEY_DEVICE_TAG, null);
+        if (deviceTag == null || deviceTag.isEmpty()) {
+            deviceTag = generateDeviceTag();
+            prefs.edit().putString(KEY_DEVICE_TAG, deviceTag).apply();
+        }
     }
 
     public synchronized void setConfig(String host, String mqttTopic) {
@@ -158,7 +164,15 @@ public class MqttManager {
     public void setHeartRateCallback(HeartRateCallback callback) { this.hrCallback = callback; }
 
     public void onHeartRateReceived(int hr) {
-        if (running.get() && hr > 20 && hr < 250) publishHeartRate(hr);
+        if (running.get() && hr > 20 && hr < 250) {
+            final int value = hr;
+            final ExecutorService pub = publishExecutor;
+            if (pub != null) {
+                try {
+                    pub.execute(() -> publishHeartRate(value));
+                } catch (Exception ignored) {}
+            }
+        }
         HeartRateCallback callback = hrCallback;
         if (callback != null) callback.onHeartRate(hr);
     }
@@ -245,7 +259,10 @@ public class MqttManager {
             postError("未配置有效的 Broker 地址或端口");
             return false;
         }
-        deviceTag = generateDeviceTag();
+        if (deviceTag == null || deviceTag.isEmpty()) {
+            deviceTag = generateDeviceTag();
+            prefs.edit().putString(KEY_DEVICE_TAG, deviceTag).apply();
+        }
         clientId = generateClientId();
         prefs.edit().putString(KEY_CLIENT_ID, clientId).apply();
         running.set(true);
@@ -342,7 +359,10 @@ public class MqttManager {
         int returnCode = connack[3] & 0xFF;
         if (returnCode != 0) throw new IOException("Broker 拒绝连接，返回码 " + returnCode);
 
-        sendSubscribePacket();
+        int subResult = sendSubscribePacket();
+        if (subResult != 0) {
+            throw new IOException("订阅被拒绝，返回码 " + subResult);
+        }
         connected = true;
         publishFailed = false;
         postConnected(null);
@@ -361,6 +381,11 @@ public class MqttManager {
                 int type = packet[0] & 0xF0;
                 if (type == 0xD0) {
                     lastPingTime = 0;
+                } else if (type == 0x30) {
+                    String selfTopic = getTaggedTopic();
+                    if (selfTopic != null && selfTopic.equals(readPublishTopic(packet))) {
+                        continue;
+                    }
                 }
 
             }
@@ -413,13 +438,17 @@ public class MqttManager {
         writePacket(0x10, body.toByteArray());
     }
 
-    private void sendSubscribePacket() throws IOException {
+    private int sendSubscribePacket() throws IOException {
         byte[] topicBytes = getTaggedTopic().getBytes(StandardCharsets.UTF_8);
         ByteArrayOutputStream body = new ByteArrayOutputStream();
         writeU16(body, 1);
         writeU16(body, topicBytes.length); body.write(topicBytes, 0, topicBytes.length);
         body.write(0x00);
         writePacket(0x82, body.toByteArray());
+        byte[] suback = readPacket();
+        if (suback == null || (suback[0] & 0xF0) != 0x90) return 0x80;
+        if (suback.length < 4) return 0x80;
+        return suback[3] & 0xFF;
     }
 
     private void publishHeartRate(int hr) {
@@ -443,6 +472,16 @@ public class MqttManager {
         }
     }
 
+    private static String readPublishTopic(byte[] packet) {
+        try {
+            if (packet.length < 4) return null;
+            int topicLen = ((packet[1] & 0xFF) << 8) | (packet[2] & 0xFF);
+            if (topicLen <= 0 || 3 + topicLen > packet.length) return null;
+            return new String(packet, 3, topicLen, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return null;
+        }
+    }
     private void sendPingReq() throws IOException { writePacket(0xC0, new byte[0]); }
 
     private void writePacket(int header, byte[] body) throws IOException {
