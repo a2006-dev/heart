@@ -66,8 +66,6 @@ dependencies {
     // MPAndroidChart 图表库
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
-    implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5'
-
     testImplementation 'junit:junit:4.13.2'
 
 }
