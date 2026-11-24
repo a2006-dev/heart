@@ -21,12 +21,9 @@ public class BroadcastServer {
     private static final long SSE_HEARTBEAT_INTERVAL_MS = 15000;
     private static final long ACCEPT_RETRY_DELAY_MS = 3000;
 
-    /** SSE 线程池：核心线程数 */
-    private static final int SSE_CORE_POOL = 2;
-    /** SSE 线程池：最大线程数，即同时允许的 SSE 连接上限 */
-    private static final int SSE_MAX_POOL = 16;
-    /** 允许的最大 SSE 客户端数量 */
     private static final int SSE_MAX_CLIENTS = 16;
+    private static final int SSE_CORE_POOL = SSE_MAX_CLIENTS;
+    private static final int SSE_MAX_POOL = SSE_MAX_CLIENTS;
 
     private ServerSocket serverSocket;
     private volatile int actualPort = -1;
@@ -117,7 +114,7 @@ public class BroadcastServer {
         sseExecutor = new ThreadPoolExecutor(
             SSE_CORE_POOL, SSE_MAX_POOL,
             60L, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<>(SSE_MAX_CLIENTS),
+            new SynchronousQueue<>(),
             r -> {
                 Thread t = new Thread(r, "HR-SSE");
                 t.setDaemon(true);
