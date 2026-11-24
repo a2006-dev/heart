@@ -40,6 +40,7 @@ public class SettingsFragment extends Fragment {
     private Switch swMqttEnabled;
     private TextView tvMqttStatus, tvMqttTag, tvMqttCode;
     private EditText etMqttBroker, etMqttPort, etMqttTopic;
+    private com.google.android.material.switchmaterial.SwitchMaterial swMqttTls;
     private View mqttConfigBody, mqttCodeSection;
     private Button btnCopyCode, btnShareCode, btnMqttTest;
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -114,6 +115,7 @@ public class SettingsFragment extends Fragment {
         etMqttBroker = v.findViewById(R.id.etMqttBroker);
         etMqttPort = v.findViewById(R.id.etMqttPort);
         etMqttTopic = v.findViewById(R.id.etMqttTopic);
+        swMqttTls = v.findViewById(R.id.swMqttTls);
         mqttConfigBody = v.findViewById(R.id.mqttConfigBody);
         mqttCodeSection = v.findViewById(R.id.mqttCodeSection);
         btnCopyCode = v.findViewById(R.id.btnCopyCode);
@@ -125,6 +127,7 @@ public class SettingsFragment extends Fragment {
         etMqttBroker.setText(mqttManager.getBrokerHost());
         etMqttPort.setText(String.valueOf(mqttManager.getBrokerPort()));
         etMqttTopic.setText(mqttManager.getTopic());
+        swMqttTls.setChecked(mqttManager.isTls());
         if (mqttManager.isRunning()) {
             setMqttSwitchSilently(true);
             mqttConfigBody.setVisibility(View.VISIBLE);
@@ -211,6 +214,14 @@ public class SettingsFragment extends Fragment {
         etMqttBroker.setOnFocusChangeListener(onBlur);
         etMqttPort.setOnFocusChangeListener(onBlur);
         etMqttTopic.setOnFocusChangeListener(onBlur);
+        swMqttTls.setOnCheckedChangeListener((btn, checked) -> {
+            if (checked && "1883".equals(etMqttPort.getText().toString().trim())) {
+                etMqttPort.setText("8883");
+            } else if (!checked && "8883".equals(etMqttPort.getText().toString().trim())) {
+                etMqttPort.setText("1883");
+            }
+            saveMqttConfig();
+        });
 
         btnCopyCode.setOnClickListener(v2 -> {
             String code = tvMqttCode.getText().toString();
@@ -380,9 +391,9 @@ public class SettingsFragment extends Fragment {
         if (TextUtils.isEmpty(host)) host = "broker-cn.emqx.io";
         if (TextUtils.isEmpty(portStr)) portStr = "1883";
         if (TextUtils.isEmpty(t)) t = "heart/rate";
-        int port = 1883;
+        int port = swMqttTls.isChecked() ? 8883 : 1883;
         try { port = Integer.parseInt(portStr); } catch (NumberFormatException ignored) {}
-        mqttManager.setConfig(host, port, t);
+        mqttManager.setConfig(host, port, t, swMqttTls.isChecked());
     }
 
     private void showConnCode() {

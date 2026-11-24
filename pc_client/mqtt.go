@@ -3,6 +3,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
@@ -27,6 +28,7 @@ const (
 )
 
 type MQTTClient struct {
+	useTLS   bool
 	conn     net.Conn
 	mu       sync.Mutex
 	broker   string
@@ -47,6 +49,10 @@ func NewMQTTClient(broker, clientID string) *MQTTClient {
 	}
 }
 
+func (m *MQTTClient) SetTLS(useTLS bool) {
+	m.useTLS = useTLS
+}
+
 func (m *MQTTClient) SetCredentials(user, pass string) {
 	m.username = user
 	m.password = pass
@@ -60,12 +66,26 @@ func (m *MQTTClient) Connect() error {
 	defer m.mu.Unlock()
 
 	addLog(fmt.Sprintf("正在连接 %s ...", m.broker))
-	conn, err := net.DialTimeout("tcp", m.broker, 10*time.Second)
-	if err != nil {
-		return fmt.Errorf("连接失败: %v", err)
+	var conn net.Conn
+	var err error
+	if m.useTLS {
+		dialer := &net.Dialer{Timeout: 10 * time.Second}
+		conn, err = tls.DialWithDialer(dialer, "tcp", m.broker, &tls.Config{
+			ServerName: strings.Split(m.broker, ":")[0],
+			MinVersion: tls.VersionTLS12,
+		})
+		if err != nil {
+			return fmt.Errorf("TLS 连接失败: %v", err)
+		}
+		addLog("TLS 连接成功")
+	} else {
+		conn, err = net.DialTimeout("tcp", m.broker, 10*time.Second)
+		if err != nil {
+			return fmt.Errorf("连接失败: %v", err)
+		}
+		addLog("TCP 连接成功")
 	}
 	m.conn = conn
-	addLog("TCP 连接成功")
 
 	// 发送 CONNECT 报文前短暂等待，确保 TCP 握手完成
 	time.Sleep(50 * time.Millisecond)
@@ -374,12 +394,13 @@ func setMqttClient(c *MQTTClient) {
 	mu.Unlock()
 }
 
-func startMQTT(broker, topic string) error {
+func startMQTT(broker, topic string, useTLS bool) error {
 	if old := getMqttClient(); old != nil {
 		old.Disconnect()
 	}
 
 	client := NewMQTTClient(broker, fmt.Sprintf("heart_pc_%d", time.Now().UnixNano()))
+	client.SetTLS(useTLS)
 	client.SetCallback(func(t string, payload []byte) {
 		// 只允许精确匹配，不接收通配符数据
 		if t != topic {

@@ -586,10 +586,11 @@ func tryConnectMQTT() {
 	}
 
 
-	broker, topic := parseCode(code)
+	broker, topic, useTLS := parseCode(code)
 	if broker == "" || topic == "" {
 		addLog("连接码格式无效，请检查")
 		addLog("格式: HEARTBEAT#V1#设备标识#IP:端口#Topic")
+		addLog("加密格式: HEARTBEAT#V2#设备标识#IP:端口#Topic")
 		return
 	}
 
@@ -599,7 +600,7 @@ func tryConnectMQTT() {
 
 
 	go func() {
-		err := startMQTT(broker, topic)
+		err := startMQTT(broker, topic, useTLS)
 		result := C.WPARAM(0)
 		if err == nil && getMqttClient() != nil {
 			result = C.WPARAM(1)
@@ -636,17 +637,18 @@ func onMQTTConnectResult() {
 }
 
 
-func parseCode(code string) (string, string) {
+func parseCode(code string) (string, string, bool) {
 	if !strings.HasPrefix(code, "HEARTBEAT#") {
-		return "", ""
+		return "", "", false
 	}
 	body := strings.TrimPrefix(code, "HEARTBEAT#")
 	parts := strings.SplitN(body, "#", 4)
 	if len(parts) < 4 {
-		return "", ""
+		return "", "", false
 	}
-	if parts[0] != "V1" {
-		return "", ""
+	useTLS := parts[0] == "V2"
+	if !useTLS && parts[0] != "V1" {
+		return "", "", false
 	}
 	tag := parts[1]
 	hostPort := parts[2]
@@ -654,7 +656,7 @@ func parseCode(code string) (string, string) {
 
 	idx := strings.LastIndex(hostPort, ":")
 	if idx <= 0 {
-		return "", ""
+		return "", "", false
 	}
 	host := hostPort[:idx]
 	port := hostPort[idx+1:]
@@ -665,7 +667,7 @@ func parseCode(code string) (string, string) {
 		fullTopic = fullTopic + "/" + tag
 	}
 
-	return host + ":" + port, fullTopic
+	return host + ":" + port, fullTopic, useTLS
 }
 
 func tryDisconnectMQTT() {

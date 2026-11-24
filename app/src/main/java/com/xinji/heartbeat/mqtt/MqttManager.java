@@ -13,6 +13,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import javax.net.ssl.SSLParameters;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.UUID;
@@ -32,6 +35,7 @@ public class MqttManager {
     private static final String KEY_PORT = "mqtt_port";
     private static final String KEY_TOPIC = "mqtt_topic";
     private static final String KEY_CLIENT_ID = "mqtt_client_id";
+    private static final String KEY_TLS = "mqtt_tls";
 
     private static final String DEFAULT_BROKER = "broker-cn.emqx.io";
     private static final int DEFAULT_PORT = 1883;
@@ -41,7 +45,9 @@ public class MqttManager {
     private static final long MAX_RECONNECT_MS = 60000;
 
     private static final String CONN_CODE_PREFIX = "HEARTBEAT#";
-    private static final String CONN_CODE_VERSION = "V1#";
+    private static final String CONN_CODE_VERSION_TLS = "V2";
+    private static final String CONN_CODE_VERSION_PLAIN = "V1";
+    private static final int DEFAULT_TLS_PORT = 8883;
     private static volatile String deviceTag;
 
     private final Context context;
@@ -51,6 +57,7 @@ public class MqttManager {
 
     private volatile String brokerHost = DEFAULT_BROKER;
     private volatile int brokerPort = DEFAULT_PORT;
+    private volatile boolean brokerTls = false;
     private volatile String topic = "heart/rate";
     private volatile String clientId = "";
     private volatile String bleDeviceName = "";
@@ -100,6 +107,7 @@ public class MqttManager {
     private void loadConfig() {
         brokerHost = prefs.getString(KEY_BROKER, DEFAULT_BROKER);
         brokerPort = prefs.getInt(KEY_PORT, DEFAULT_PORT);
+        brokerTls = prefs.getBoolean(KEY_TLS, false);
         topic = prefs.getString(KEY_TOPIC, "heart/rate");
         clientId = prefs.getString(KEY_CLIENT_ID, generateClientId());
         deviceTag = null;
@@ -118,9 +126,32 @@ public class MqttManager {
         saveConfig();
     }
 
+    public synchronized void setConfig(String host, int port, String mqttTopic, boolean tls) {
+        if (host != null && !host.trim().isEmpty()) brokerHost = host.trim();
+        if (port > 0 && port <= 65535) brokerPort = port;
+        if (mqttTopic != null && !mqttTopic.trim().isEmpty()) topic = mqttTopic.trim();
+        brokerTls = tls;
+        saveConfig();
+    }
+    public boolean isTls() { return brokerTls; }
     private void saveConfig() {
         prefs.edit().putString(KEY_BROKER, brokerHost).putInt(KEY_PORT, brokerPort)
+                .putBoolean(KEY_TLS, brokerTls)
                 .putString(KEY_TOPIC, topic).apply();
+    }
+    private Socket openSocket(String host, int port, int timeoutMs) throws IOException {
+        Socket raw = new Socket();
+        raw.setKeepAlive(true);
+        raw.setTcpNoDelay(true);
+        raw.connect(new InetSocketAddress(host, port), timeoutMs);
+        if (!brokerTls) return raw;
+        SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+        SSLSocket tls = (SSLSocket) factory.createSocket(raw, host, port, true);
+        SSLParameters params = tls.getSSLParameters();
+        params.setEndpointIdentificationAlgorithm("HTTPS");
+        tls.setSSLParameters(params);
+        tls.startHandshake();
+        return tls;
     }
 
     public void setListener(MqttListener listener) { this.listener = listener; }
@@ -156,16 +187,18 @@ public class MqttManager {
 
     public String generateConnectionCode() {
         if (!hasValidConfig()) return "";
-        return CONN_CODE_PREFIX + CONN_CODE_VERSION + getDeviceTagStatic() + "#"
+        String ver = brokerTls ? CONN_CODE_VERSION_TLS : CONN_CODE_VERSION_PLAIN;
+        return CONN_CODE_PREFIX + ver + "#" + getDeviceTagStatic() + "#"
                 + brokerHost + ":" + brokerPort + "#" + topic;
     }
 
-    public static String generateConnectionCode(String host, int port, String mqttTopic) {
+    public static String generateConnectionCode(String host, int port, String mqttTopic, boolean tls) {
         String tag = deviceTag != null ? deviceTag : ("CUST" + UUID.randomUUID().toString().substring(0, 5).toUpperCase());
         String cleanHost = host != null && !host.trim().isEmpty() ? host.trim() : DEFAULT_BROKER;
         int cleanPort = port > 0 && port <= 65535 ? port : DEFAULT_PORT;
         String cleanTopic = mqttTopic != null && !mqttTopic.trim().isEmpty() ? mqttTopic.trim() : "heart/rate";
-        return CONN_CODE_PREFIX + CONN_CODE_VERSION + tag + "#" + cleanHost + ":" + cleanPort + "#" + cleanTopic;
+        String ver = tls ? CONN_CODE_VERSION_TLS : CONN_CODE_VERSION_PLAIN;
+        return CONN_CODE_PREFIX + ver + "#" + tag + "#" + cleanHost + ":" + cleanPort + "#" + cleanTopic;
     }
 
 
@@ -174,7 +207,9 @@ public class MqttManager {
         String trimmed = code.trim();
         if (!trimmed.startsWith(CONN_CODE_PREFIX)) return null;
         String[] parts = trimmed.substring(CONN_CODE_PREFIX.length()).split("#", 4);
-        if (parts.length != 4 || !"V1".equals(parts[0])) return null;
+        if (parts.length != 4) return null;
+        boolean tls = CONN_CODE_VERSION_TLS.equals(parts[0]);
+        if (!tls && !CONN_CODE_VERSION_PLAIN.equals(parts[0])) return null;
 
         String tag = parts[1].trim();
         String hostPort = parts[2].trim();
@@ -201,7 +236,7 @@ public class MqttManager {
         if (host.isEmpty() || port < 1 || port > 65535) return null;
 
         String fullTopic = topicPart.endsWith("/" + tag) ? topicPart : topicPart + "/" + tag;
-        return new String[]{tag, host, String.valueOf(port), fullTopic};
+        return new String[]{tag, host, String.valueOf(port), fullTopic, tls ? "1" : "0"};
     }
 
     public synchronized boolean start() {
@@ -232,8 +267,7 @@ public class MqttManager {
             return t;
         });
         testExecutor.execute(() -> {
-            try (Socket s = new Socket()) {
-                s.connect(new InetSocketAddress(brokerHost, brokerPort), CONNECT_TIMEOUT_MS);
+            try (Socket s = openSocket(brokerHost, brokerPort, CONNECT_TIMEOUT_MS)) {
                 postConnected(testListener);
             } catch (IOException e) {
                 postError(testListener, "无法连接到 " + brokerHost + ":" + brokerPort + ": " + safeMessage(e));
@@ -291,11 +325,8 @@ public class MqttManager {
     }
 
     private void openConnection() throws IOException {
-        Log.d(TAG, "连接 MQTT Broker: " + brokerHost + ":" + brokerPort);
-        Socket socket = new Socket();
-        socket.setKeepAlive(true);
-        socket.setTcpNoDelay(true);
-        socket.connect(new InetSocketAddress(brokerHost, brokerPort), CONNECT_TIMEOUT_MS);
+        Log.d(TAG, "连接 MQTT Broker: " + brokerHost + ":" + brokerPort + (brokerTls ? " (TLS)" : ""));
+        Socket socket = openSocket(brokerHost, brokerPort, CONNECT_TIMEOUT_MS);
         socket.setSoTimeout(0);
         synchronized (ioLock) {
             mqttSocket = socket;
