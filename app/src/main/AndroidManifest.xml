@@ -12,14 +12,11 @@
          tools:targetApi="s" />
      <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
      <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-     <!-- 后台定位权限：部分国产ROM后台扫描蓝牙需要 -->
-     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
      <!-- ========== 网络状态（广播功能必需）========== -->
      <uses-permission android:name="android.permission.INTERNET" />
      <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
      <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
 
      <!-- ========== 悬浮窗 ========== -->
      <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
@@ -27,7 +24,6 @@
      <!-- ========== 后台保活 ========== -->
      <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
      <uses-permission android:name="android.permission.WAKE_LOCK" />
-     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
      <!-- ========== 通知 ========== -->
      <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -50,7 +46,9 @@
      <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
 
     <application
-         android:allowBackup="true"
+         android:allowBackup="false"
+         android:fullBackupContent="false"
+         android:dataExtractionRules="@xml/data_extraction_rules"
          android:icon="@drawable/ic_launcher"
          android:roundIcon="@drawable/ic_launcher"
          android:label="心迹"
@@ -58,7 +56,7 @@
          android:supportsRtl="true"
          android:persistent="false"
          android:usesCleartextTraffic="true"
-         tools:ignore="AllowBackup,GoogleAppIndexingWarning,UnusedAttribute">
+         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
 
 <activity
               android:name=".OnboardingActivity"
