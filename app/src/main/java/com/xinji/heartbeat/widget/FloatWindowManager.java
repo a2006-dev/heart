@@ -1,4 +1,5 @@
 package com.xinji.heartbeat.widget;
+import com.xinji.heartbeat.HeartRateRange;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -116,7 +117,7 @@ public class FloatWindowManager {
                 floatHrView.setText(String.valueOf(hr));
             }
 
-            if (style == 3 && pulseIconView != null && hr > 30) {
+            if (style == 3 && pulseIconView != null && HeartRateRange.isValid(hr)) {
                 pulseIconView.animate().scaleX(1.3f).scaleY(1.3f).setDuration(80)
                     .withEndAction(() -> pulseIconView.animate().scaleX(1f).scaleY(1f).setDuration(120).start())
                     .start();

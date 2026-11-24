@@ -276,7 +276,7 @@ body{{background:transparent;font-family:sans-serif;overflow:hidden}}
 <script>
 var es=new EventSource('/stream');
 es.onmessage=function(e){{try{{var d=JSON.parse(e.data);var el=document.getElementById('hrV'),dn=document.getElementById('devN');
-if(d.connected&&d.hr>30&&d.hr<220){{el.innerText=d.hr;dn.innerText=d.device||'已连接'}}
+if(d.connected&&d.hr>=20&&d.hr<=250){{el.innerText=d.hr;dn.innerText=d.device||'已连接'}}else if(d.connected&&d.hr>0){{el.innerText='数值异常'}}
 else{{el.innerText='--';dn.innerText='等待连接...'}}}}catch(err){{}}}}
 </script></body></html>""".encode())
         def _json(self):

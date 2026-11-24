@@ -1,4 +1,5 @@
 package com.xinji.heartbeat.core;
+import com.xinji.heartbeat.HeartRateRange;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -186,11 +187,11 @@ public class HeartRateManager {
 
     public void notifyListeners(int hr, int[] rrIntervals) {
         this.currentHR = hr;
-        if (hr > 20 && hr < 250) {
+        if (HeartRateRange.isValid(hr)) {
             this.lastHRTime = System.currentTimeMillis();
         }
 
-        if (hr > 20 && hr < 250) {
+        if (HeartRateRange.isValid(hr)) {
             long now = System.currentTimeMillis();
             synchronized (this) {
                 hrHistory.addLast(new long[]{now, hr});

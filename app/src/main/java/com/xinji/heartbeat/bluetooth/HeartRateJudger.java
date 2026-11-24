@@ -1,5 +1,6 @@
 package com.xinji.heartbeat.bluetooth;
 
+import com.xinji.heartbeat.HeartRateRange;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -61,7 +62,7 @@ public class HeartRateJudger {
         int latest = parsedValues.get(parsedValues.size() - 1);
         DetectResult.Confidence confidence;
 
-        if (parsedValues.size() >= 3 && smooth && latest >= 30 && latest <= 220) {
+        if (parsedValues.size() >= 3 && smooth && HeartRateRange.isValid(latest)) {
             confidence = DetectResult.Confidence.MEDIUM;
         } else {
             confidence = DetectResult.Confidence.LOW;

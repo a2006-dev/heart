@@ -423,6 +423,10 @@
 </div>
 
 <script>
+    var HR_MIN = 20, HR_MAX = 250;
+    var HR_ABNORMAL = '数值异常';
+    function hrValid(v) { return v >= HR_MIN && v <= HR_MAX; }
+
     // =====================================================
     // ECG 波形引擎 — 收到数据才触发一次心跳波形，中间为平滑基线
     // 每跳 P-QRS-T 形态各异，真实模拟 ECG 监护仪效果
@@ -614,7 +618,7 @@
 
         updateUI() {
             const hrSpan = document.getElementById('heartRate');
-            if (hrSpan && this.hr > 30) hrSpan.innerText = this.hr;
+            if (hrSpan) hrSpan.innerText = hrValid(this.hr) ? this.hr : HR_ABNORMAL;
 
             const led = document.getElementById('pulseDot');
             if (led) {
@@ -816,10 +820,13 @@
         }
 
         // 同时保持旧接口兼容
-        if (hr > 30 && hr < 220) {
+        if (hrValid(hr)) {
             window.currentHr = hr;
             document.getElementById('heartRate').innerText = hr;
-            document.getElementById('statusText').innerText = '❤️ ECG';
+            document.getElementById('statusText').innerText = 'ECG';
+        } else if (hr > 0) {
+            document.getElementById('heartRate').innerText = HR_ABNORMAL;
+            document.getElementById('statusText').innerText = '数据异常';
         }
 
         // 更新平均心率（30秒滑动平均）
@@ -829,7 +836,7 @@
 
     /** 旧接口兼容（仅心率数字，无 RR 数据时降级） */
     window.updateHeartRate = function(hr) {
-        if (hr && hr > 30 && hr < 220) {
+        if (hrValid(hr)) {
             window.currentHr = hr;
             document.getElementById('heartRate').innerText = hr;
             if (ecgEngine) {

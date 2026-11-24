@@ -99,7 +99,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             {
                 int hr = (int)wParam;
                 wchar_t buf[16];
-                if (hr > 30 && hr < 220) {
+                if (hrValid(hr)) {
                     wsprintfW(buf, L"%d", hr);
                 } else {
                     wcscpy(buf, L"--");
@@ -123,7 +123,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             {
                 int hr = (int)wParam;
                 wchar_t buf[16];
-                if (hr > 30 && hr < 220) {
+                if (hrValid(hr)) {
                     wsprintfW(buf, L"%d", hr);
                 } else {
                     wcscpy(buf, L"--");
@@ -827,11 +827,23 @@ func forceUpdateHR() {
 	postHRToUI(hr, dev, conn)
 }
 
+const (
+	hrMin      = 20
+	hrMax      = 250
+	hrAbnormal = "数值异常"
+)
+
+func hrValid(hr int) bool {
+	return hr >= hrMin && hr <= hrMax
+}
+
 func postHRToUI(hr int, dev string, conn bool) {
 
 	hrText := "--"
-	if conn && hr > 30 && hr < 220 {
+	if conn && hrValid(hr) {
 		hrText = fmt.Sprintf("%d", hr)
+	} else if conn && hr > 0 {
+		hrText = hrAbnormal
 	}
 	setTextW(C.GetDlgItem(hwnd, 2), hrText)
 
@@ -840,8 +852,11 @@ func postHRToUI(hr int, dev string, conn bool) {
 
 	statusText := "\xE2\x97\x8B 等待连接..."
 	deviceText := "未连接"
-	if conn && hr > 30 {
+	if conn && hrValid(hr) {
 		statusText = fmt.Sprintf("\xE2\x9C\x85 %d BPM", hr)
+		deviceText = dev
+	} else if conn && hr > 0 {
+		statusText = "\xE2\x9A\xA0 " + hrAbnormal
 		deviceText = dev
 	} else if conn {
 		statusText = "\xE2\x9C\x85 已连接"
@@ -864,7 +879,7 @@ func updateFloatHR() {
 	hr := currentHR
 	conn := connected
 	mu.Unlock()
-	if conn && hr > 30 && hr < 220 {
+	if conn && hrValid(hr) {
 		C.PostMessageW(hwnd, 0x040F, C.WPARAM(hr), 0)
 	} else {
 		C.PostMessageW(hwnd, 0x040F, C.WPARAM(0), 0)
@@ -1002,12 +1017,12 @@ h1{text-align:center;color:#ff5d7c;font-size:22px;margin:8px 0}
 <div class="info" id="logArea" style="margin-top:4px;line-height:1.6">启动中...</div>
 </div>
 <div class="footer">❤️ 心迹 · PC 心率监测</div>
-<script>
+<script>function hrValid(v){return v>=20&&v<=250;}var HR_ABNORMAL='数值异常';
 var es=new EventSource('/api/sse'),last=0;
 es.onmessage=function(e){
 var d=JSON.parse(e.data);last=Date.now();
 var el=document.getElementById('hrV'),dot=document.getElementById('dot'),st=document.getElementById('st');
-if(d.connected&&d.hr>30&&d.hr<220){el.innerText=d.hr;el.style.color='#ff5d7c';dot.className='dot on';st.innerText='✅ '+d.device;}
+if(d.connected&&hrValid(d.hr)){el.innerText=d.hr;el.style.color='#ff5d7c';dot.className='dot on';st.innerText='✅ '+d.device;}
 else{el.innerText='--';el.style.color='#443a40';dot.className='dot off';st.innerText='⏳ 等待中...';}
 };
 </script>

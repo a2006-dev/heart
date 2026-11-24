@@ -1,4 +1,5 @@
 package com.xinji.heartbeat.bluetooth;
+import com.xinji.heartbeat.HeartRateRange;
 import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -671,7 +672,7 @@ public class BleManager {
                     hr = data[1] & 0xFF;
                 }
 
-                if (hr > 20 && hr < 250) {
+                if (HeartRateRange.isValid(hr)) {
                     if (filterCallback != null) filterCallback.onHeartRateData(hr);
                     if (listener != null) {
                 HeartRatePacket packet = HeartRatePacket.parse(data);

@@ -144,11 +144,11 @@ h1{text-align:center;color:#ff5d7c;font-size:28px;margin:10px 0;}
 </div>
 <script>
 function updateDisplay(d){
-document.getElementById('hrVal').innerText = (d.connected && d.hr>30 && d.hr<220) ? d.hr : '--';
-document.getElementById('statusText').innerText = (d.connected && d.hr>30) ? (d.device || '已连接') : '等待连接...';
+document.getElementById('hrVal').innerText = (d.connected && d.hr>=20 && d.hr<=250) ? d.hr : (d.connected && d.hr>0 ? '数值异常' : '--');
+document.getElementById('statusText').innerText = (d.connected && d.hr>=20 && d.hr<=250) ? (d.device || '已连接') : (d.connected && d.hr>0 ? '数据异常' : '等待连接...');
 document.getElementById('connType').innerText = d.type || '';
 var dot = document.getElementById('statusDot');
-dot.className = 'dot ' + ((d.connected && d.hr>30) ? 'green' : 'red');
+dot.className = 'dot ' + ((d.connected && d.hr>=20 && d.hr<=250) ? 'green' : 'red');
 }
 function fetchHR(){fetch('/api/hr').then(r=>r.json()).then(updateDisplay).catch(function(){});}
 setInterval(fetchHR, 1000);fetchHR();

@@ -159,6 +159,10 @@
   </div>
 </div>
 <script>
+    var HR_MIN = 20, HR_MAX = 250;
+    var HR_ABNORMAL = '数值异常';
+    function hrValid(v) { return v >= HR_MIN && v <= HR_MAX; }
+
   // URL 参数
   (function(){
     var params = new URLSearchParams(location.search);
@@ -249,7 +253,7 @@
 
     lastUpdateTime = Date.now();
 
-    if (data.connected && data.hr > 30 && data.hr < 220) {
+    if (data.connected && hrValid(data.hr)) {
       el.innerText = data.hr;
       win.classList.remove('disconnected', 'stale-data');
       dot.classList.remove('disconnected');

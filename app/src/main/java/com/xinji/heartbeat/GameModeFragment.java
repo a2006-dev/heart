@@ -1,4 +1,5 @@
 package com.xinji.heartbeat;
+import com.xinji.heartbeat.HeartRateRange;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -77,7 +78,7 @@ public class GameModeFragment extends Fragment implements HeartEventBus.EventLis
     public void onEvent(int type, Object data) {
         if (type == HeartEventBus.EVENT_HR_UPDATE && isRecording && data instanceof Integer) {
             int hr = (Integer) data;
-            if (hr > 30 && hr < 220) {
+            if (HeartRateRange.isValid(hr)) {
                 recordData.add(hr);
             }
         }

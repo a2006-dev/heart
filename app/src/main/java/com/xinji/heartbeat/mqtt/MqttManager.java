@@ -1,5 +1,6 @@
 package com.xinji.heartbeat.mqtt;
 
+import com.xinji.heartbeat.HeartRateRange;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
@@ -164,7 +165,7 @@ public class MqttManager {
     public void setHeartRateCallback(HeartRateCallback callback) { this.hrCallback = callback; }
 
     public void onHeartRateReceived(int hr) {
-        if (running.get() && hr > 20 && hr < 250) {
+        if (running.get() && HeartRateRange.isValid(hr)) {
             final int value = hr;
             final ExecutorService pub = publishExecutor;
             if (pub != null) {
