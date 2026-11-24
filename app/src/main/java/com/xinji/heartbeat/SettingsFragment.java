@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import com.xinji.heartbeat.widget.TouchTargets;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -118,6 +119,17 @@ public class SettingsFragment extends Fragment {
         swMqttTls = v.findViewById(R.id.swMqttTls);
         mqttConfigBody = v.findViewById(R.id.mqttConfigBody);
         mqttCodeSection = v.findViewById(R.id.mqttCodeSection);
+        float dens2 = getResources().getDisplayMetrics().density;
+        int[] smallTargets = new int[]{
+            R.id.swAutoConnect, R.id.swFloatMemory, R.id.swFloatVisible,
+            R.id.swFloatLocked, R.id.swMqttEnabled, R.id.swMqttTls,
+            R.id.swHideRecents, R.id.btnMqttTest, R.id.btnCopyCode,
+            R.id.btnShareCode, R.id.btnMqttHelp, R.id.btnHelp,
+            R.id.btnContact, R.id.btnGitHub, R.id.btnCheckUpdate,
+            R.id.btnBroadcast, R.id.btnFloatStyle};
+        for (int tid : smallTargets) {
+            TouchTargets.expand(v.findViewById(tid), 8, dens2);
+        }
         btnCopyCode = v.findViewById(R.id.btnCopyCode);
         btnShareCode = v.findViewById(R.id.btnShareCode);
         btnMqttTest = v.findViewById(R.id.btnMqttTest);

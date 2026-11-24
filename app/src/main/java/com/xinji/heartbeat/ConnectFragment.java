@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import com.xinji.heartbeat.widget.TouchTargets;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
@@ -90,6 +91,11 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
         tvLog = v.findViewById(R.id.tvLog);
         logScrollView = (ScrollView) v.findViewById(R.id.logScrollView);
         btnClearLog = v.findViewById(R.id.btnClearLog);
+        float dens = getResources().getDisplayMetrics().density;
+        TouchTargets.expand(btnDisconnect, 8, dens);
+        TouchTargets.expand(btnClearLog, 8, dens);
+        TouchTargets.expand(btnScan, 4, dens);
+        TouchTargets.expand(swBroadSearch, 8, dens);
 
         btnScan.setOnClickListener(view -> toggleScan());
         btnDisconnect.setOnClickListener(view -> disconnectDevice());
