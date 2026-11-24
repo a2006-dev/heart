@@ -2,6 +2,11 @@ package main
 
 /*
 #include <windows.h>
+#define HR_MIN_C 20
+#define HR_MAX_C 250
+static int hr_valid_c(int hr) {
+    return hr >= HR_MIN_C && hr <= HR_MAX_C;
+}
 
 int g_connectReq = 0;
 int g_disconnectReq = 0;
@@ -99,7 +104,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             {
                 int hr = (int)wParam;
                 wchar_t buf[16];
-                if (hrValid(hr)) {
+                if (hr_valid_c(hr)) {
                     wsprintfW(buf, L"%d", hr);
                 } else {
                     wcscpy(buf, L"--");
@@ -123,7 +128,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             {
                 int hr = (int)wParam;
                 wchar_t buf[16];
-                if (hrValid(hr)) {
+                if (hr_valid_c(hr)) {
                     wsprintfW(buf, L"%d", hr);
                 } else {
                     wcscpy(buf, L"--");
