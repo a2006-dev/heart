@@ -900,7 +900,6 @@ func startLocalServer() {
 		hr, dev, conn := currentHR, deviceName, connected
 		mu.Unlock()
 		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"hr": hr, "device": dev, "connected": conn,
 		})
@@ -909,7 +908,6 @@ func startLocalServer() {
 		w.Header().Set("Content-Type", "text/event-stream")
 		w.Header().Set("Cache-Control", "no-cache")
 		w.Header().Set("Connection", "keep-alive")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
 		flusher, ok := w.(http.Flusher)
 		if !ok {
 			return

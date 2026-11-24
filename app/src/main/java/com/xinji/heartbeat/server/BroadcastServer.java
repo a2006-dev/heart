@@ -22,6 +22,8 @@ public class BroadcastServer {
     private static final long ACCEPT_RETRY_DELAY_MS = 3000;
 
     private static final int SSE_MAX_CLIENTS = 16;
+    private static final int MAX_HEADER_LINES = 100;
+    private static final int MAX_HEADER_BYTES = 8192;
     private static final int SSE_CORE_POOL = SSE_MAX_CLIENTS;
     private static final int SSE_MAX_POOL = SSE_MAX_CLIENTS;
 
@@ -241,9 +243,18 @@ public class BroadcastServer {
             String requestLine = reader.readLine();
             if (requestLine == null) { safeClose(client); return; }
 
+            if (requestLine.length() > MAX_HEADER_BYTES) { safeClose(client); return; }
             Map<String, String> headers = new HashMap<>();
             String line;
+            int headerCount = 0;
+            int headerBytes = 0;
             while ((line = reader.readLine()) != null && !line.isEmpty()) {
+                headerCount++;
+                headerBytes += line.length();
+                if (headerCount > MAX_HEADER_LINES || headerBytes > MAX_HEADER_BYTES) {
+                    safeClose(client);
+                    return;
+                }
                 int idx = line.indexOf(":");
                 if (idx > 0) {
                     headers.put(line.substring(0, idx).trim().toLowerCase(),
@@ -272,8 +283,6 @@ public class BroadcastServer {
                     serveJson(client, out);
                 } else if (path.equals("/api/ip")) {
                     serveIPJson(client, out);
-                } else if (path.equals("/api/profiles")) {
-                    serveProfilesJson(client, out);
                 } else {
                     send404(client, out);
                 }
@@ -300,7 +309,6 @@ public class BroadcastServer {
                             out, java.nio.charset.StandardCharsets.UTF_8), false);
                     pw.print("HTTP/1.1 503 Service Unavailable\r\n");
                     pw.print("Content-Type: text/plain; charset=utf-8\r\n");
-                    pw.print("Access-Control-Allow-Origin: *\r\n");
                     pw.print("Connection: close\r\n");
                     pw.print("\r\n");
                     pw.print("too many sse clients");
@@ -337,7 +345,6 @@ public class BroadcastServer {
             pw.print("Content-Type: text/event-stream; charset=utf-8\r\n");
             pw.print("Cache-Control: no-cache, no-store\r\n");
             pw.print("Connection: keep-alive\r\n");
-            pw.print("Access-Control-Allow-Origin: *\r\n");
             pw.print("X-Accel-Buffering: no\r\n");
             pw.print("\r\n");
             pw.flush();
@@ -433,7 +440,6 @@ public class BroadcastServer {
         pw.print("HTTP/1.1 200 OK\r\n");
         pw.print("Content-Type: text/html; charset=utf-8\r\n");
         pw.print("Content-Length: " + htmlBytes.length + "\r\n");
-        pw.print("Access-Control-Allow-Origin: *\r\n");
         pw.print("Connection: close\r\n");
         pw.print("\r\n");
         pw.flush();
@@ -448,7 +454,6 @@ public class BroadcastServer {
         pw.print("HTTP/1.1 200 OK\r\n");
         pw.print("Content-Type: application/json; charset=utf-8\r\n");
         pw.print("Content-Length: " + data.length + "\r\n");
-        pw.print("Access-Control-Allow-Origin: *\r\n");
         pw.print("Connection: close\r\n");
         pw.print("\r\n");
         pw.flush();
@@ -463,25 +468,6 @@ public class BroadcastServer {
         pw.print("HTTP/1.1 200 OK\r\n");
         pw.print("Content-Type: application/json; charset=utf-8\r\n");
         pw.print("Content-Length: " + data.length + "\r\n");
-        pw.print("Access-Control-Allow-Origin: *\r\n");
-        pw.print("Connection: close\r\n");
-        pw.print("\r\n");
-        pw.flush();
-        out.write(data);
-        out.flush();
-    }
-
-    private void serveProfilesJson(Socket client, OutputStream out) throws IOException {
-        String json = "[]";
-        try {
-            json = com.xinji.heartbeat.core.DeviceProfileManager.getInstance(context).getProfilesJson();
-        } catch (Exception ignored) {}
-        byte[] data = json.getBytes("UTF-8");
-        PrintWriter pw = new PrintWriter(out);
-        pw.print("HTTP/1.1 200 OK\r\n");
-        pw.print("Content-Type: application/json; charset=utf-8\r\n");
-        pw.print("Content-Length: " + data.length + "\r\n");
-        pw.print("Access-Control-Allow-Origin: *\r\n");
         pw.print("Connection: close\r\n");
         pw.print("\r\n");
         pw.flush();

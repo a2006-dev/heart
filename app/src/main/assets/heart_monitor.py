@@ -211,7 +211,7 @@ def scan_lan():
 def find_free_port(base,m=10):
     for i in range(m):
         try:
-            s=socket.socket();s.settimeout(1);s.bind(("0.0.0.0",base+i));s.close();return base+i
+            s=socket.socket();s.settimeout(1);s.bind(("127.0.0.1",base+i));s.close();return base+i
         except: continue
     return base
 
@@ -310,7 +310,7 @@ else{{el.innerText='--';dn.innerText='等待连接...'}}}}catch(err){{}}}}
             self.wfile.write(json.dumps({"msg":msg}).encode())
         def log_message(self,*a): pass
     # 使用多线程服务器：SSE 长连接不会阻塞其他 HTTP 请求
-    server=ThreadingHTTPServer(("0.0.0.0",UNIFIED_PORT),H)
+    server=ThreadingHTTPServer(("127.0.0.1",UNIFIED_PORT),H)
     server.daemon_threads = True
     threading.Thread(target=server.serve_forever,daemon=True).start()
     log(f"🌐 http://{ip()}:{UNIFIED_PORT}  🎬OBS: http://{ip()}:{UNIFIED_PORT}/?transparent=1")

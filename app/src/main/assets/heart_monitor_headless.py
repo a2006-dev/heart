@@ -78,7 +78,7 @@ def find_free_port(base: int, max_try: int = 10) -> int:
         p = base + i
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(1); s.bind(("0.0.0.0", p)); s.close()
+            s.settimeout(1); s.bind(("127.0.0.1", p)); s.close()
             return p
         except: continue
     return base
@@ -227,7 +227,7 @@ def start_server():
             self.send_response(200); self.send_header("Access-Control-Allow-Origin","*"); self.end_headers()
         def log_message(self,*a): pass
 
-    server = ThreadingHTTPServer(("0.0.0.0", UNIFIED_PORT), Handler)
+    server = ThreadingHTTPServer(("127.0.0.1", UNIFIED_PORT), Handler)
     server.daemon_threads = True
     threading.Thread(target=server.serve_forever, daemon=True).start()
     log(f"🌐 服务器启动: http://{ip()}:{UNIFIED_PORT}")
