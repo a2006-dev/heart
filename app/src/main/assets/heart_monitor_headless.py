@@ -66,7 +66,7 @@ def ip():
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.settimeout(1); s.connect(("8.8.8.8", 80))
         _IP = s.getsockname()[0]; s.close()
-    except:
+    except OSError:
         for i in socket.getaddrinfo(socket.gethostname(), None):
             a = i[4][0]
             if a.startswith("192.168.") or a.startswith("10."): _IP = a; break
@@ -80,7 +80,8 @@ def find_free_port(base: int, max_try: int = 10) -> int:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(1); s.bind(("127.0.0.1", p)); s.close()
             return p
-        except: continue
+        except OSError:
+            continue
     return base
 
 HTML_PAGE = '''<!DOCTYPE html>
@@ -178,24 +179,22 @@ def start_server():
         def _page(self):
             self.send_response(200)
             self.send_header("Content-Type","text/html;charset=utf-8")
-            self.send_header("Cache-Control","no-cache"); self.send_header("Access-Control-Allow-Origin","*")
-            self.end_headers(); self.wfile.write(HTML_PAGE.encode("utf-8"))
+            self.send_header("Cache-Control","no-cache");            self.end_headers(); self.wfile.write(HTML_PAGE.encode("utf-8"))
         def _json(self):
             s=state.snapshot(); self.send_response(200)
             self.send_header("Content-Type","application/json;charset=utf-8")
-            self.send_header("Access-Control-Allow-Origin","*"); self.end_headers()
+            self.end_headers()
             self.wfile.write(json.dumps(s).encode("utf-8"))
         def _info(self):
             d=json.dumps({"ip":ip(),"port":UNIFIED_PORT}); self.send_response(200)
             self.send_header("Content-Type","application/json;charset=utf-8")
-            self.send_header("Access-Control-Allow-Origin","*"); self.end_headers()
+            self.end_headers()
             self.wfile.write(d.encode("utf-8"))
         def _sse(self):
             with _sse_lock:
                 if _sse_count[0] >= SSE_MAX_CLIENTS:
                     self.send_response(503)
                     self.send_header("Content-Type","text/plain;charset=utf-8")
-                    self.send_header("Access-Control-Allow-Origin","*")
                     self.end_headers()
                     self.wfile.write(b"too many sse clients")
                     return
@@ -203,7 +202,7 @@ def start_server():
             try:
                 self.send_response(200)
                 for k,v in {"Content-Type":"text/event-stream","Cache-Control":"no-cache",
-                            "Connection":"keep-alive","Access-Control-Allow-Origin":"*"}.items():
+                            "Connection":"keep-alive"}.items():
                     self.send_header(k,v)
                 self.end_headers()
                 while not _server_stop.is_set():
@@ -223,8 +222,9 @@ def start_server():
                     b=self.rfile.read(l).decode("utf-8"); d=json.loads(b); v=d.get("hr",0)
                     if isinstance(v,(int,float)) and 0<v<250:
                         state.update(int(v),d.get("device","手机"),d.get("connect_type","WiFi"),priority=1)
-                except: pass
-            self.send_response(200); self.send_header("Access-Control-Allow-Origin","*"); self.end_headers()
+                except (ValueError, TypeError, KeyError):
+                    pass
+            self.send_response(200); self.end_headers()
         def log_message(self,*a): pass
 
     server = ThreadingHTTPServer(("127.0.0.1", UNIFIED_PORT), Handler)

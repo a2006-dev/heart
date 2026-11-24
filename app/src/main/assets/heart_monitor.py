@@ -16,7 +16,8 @@ try:
     import tkinter as tk
     from tkinter import ttk, scrolledtext, messagebox, simpledialog
     _HAS_GUI = True
-except: pass
+except ImportError:
+    pass
 
 UNIFIED_PORT = 9090; SRC_MQTT = 2
 
@@ -48,7 +49,7 @@ def ip():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.settimeout(1)
         s.connect(("8.8.8.8",80)); _IP = s.getsockname()[0]; s.close()
-    except:
+    except OSError:
         for i in socket.getaddrinfo(socket.gethostname(),None):
             a=i[4][0]
             if a.startswith("192.168.") or a.startswith("10."): _IP=a; break
@@ -64,13 +65,38 @@ def log(m):
 _mqtt_client=None; _mqtt_connected=False; _mqtt_thread=None
 
 def _ensure_paho():
-    try: import paho.mqtt.client as mqtt; return True
+    try:
+        import paho.mqtt.client as mqtt
+        return True
     except ImportError:
-        log("📦 安装 paho-mqtt...")
-        try:
-            subprocess.check_call([sys.executable,"-m","pip","install","paho-mqtt","-q","-i","https://pypi.tuna.tsinghua.edu.cn/simple"],timeout=60)
-            import paho.mqtt.client as mqtt; log("✅ 完成"); return True
-        except: log("❌ 失败，运行: pip install paho-mqtt"); return False
+        pass
+    pkg = "paho-mqtt"
+    ans = ""
+    try:
+        if _HAS_GUI:
+            ans = messagebox.askyesno(
+                "需要安装依赖",
+                "MQTT 功能需要 Python 包：" + pkg + "\n\n是否现在自动安装？\n"
+                "（将从 PyPI 下载，约 100KB）")
+        else:
+            ans = input("MQTT 功能需要 Python 包 " + pkg + "，是否现在安装？[y/N] ").strip().lower() in ("y", "yes")
+    except Exception:
+        ans = False
+    if not ans:
+        log("⚠️ 已跳过安装，MQTT 功能不可用。手动安装: pip install " + pkg)
+        return False
+    log("📦 安装 " + pkg + " ...")
+    try:
+        subprocess.check_call(
+            [sys.executable, "-m", "pip", "install", pkg],
+            timeout=120)
+        import paho.mqtt.client as mqtt
+        log("✅ 依赖安装完成")
+        return True
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError) as e:
+        log("❌ 安装失败: " + str(e))
+        log("请手动运行: pip install " + pkg)
+        return False
 
 def parse_conn_code(code):
     if not code.startswith("HEARTBEAT#"): return None
@@ -79,7 +105,7 @@ def parse_conn_code(code):
     tag,hp,tb=parts[1],parts[2],parts[3]; i=hp.rfind(":")
     if i<=0: return None
     try: p=int(hp[i+1:])
-    except: p=1883
+    except ValueError: p=1883
     ft=tb
     if not ft.endswith("/"+tag): ft+="/"+tag
     return {"host":hp[:i],"port":p,"topic":ft,"tag":tag}
@@ -89,7 +115,8 @@ def mqtt_cb(client,userdata,msg):
         d=json.loads(msg.payload.decode()); hr=d.get("hr",0)
         if isinstance(hr,(int,float)) and 20<hr<250:
             state.update(int(hr),d.get("device","MQTT"),"MQTT",priority=SRC_MQTT)
-    except: pass
+    except (ValueError, TypeError, KeyError):
+        pass
 
 def _mqtt_loop(broker,port,topic):
     global _mqtt_client,_mqtt_connected
@@ -129,7 +156,8 @@ def mqtt_disconnect():
     global _mqtt_client,_mqtt_connected
     if _mqtt_client:
         try: _mqtt_client.disconnect()
-        except: pass
+        except OSError:
+            pass
         _mqtt_client=None
     _mqtt_connected=False; log("🔌 MQTT 断开")
 
@@ -169,7 +197,7 @@ def _lan_loop(addr):
                 state.update(int(v), d.get("device", "手机"), "局域网", priority=SRC_LAN)
                 fail = 0
             resp.close()
-        except:
+        except (OSError, ValueError, AttributeError):
             fail += 1
             if fail == 1: log(f"⚠️ 连接异常({addr})，重试中...")
         _adb_stop.wait(2 if fail < 10 else 5)
@@ -182,7 +210,7 @@ def scan_lan():
         s.connect(("8.8.8.8", 80)); local_ip = s.getsockname()[0]; s.close()
         parts = local_ip.split(".")
         subnet = f"{parts[0]}.{parts[1]}.{parts[2]}."
-    except:
+    except (IndexError, ValueError):
         log("❌ 无法获取局域网网段")
         return found
     def check(ip):
@@ -193,7 +221,8 @@ def scan_lan():
             resp.close()
             if data.get("hr", 0) >= 0:
                 return data.get("device", "手机")
-        except: pass
+        except (OSError, ValueError, AttributeError):
+            pass
         return None
     log(f"🔍 扫描 {subnet}0/24 ...")
     for i in range(1, 255):
@@ -212,7 +241,8 @@ def find_free_port(base,m=10):
     for i in range(m):
         try:
             s=socket.socket();s.settimeout(1);s.bind(("127.0.0.1",base+i));s.close();return base+i
-        except: continue
+        except OSError:
+            continue
     return base
 
 def _start_server():
@@ -232,7 +262,7 @@ def _start_server():
             else:self.send_response(404);self.end_headers()
         def _page(self):
             self.send_response(200)
-            self.send_header("Content-Type","text/html;charset=utf-8");self.send_header("Cache-Control","no-cache");self.send_header("Access-Control-Allow-Origin","*")
+            self.send_header("Content-Type","text/html;charset=utf-8");self.send_header("Cache-Control","no-cache")
             self.end_headers()
             self.wfile.write(f"""<!DOCTYPE html><html><head><meta charset="UTF-8"><title>心迹</title><style>
 *{{margin:0;padding:0;box-sizing:border-box}}
@@ -251,7 +281,7 @@ else{{el.innerText='--';dn.innerText='等待连接...'}}}}catch(err){{}}}}
 </script></body></html>""".encode())
         def _json(self):
             s=state.snapshot();self.send_response(200)
-            self.send_header("Content-Type","application/json;charset=utf-8");self.send_header("Access-Control-Allow-Origin","*");self.end_headers()
+            self.send_header("Content-Type","application/json;charset=utf-8");self.end_headers()
             self.wfile.write(json.dumps(s).encode())
         def _sse(self):
             # 限制并发 SSE 数量，避免无限堆积线程
@@ -259,14 +289,13 @@ else{{el.innerText='--';dn.innerText='等待连接...'}}}}catch(err){{}}}}
                 if _sse_count[0] >= SSE_MAX_CLIENTS:
                     self.send_response(503)
                     self.send_header("Content-Type", "text/plain; charset=utf-8")
-                    self.send_header("Access-Control-Allow-Origin", "*")
                     self.end_headers()
                     self.wfile.write("too many sse clients".encode())
                     return
                 _sse_count[0] += 1
             try:
                 self.send_response(200)
-                for k,v in {"Content-Type":"text/event-stream","Cache-Control":"no-cache","Connection":"keep-alive","Access-Control-Allow-Origin":"*"}.items():self.send_header(k,v)
+                for k,v in {"Content-Type":"text/event-stream","Cache-Control":"no-cache","Connection":"keep-alive"}.items():self.send_header(k,v)
                 self.end_headers()
                 while not _server_stop.is_set():
                     self.wfile.write(f"data: {json.dumps(state.snapshot())}\n\n".encode())
@@ -286,27 +315,30 @@ else{{el.innerText='--';dn.innerText='等待连接...'}}}}catch(err){{}}}}
                     b=self.rfile.read(l).decode();d=json.loads(b);v=d.get("hr",0)
                     if isinstance(v,(int,float)) and 0<v<250:
                         state.update(int(v),d.get("device","手机"),d.get("connect_type","WiFi"),priority=1)
-                except: pass
-            self.send_response(200);self.send_header("Access-Control-Allow-Origin","*");self.end_headers()
+                except (ValueError, TypeError, KeyError):
+                    pass
+            self.send_response(200);self.end_headers()
         def _mc(self):
             l=int(self.headers.get("Content-Length",0));c=""
             if l>0:
-                try: c=self.rfile.read(l).decode()
-                except: pass
+                try: c=self.rfile.read(l).decode("utf-8", "replace")
+                except (OSError, ValueError):
+                    pass
             msg=mqtt_connect(c) if c else "❌ 无连接码"
-            self.send_response(200);self.send_header("Content-Type","application/json;charset=utf-8");self.send_header("Access-Control-Allow-Origin","*");self.end_headers()
+            self.send_response(200);self.send_header("Content-Type","application/json;charset=utf-8");self.end_headers()
             self.wfile.write(json.dumps({"msg":msg}).encode())
         def _md(self):
             mqtt_disconnect()
-            self.send_response(200);self.send_header("Content-Type","application/json;charset=utf-8");self.send_header("Access-Control-Allow-Origin","*");self.end_headers()
+            self.send_response(200);self.send_header("Content-Type","application/json;charset=utf-8");self.end_headers()
             self.wfile.write(json.dumps({"msg":"已断开"}).encode())
         def _mt(self):
             l=int(self.headers.get("Content-Length",0));c=""
             if l>0:
-                try: c=self.rfile.read(l).decode()
-                except: pass
+                try: c=self.rfile.read(l).decode("utf-8", "replace")
+                except (OSError, ValueError):
+                    pass
             msg=test_mqtt(c) if c else "❌ 无连接码"
-            self.send_response(200);self.send_header("Content-Type","application/json;charset=utf-8");self.send_header("Access-Control-Allow-Origin","*");self.end_headers()
+            self.send_response(200);self.send_header("Content-Type","application/json;charset=utf-8");self.end_headers()
             self.wfile.write(json.dumps({"msg":msg}).encode())
         def log_message(self,*a): pass
     # 使用多线程服务器：SSE 长连接不会阻塞其他 HTTP 请求
@@ -495,7 +527,8 @@ if _HAS_GUI:
             if _float_showing:
                 if _float_win:
                     try: _float_win.destroy()
-                    except: pass
+                    except Exception:
+                        pass
                 _float_win=None;_float_label=None;_float_showing=False
                 log("🔽 悬浮窗关闭")
             else:
@@ -546,7 +579,8 @@ if _HAS_GUI:
                 _float_win.configure(highlightbackground=sty["border"])
                 for child in _float_win.winfo_children():
                     try: child.configure(bg=sty["bg"])
-                    except: pass
+                    except Exception:
+                        pass
             log(f"🎨 样式: {sty['name']}")
 
         def toggle_lock(self):
