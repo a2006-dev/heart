@@ -229,7 +229,7 @@ HWND CreateAppWindow(HINSTANCE hInstance, int nCmdShow) {
             WS_VISIBLE | WS_CHILD | SS_CENTER, 0, 90, 420, 16, hwnd, (HMENU)3, hInstance, NULL);
         SendMessageW(GetDlgItem(hwnd, 3), WM_SETFONT, (WPARAM)hSmallFont, 0);
 
-	CreateWindowW(L"STATIC", L"\x25CF 等待连接...",
+	CreateWindowW(L"STATIC", L"\x25CF" L" 等待连接...",
 			WS_VISIBLE | WS_CHILD | SS_CENTER, 20, 112, 380, 22, hwnd, (HMENU)4, hInstance, NULL);
 		SendMessageW(GetDlgItem(hwnd, 4), WM_SETFONT, (WPARAM)hFont, 0);
 
@@ -251,7 +251,7 @@ HWND CreateAppWindow(HINSTANCE hInstance, int nCmdShow) {
             WS_VISIBLE | WS_CHILD | WS_BORDER | ES_READONLY, 20, 186, 380, 22, hwnd, (HMENU)6, hInstance, NULL);
         SendMessageW(GetDlgItem(hwnd, 6), WM_SETFONT, (WPARAM)hSmallFont, 0);
 
-        CreateWindowW(L"STATIC", L"\x1F4E5 手机推送:",
+        CreateWindowW(L"STATIC", L"\x1F4E5" L" 手机推送:",
             WS_VISIBLE | WS_CHILD | SS_LEFT, 20, 215, 380, 18, hwnd, (HMENU)7, hInstance, NULL);
         SendMessageW(GetDlgItem(hwnd, 7), WM_SETFONT, (WPARAM)hSmallFont, 0);
 
@@ -259,7 +259,7 @@ HWND CreateAppWindow(HINSTANCE hInstance, int nCmdShow) {
             WS_VISIBLE | WS_CHILD | WS_BORDER | ES_READONLY, 20, 233, 380, 22, hwnd, (HMENU)8, hInstance, NULL);
         SendMessageW(GetDlgItem(hwnd, 8), WM_SETFONT, (WPARAM)hSmallFont, 0);
 
-        CreateWindowW(L"STATIC", L"\x1F4FA OBS 叠加:",
+        CreateWindowW(L"STATIC", L"\x1F4FA" L" OBS 叠加:",
             WS_VISIBLE | WS_CHILD | SS_LEFT, 20, 262, 380, 18, hwnd, (HMENU)9, hInstance, NULL);
         SendMessageW(GetDlgItem(hwnd, 9), WM_SETFONT, (WPARAM)hSmallFont, 0);
 
@@ -302,7 +302,7 @@ HWND CreateAppWindow(HINSTANCE hInstance, int nCmdShow) {
         SendMessageW(GetDlgItem(hwnd, 22), WM_SETFONT, (WPARAM)hSmallFont, 0);
 
         // ─── 日志 ───
-        CreateWindowW(L"STATIC", L"\x1F4CB 日志:",
+        CreateWindowW(L"STATIC", L"\x1F4CB" L" 日志:",
             WS_VISIBLE | WS_CHILD | SS_LEFT, 20, 490, 380, 18, hwnd, (HMENU)11, hInstance, NULL);
         SendMessageW(GetDlgItem(hwnd, 11), WM_SETFONT, (WPARAM)hSmallFont, 0);
 
@@ -317,6 +317,7 @@ HWND CreateAppWindow(HINSTANCE hInstance, int nCmdShow) {
     return hwnd;
 }
 */
+// #cgo LDFLAGS: -lgdi32 -luser32 -lkernel32 -lcomdlg32 -lshell32 -ladvapi32 -lwinmm
 import "C"
 import (
 	"bufio"
