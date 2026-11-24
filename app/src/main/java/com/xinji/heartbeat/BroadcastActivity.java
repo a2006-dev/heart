@@ -173,6 +173,16 @@ public class BroadcastActivity extends AppCompatActivity {
     }
 
     private void shareExeClient() {
+        if (!assetExists("heart_client.exe")) {
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("未随包提供 exe 客户端")
+                .setMessage("heart_client.exe 不在本安装包中。\n\n"
+                        + "请到 GitHub 仓库的 Release 页面下载，"
+                        + "或改用「分享 Python 脚本」。")
+                .setPositiveButton("知道了", null)
+                .show();
+            return;
+        }
         try {
             java.io.File cacheDir = new java.io.File(getCacheDir(), "share");
             if (!cacheDir.exists()) cacheDir.mkdirs();
@@ -193,6 +203,15 @@ public class BroadcastActivity extends AppCompatActivity {
             startActivity(Intent.createChooser(shareIntent, "分享 exe 客户端"));
         } catch (Exception e) {
             Toast.makeText(this, "分享失败: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private boolean assetExists(String name) {
+        try {
+            getAssets().open(name).close();
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 
