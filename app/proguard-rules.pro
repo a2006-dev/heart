@@ -1,14 +1,8 @@
-# Add project specific ProGuard rules here.
-
-# WebView JS 接口
--keepclassmembers class com.xinji.heartbeat.HomeFragment { *; }
-
-# MPAndroidChart
+# MPAndroidChart 通过 XML 属性与反射构建, 保留
 -keep class com.github.mikephil.charting.** { *; }
 
-# ZXing
--keep class com.google.zxing.** { *; }
--keep class com.journeyapps.barcodescanner.** { *; }
-
-# 保留所有 Activity/Fragment/Service
--keep class com.xinji.heartbeat.** { *; }
+# Android 组件由 Manifest 引用, 保留入口
+-keep public class * extends android.app.Activity
+-keep public class * extends android.app.Service
+-keep public class * extends android.content.BroadcastReceiver
+-keep public class * extends androidx.fragment.app.Fragment
