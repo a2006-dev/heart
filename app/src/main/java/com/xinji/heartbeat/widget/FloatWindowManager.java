@@ -8,9 +8,11 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
+import android.animation.ValueAnimator;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -36,6 +38,9 @@ public class FloatWindowManager {
 
     private int dragInitX, dragInitY;
     private float dragTouchX, dragTouchY;
+    private boolean dragMoved = false;
+    private int touchSlop = 8;
+    private boolean edgeAnimating = false;
 
     public FloatWindowManager(Activity activity) {
         this.activityRef = new WeakReference<>(activity);
@@ -172,27 +177,49 @@ public class FloatWindowManager {
             type, flags, PixelFormat.TRANSLUCENT);
 
         floatParams.gravity = Gravity.TOP | Gravity.START;
-        floatParams.x = getPosPrefs(activity).getInt("float_x", screenW - dp2px(activity, 100));
-        floatParams.y = getPosPrefs(activity).getInt("float_y", dp2px(activity, 100));
+        applySavedPosition(activity);
 
+        touchSlop = ViewConfiguration.get(activity).getScaledTouchSlop();
         floatView.setOnTouchListener((v, event) -> {
             if (floatLocked || floatParams == null) return false;
-            switch (event.getAction()) {
+            switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
-                    dragInitX = floatParams.x; dragInitY = floatParams.y;
-                    dragTouchX = event.getRawX(); dragTouchY = event.getRawY();
+                    dragInitX = floatParams.x;
+                    dragInitY = floatParams.y;
+                    dragTouchX = event.getRawX();
+                    dragTouchY = event.getRawY();
+                    dragMoved = false;
+                    if (edgeAnimating) {
+                        edgeAnimating = false;
+                        v.animate().cancel();
+                    }
+                    v.setPressed(true);
                     return true;
                 case MotionEvent.ACTION_MOVE:
-                    floatParams.x = dragInitX + (int) (event.getRawX() - dragTouchX);
-                    floatParams.y = dragInitY + (int) (event.getRawY() - dragTouchY);
-                    wm.updateViewLayout(floatView, floatParams);
+                    float dx = event.getRawX() - dragTouchX;
+                    float dy = event.getRawY() - dragTouchY;
+                    if (!dragMoved && Math.hypot(dx, dy) > touchSlop) {
+                        dragMoved = true;
+                        v.setPressed(false);
+                    }
+                    if (dragMoved) {
+                        moveToClamped(dragInitX + (int) dx, dragInitY + (int) dy);
+                    }
                     return true;
                 case MotionEvent.ACTION_UP:
-                    if (memoryEnabled) {
-                        getPosPrefs(activity).edit()
-                            .putInt("float_x", floatParams.x)
-                            .putInt("float_y", floatParams.y)
-                            .apply();
+                    v.setPressed(false);
+                    if (dragMoved) {
+                        snapToEdge(activity);
+                        savePosition(activity);
+                    } else {
+                        openMainActivity();
+                    }
+                    return true;
+                case MotionEvent.ACTION_CANCEL:
+                    v.setPressed(false);
+                    if (dragMoved) {
+                        snapToEdge(activity);
+                        savePosition(activity);
                     }
                     return true;
             }
@@ -382,6 +409,102 @@ public class FloatWindowManager {
 
     private int dp2px(Context context, int dp) {
         return (int) (dp * context.getResources().getDisplayMetrics().density);
+    }
+
+    private int viewW() {
+        if (floatView == null) return 0;
+        int w = floatView.getWidth();
+        return w > 0 ? w : floatView.getMeasuredWidth();
+    }
+
+    private int viewH() {
+        if (floatView == null) return 0;
+        int h = floatView.getHeight();
+        return h > 0 ? h : floatView.getMeasuredHeight();
+    }
+
+    private void moveToClamped(int x, int y) {
+        if (floatParams == null || wm == null || floatView == null) return;
+        int w = viewW();
+        int h = viewH();
+        int maxX = Math.max(0, screenW - w);
+        int maxY = Math.max(0, screenH - h);
+        floatParams.x = Math.max(0, Math.min(x, maxX));
+        floatParams.y = Math.max(0, Math.min(y, maxY));
+        try {
+            wm.updateViewLayout(floatView, floatParams);
+        } catch (IllegalArgumentException ignored) {}
+    }
+
+    private void snapToEdge(Activity activity) {
+        if (activity == null) return;
+        if (floatParams == null || wm == null || floatView == null) return;
+        int w = viewW();
+        int maxX = Math.max(0, screenW - w);
+        final int target = floatParams.x + w / 2 < screenW / 2 ? 0 : maxX;
+        if (floatParams.x == target) return;
+        final int from = floatParams.x;
+        edgeAnimating = true;
+        ValueAnimator anim = ValueAnimator.ofInt(from, target);
+        anim.setDuration(170);
+        anim.addUpdateListener(a -> {
+            if (floatParams == null || wm == null || floatView == null) return;
+            floatParams.x = (int) a.getAnimatedValue();
+            try {
+                wm.updateViewLayout(floatView, floatParams);
+            } catch (IllegalArgumentException ignored) {}
+        });
+        anim.addListener(new android.animation.AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(android.animation.Animator a) {
+                edgeAnimating = false;
+                if (floatParams != null) floatParams.x = target;
+            }
+        });
+        anim.start();
+    }
+
+    private void savePosition(Activity activity) {
+        if (!memoryEnabled || floatParams == null) return;
+        int w = viewW();
+        int maxX = Math.max(0, screenW - w);
+        int side = floatParams.x + w / 2 < screenW / 2 ? 0 : 1;
+        float ratio = screenH > 0 ? (float) floatParams.y / (float) screenH : 0f;
+        getPosPrefs(activity).edit()
+            .putInt("float_side", side)
+            .putFloat("float_y_ratio", ratio)
+            .putInt("float_w", screenW)
+            .putInt("float_h", screenH)
+            .putInt("float_x", floatParams.x)
+            .putInt("float_y", floatParams.y)
+            .apply();
+    }
+
+    private void applySavedPosition(Activity activity) {
+        SharedPreferences p = getPosPrefs(activity);
+        int w = floatView == null ? 0 : floatView.getMeasuredWidth();
+        int maxX = Math.max(0, screenW - w);
+        float ratio = p.getFloat("float_y_ratio", -1f);
+        if (ratio < 0f) {
+            int legacyY = p.getInt("float_y", dp2px(activity, 100));
+            int savedX = p.getInt("float_x", screenW - dp2px(activity, 100));
+            floatParams.x = Math.max(0, Math.min(savedX, maxX));
+            floatParams.y = Math.max(0, Math.min(legacyY, screenH - dp2px(activity, 60)));
+            return;
+        }
+        int side = p.getInt("float_side", 1);
+        floatParams.x = side == 0 ? 0 : maxX;
+        int y = (int) (ratio * screenH);
+        floatParams.y = Math.max(0, Math.min(y, screenH - dp2px(activity, 40)));
+    }
+
+    private void openMainActivity() {
+        Activity activity = activityRef.get();
+        if (activity == null) return;
+        try {
+            Intent i = new Intent(activity, com.xinji.heartbeat.MainActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            activity.startActivity(i);
+        } catch (Exception ignored) {}
     }
 
     private SharedPreferences getPosPrefs(Context context) {
