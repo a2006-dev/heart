@@ -52,6 +52,7 @@
          android:icon="@mipmap/ic_launcher"
          android:roundIcon="@mipmap/ic_launcher_round"
          android:label="心迹"
+         android:enableOnBackInvokedCallback="true"
          android:theme="@style/Theme.App.Starting"
          android:supportsRtl="true"
          android:persistent="false"

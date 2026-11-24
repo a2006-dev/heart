@@ -28,6 +28,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.activity.OnBackPressedCallback;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -82,6 +83,7 @@ public class MainActivity extends FragmentActivity {
 
         setFullScreen();
         setupBottomNav();
+        setupBackHandling();
         registerBroadcastReceivers();
         createNotificationChannel();
         requestNotificationPermissionIfNeeded();
@@ -186,6 +188,33 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
+    private void setupBackHandling() {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override public void handleOnBackPressed() {
+                if (viewPager != null && viewPager.getCurrentItem() != 0) {
+                    viewPager.setCurrentItem(0, true);
+                    if (bottomNav != null) bottomNav.setSelectedItemId(R.id.nav_home);
+                    return;
+                }
+                boolean monitoring = false;
+                try {
+                    BleManager ble = serviceLocator == null ? null : serviceLocator.getBleManager();
+                    monitoring = ble != null && ble.isConnected();
+                } catch (Exception ignored) {}
+                if (monitoring && !backConfirmPending) {
+                    backConfirmPending = true;
+                    Toast.makeText(MainActivity.this,
+                        "再按一次退出，后台仍会继续监测", Toast.LENGTH_SHORT).show();
+                    mainHandler.postDelayed(() -> backConfirmPending = false, 2500);
+                    return;
+                }
+                setEnabled(false);
+                getOnBackPressedDispatcher().onBackPressed();
+            }
+        });
+    }
+
+    private boolean backConfirmPending = false;
     private void setupBottomNav() {
         viewPager = findViewById(R.id.viewPager);
         bottomNav = findViewById(R.id.bottomNav);
