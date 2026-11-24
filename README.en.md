@@ -280,7 +280,53 @@ CC=x86_64-w64-mingw32-gcc CGO_ENABLED=1 GOOS=windows GOARCH=amd64 \
 
 ## 📋 Changelog
 
-### v3.1 — Onboarding Redesign & Clearer Permissions (Current)
+### v3.4 — Security Hardening & Unified Experience (Current)
+This release fixes the outstanding issue list in four passes: functionality, security, cleanup, UI. No new features.
+**🐞 Functional fixes**
+- **Go client failed to compile** — restored the missing Win32 C window code
+- **SSE thread pool dropped connections** — switched to `SynchronousQueue` with core = max = client limit
+- **BLE RR interval parsing** — added `Energy Expended` flag handling; devices sending that field produced wrong RR values
+- **Go MQTT concurrency** — shared state is now mutex-protected
+**🔒 Security**
+- **Wildcard CORS removed** (6 spots in Java, 2 in Go); `/api/profiles` retired and now returns 404
+- **Python servers bind loopback only** — `0.0.0.0` → `127.0.0.1`, port probing updated as well
+- **Header size limits** — max 100 lines / 8192 bytes per request, oversized requests are dropped
+- **MQTT over TLS** — new V2 connection code format (`HEARTBEAT#V2#...`), TLS 1.2 minimum; V1 codes remain fully compatible
+- **Update signature verification** — verifies certificate fingerprint and SHA-256, untrusted third-party mirrors removed
+- **FileProvider narrowed** — `external-path` removed, only `cache/share` and `cache/update` exposed
+**🧹 Cleanup**
+- Dropped unused Paho MQTT dependency and blanket `keep` proguard rules
+- Removed unused permissions from the manifest, disabled auto backup
+- `heart_monitor.py` asks before installing packages at runtime; bare `except` blocks and leftover CORS handling removed
+- MQTT device ID is persisted, SUBACK is validated, self-published messages are ignored, publishing moved off the BLE callback thread
+- Go `parseCode` now matches Android validation; 13 unit tests added for connection code parsing/generation
+**🎨 UI & interaction**
+- **Adaptive icon** with Android 13 themed icon support, source SVG included
+- **Splash** — duplicate second splash removed, icon moved into the safe area
+- **Notifications** — brand monochrome icon, ongoing notification is silent (disconnect notification still alerts)
+- **Consistent icons** — 22 emoji replaced with a single vector icon set
+- **Floating window** — clamping to screen bounds, tap to open the app, snap to nearest edge on release, position stored as side + height ratio
+- **Back button** — returns to first tab; while monitoring, the first press only warns, the second within 2.5s exits
+- **Touch targets** — small buttons and switches enlarged to 48dp
+- **String externalization** — all UI text moved to resources, new `values-en` locale
+- **Accessibility** — `aria-live` added, `user-scalable=no` removed, icon buttons declare `importantForAccessibility`
+- **Edge-to-edge** — unified on `WindowCompat` with inset padding for bottom nav and content, legacy translucent theme items removed
+- **Heart rate range** — unified to 20–250 across all clients; out-of-range shows an explicit warning instead of a silent dash
+- **PC page** — new `/api/info`; placeholders no longer stay on "loading"; copy buttons; reconnect hint on disconnect; data older than 10s marked stale
+- **Shared web assets** — `hr-widget.js` / `hr-widget.css` extracted; status text unified
+- **PC log** — buffered queue, no more rate-limit drops; truncation is rune-safe so CJK text is not cut mid-character; keeps the last 200 lines
+- **Python window** — DPI awareness, resizable window, proper cleanup on close; copy buttons and correct OBS link
+- **MQTT page** — `?code=` prefill, local code memory with clear button, disabled "Connecting…" state, in-page failure banner, light/dark theming
+**🤖 CI**
+- New GitHub Actions workflow running `go vet` / `go test` / `go build` on a Windows runner
+**🔖 Other**
+- Version 3.3 → 3.4
+> ⚠️ **Status of the leftovers listed in v3.3**:
+> - **MQTT TLS & credentials**: TLS is done (V2 codes); username/password is still unsupported.
+> - **HTTP access authentication**: not implemented yet. The Python servers bind loopback only, but **the Go client still listens on all interfaces so phones can push over Wi-Fi**. Do not expose the PC page on untrusted networks.
+> - **Go listener scope**: narrowing it conflicts with the point above until access authentication exists, so it is deferred.
+
+### v3.1 — Onboarding Redesign & Clearer Permissions
 
 **✨ New**
 - 🚀 **Brand new onboarding** — 7-step first-launch guide showcasing features

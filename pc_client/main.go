@@ -914,7 +914,7 @@ func getLocalIP() string {
 	return strings.Split(addr, ":")[0]
 }
 
-const appVersion = "3.3"
+const appVersion = "3.4"
 
 const (
 	logKeepLines = 200
