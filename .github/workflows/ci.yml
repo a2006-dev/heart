@@ -10,6 +10,9 @@ on:
 permissions:
   contents: write
 
+env:
+  GRADLE_OPTS: -Dorg.gradle.jvmargs=-Xmx2048m
+
 jobs:
   go-check:
     name: Go (windows/amd64)
@@ -40,7 +43,7 @@ jobs:
   android-build:
     name: Android APK
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -48,19 +51,40 @@ jobs:
           distribution: temurin
           java-version: '17'
       - uses: gradle/actions/setup-gradle@v3
-      - name: Accept Android SDK licenses
-        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+      - name: Restore signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::warning::KEYSTORE_BASE64 未配置，跳过 release 签名，仅构建 debug 包"
+            exit 0
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > release.p12
+          {
+            printf 'storeFile=release.p12\n'
+            printf 'storePassword=%s\n' "$KEYSTORE_PASSWORD"
+            printf 'keyAlias=%s\n' "$KEY_ALIAS"
+            printf 'keyPassword=%s\n' "$KEY_PASSWORD"
+          } > keystore.properties
+          keytool -list -keystore release.p12 -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS" | tail -3
+      - name: Build release APK
+        run: ./gradlew assembleRelease --no-daemon --stacktrace
       - name: Build debug APK
         run: ./gradlew assembleDebug --no-daemon --stacktrace
-      - name: Build release APK
-        id: release_apk
-        if: hashFiles('keystore.properties') != ''
-        run: ./gradlew assembleRelease --no-daemon --stacktrace
-      - name: Locate APKs
+      - name: Verify signature
+        run: |
+          APK=$(ls app/build/outputs/apk/release/*.apk | head -1)
+          echo "APK: $APK"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --print-certs "$APK" | head -5
+      - name: Collect APKs
         run: |
           mkdir -p out
-          cp app/build/outputs/apk/debug/*.apk out/ 2>/dev/null || true
-          cp app/build/outputs/apk/release/*.apk out/ 2>/dev/null || true
+          VERSION=$(grep -oP 'versionName "\K[^"]+' app/build.gradle | head -1)
+          cp app/build/outputs/apk/release/*.apk "out/heart-${VERSION}-release.apk" 2>/dev/null || true
+          cp app/build/outputs/apk/debug/*.apk "out/heart-${VERSION}-debug.apk" 2>/dev/null || true
           ls -la out
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
@@ -95,6 +119,15 @@ jobs:
           files: artifacts/*
           generate_release_notes: true
           fail_on_unmatched_files: false
+          body: |
+            ## 心迹 ${{ github.ref_name }}
+
+            自动构建产物：
+            - `heart_monitor_pc.exe` — Windows 客户端（需放在有 adb.exe 的目录或加入 PATH）
+            - `heart-*-release.apk` — Android 签名包，可直接覆盖安装
+            - `heart-*-debug.apk` — 调试包，仅供测试
+
+            安装提示：v3.2 起更换过签名密钥，从 v3.1 及更早版本升级需先卸载旧版。
 
   android-unit-test:
     name: Android unit test
