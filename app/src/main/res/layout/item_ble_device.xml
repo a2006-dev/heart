@@ -20,7 +20,7 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:gravity="center"
-        android:text="⌚"
+        android:text="@string/txt_auto_077"
         android:textSize="16sp"/>
 
     <!-- 设备名称和地址 -->
@@ -38,7 +38,7 @@
             android:textSize="14sp"
             android:maxLines="1"
             android:ellipsize="end"
-            android:text="未知设备"/>
+            android:text="@string/txt_auto_078"/>
         <TextView
             android:id="@+id/tvDevAddress"
             android:layout_width="wrap_content"
@@ -46,7 +46,7 @@
             android:textColor="#675c62"
             android:textSize="10sp"
             android:typeface="monospace"
-            android:text="00:00:00:00:00:00"/>
+            android:text="@string/txt_auto_079"/>
     </LinearLayout>
 
     <!-- 信号强度 -->
@@ -57,7 +57,7 @@
         android:textColor="#ff5d7c"
         android:textSize="14sp"
         android:typeface="monospace"
-        android:text="--/--"
+        android:text="@string/txt_auto_080"
         android:drawableEnd="@drawable/ic_icon_signal"
         android:drawablePadding="4dp"
         android:gravity="center_vertical"
@@ -69,7 +69,7 @@
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:gravity="center"
-        android:text="⋮"
+        android:text="@string/txt_auto_081"
         android:textColor="#675c62"
         android:textSize="20sp"
         android:clickable="true"

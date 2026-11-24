@@ -18,7 +18,8 @@
             android:layout_height="40dp"
             android:src="@android:drawable/ic_menu_revert"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="返回"/>
+            android:contentDescription="返回"
+            android:importantForAccessibility="yes"/>
         
         <TextView
             android:id="@+id/tvAppName"
@@ -37,6 +38,7 @@
             android:src="@android:drawable/ic_menu_send"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="分享"
+            android:importantForAccessibility="yes"
             android:tint="#ff5d7c"/>
     </LinearLayout>
     

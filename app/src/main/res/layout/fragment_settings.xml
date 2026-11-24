@@ -11,7 +11,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="设置"
+            android:text="@string/txt_auto_038"
             android:textColor="#ff5d7c"
             android:textSize="22sp"
             android:textStyle="bold"
@@ -32,13 +32,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="自动连接"
+                    android:text="@string/txt_auto_039"
                     android:textColor="#e2c2cf"
                     android:textSize="15sp"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="前/后台自动扫描并连接已知设备"
+                    android:text="@string/txt_auto_040"
                     android:textColor="#675c62"
                     android:textSize="12sp"
                     android:layout_marginTop="2dp"/>
@@ -63,13 +63,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="悬浮窗记忆"
+                    android:text="@string/txt_auto_041"
                     android:textColor="#e2c2cf"
                     android:textSize="15sp"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="记住悬浮窗位置和显示状态"
+                    android:text="@string/txt_auto_042"
                     android:textColor="#675c62"
                     android:textSize="12sp"
                     android:layout_marginTop="2dp"/>
@@ -94,13 +94,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="显示悬浮窗"
+                    android:text="@string/txt_auto_043"
                     android:textColor="#e2c2cf"
                     android:textSize="15sp"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="在屏幕上显示实时心率"
+                    android:text="@string/txt_auto_044"
                     android:textColor="#675c62"
                     android:textSize="12sp"
                     android:layout_marginTop="2dp"/>
@@ -125,13 +125,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="锁定悬浮窗"
+                    android:text="@string/txt_auto_045"
                     android:textColor="#e2c2cf"
                     android:textSize="15sp"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="防止悬浮窗被误触拖动"
+                    android:text="@string/txt_auto_046"
                     android:textColor="#675c62"
                     android:textSize="12sp"
                     android:layout_marginTop="2dp"/>
@@ -157,13 +157,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="悬浮窗样式"
+                    android:text="@string/txt_auto_047"
                     android:textColor="#e2c2cf"
                     android:textSize="15sp"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="自定义悬浮窗外观"
+                    android:text="@string/txt_auto_048"
                     android:textColor="#675c62"
                     android:textSize="12sp"
                     android:layout_marginTop="2dp"/>
@@ -197,13 +197,13 @@
                     android:drawableStart="@drawable/ic_icon_broadcast"
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
-                android:text="心率广播"
+                android:text="@string/txt_auto_001"
                     android:textColor="#e2c2cf"
                     android:textSize="15sp"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="电脑实时查看心率"
+                    android:text="@string/txt_auto_049"
                     android:textColor="#675c62"
                     android:textSize="12sp"
                     android:layout_marginTop="2dp"/>
@@ -211,7 +211,7 @@
                     android:id="@+id/tvBroadcastStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="点此管理"
+                    android:text="@string/txt_auto_050"
                     android:textColor="#ff5d7c"
                     android:textSize="12sp"
                     android:layout_marginTop="4dp"/>
@@ -219,7 +219,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="›"
+                android:text="@string/txt_auto_019"
                 android:textColor="#675c62"
                 android:textSize="18sp"/>
         </LinearLayout>
@@ -248,13 +248,13 @@
                         android:drawableStart="@drawable/ic_icon_link"
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
-                android:text="MQTT 远程推送"
+                android:text="@string/txt_auto_051"
                         android:textColor="#e2c2cf"
                         android:textSize="15sp"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="跨网络推送心率，EMQX 国内节点免费"
+                        android:text="@string/txt_auto_052"
                         android:textColor="#675c62"
                         android:textSize="12sp"
                         android:layout_marginTop="2dp"/>
@@ -262,7 +262,7 @@
                         android:id="@+id/tvMqttStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="⏹ 未启动"
+                        android:text="@string/txt_auto_053"
                         android:textColor="#ff5d7c"
                         android:textSize="12sp"
                         android:layout_marginTop="4dp"/>
@@ -283,7 +283,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="设备标识"
+                    android:text="@string/txt_auto_054"
                     android:textColor="#675c62"
                     android:textSize="11sp"/>
                 <TextView
@@ -297,7 +297,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Broker"
+                    android:text="@string/txt_auto_055"
                     android:textColor="#675c62"
                     android:textSize="11sp"/>
                 <LinearLayout
@@ -310,7 +310,7 @@
                         android:layout_width="0dp"
                         android:layout_height="36dp"
                         android:layout_weight="1"
-                        android:text="broker-cn.emqx.io"
+                        android:text="@string/txt_auto_056"
                         android:textColor="#e2c2cf"
                         android:background="@drawable/glass_button"
                         android:padding="6dp"
@@ -319,7 +319,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text=":"
+                        android:text="@string/txt_auto_057"
                         android:textColor="#675c62"
                         android:textSize="14sp"
                         android:paddingHorizontal="4dp"/>
@@ -327,7 +327,7 @@
                         android:id="@+id/etMqttPort"
                         android:layout_width="70dp"
                         android:layout_height="36dp"
-                        android:text="1883"
+                        android:text="@string/txt_auto_058"
                         android:textColor="#e2c2cf"
                         android:background="@drawable/glass_button"
                         android:padding="6dp"
@@ -345,7 +345,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="加密传输 (TLS)"
+                        android:text="@string/txt_auto_059"
                         android:textColor="#675c62"
                         android:textSize="11sp"/>
                     <com.google.android.material.switchmaterial.SwitchMaterial
@@ -356,14 +356,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Topic"
+                    android:text="@string/txt_auto_060"
                     android:textColor="#675c62"
                     android:textSize="11sp"/>
                 <EditText
                     android:id="@+id/etMqttTopic"
                     android:layout_width="match_parent"
                     android:layout_height="36dp"
-                    android:text="heart/rate"
+                    android:text="@string/txt_auto_061"
                     android:textColor="#e2c2cf"
                     android:background="@drawable/glass_button"
                     android:padding="6dp"
@@ -373,7 +373,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="实际 Topic 自动带上设备标识"
+                        android:text="@string/txt_auto_062"
                         android:textColor="#554a50"
                         android:textSize="10sp"
                         android:layout_marginBottom="6dp"/>
@@ -384,7 +384,7 @@
                         android:drawableStart="@drawable/ic_icon_search"
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
-                android:text="测试连接（检测 Broker 是否可达）"
+                android:text="@string/txt_auto_063"
                         android:textColor="#ffffff"
                         android:textSize="12sp"
                         android:background="@drawable/glass_button"
@@ -401,7 +401,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="连接码（发给电脑端粘贴）"
+                        android:text="@string/txt_auto_064"
                         android:textColor="#675c62"
                         android:textSize="10sp"/>
                     <TextView
@@ -425,7 +425,7 @@
                             android:drawableStart="@drawable/ic_icon_clipboard"
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
-                android:text="复制"
+                android:text="@string/txt_auto_065"
                             android:textColor="#ffffff"
                             android:textSize="12sp"
                             android:background="@drawable/glass_button"
@@ -438,7 +438,7 @@
                             android:drawableStart="@drawable/ic_icon_upload"
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
-                android:text="分享"
+                android:text="@string/txt_auto_066"
                             android:textColor="#ffffff"
                             android:textSize="12sp"
                             android:background="@drawable/glass_button"
@@ -452,7 +452,7 @@
                     android:drawableStart="@drawable/ic_icon_book"
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
-                android:text="MQTT 帮助（公共 Broker / 自建 / 阿里云）"
+                android:text="@string/txt_auto_067"
                     android:textColor="#ffffff"
                     android:textSize="12sp"
                     android:background="@drawable/glass_button"
@@ -474,13 +474,13 @@
                 android:drawableStart="@drawable/ic_icon_book"
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
-                android:text="使用帮助"
+                android:text="@string/txt_auto_068"
                 android:textColor="#e2c2cf"
                 android:textSize="15sp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="›"
+                android:text="@string/txt_auto_019"
                 android:textColor="#675c62"
                 android:textSize="18sp"/>
         </LinearLayout>
@@ -499,13 +499,13 @@
                 android:drawableStart="@drawable/ic_icon_chat"
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
-                android:text="联系作者 (QQ: 3544399875)"
+                android:text="@string/txt_auto_069"
                 android:textColor="#e2c2cf"
                 android:textSize="15sp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="›"
+                android:text="@string/txt_auto_019"
                 android:textColor="#675c62"
                 android:textSize="18sp"/>
         </LinearLayout>
@@ -526,13 +526,13 @@
                 android:drawableStart="@drawable/ic_icon_github"
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
-                android:text="GitHub 开源仓库"
+                android:text="@string/txt_auto_070"
                 android:textColor="#e2c2cf"
                 android:textSize="15sp"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="›"
+                android:text="@string/txt_auto_019"
                 android:textColor="#675c62"
                 android:textSize="18sp"/>
         </LinearLayout>
@@ -558,13 +558,13 @@
                     android:drawableStart="@drawable/ic_icon_download"
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
-                android:text="去 Release 下载"
+                android:text="@string/txt_auto_071"
                     android:textColor="#e2c2cf"
                     android:textSize="15sp"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="从 GitHub 下载最新版本"
+                    android:text="@string/txt_auto_072"
                     android:textColor="#675c62"
                     android:textSize="12sp"
                     android:layout_marginTop="2dp"/>
@@ -572,7 +572,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="›"
+                android:text="@string/txt_auto_019"
                 android:textColor="#675c62"
                 android:textSize="18sp"/>
         </LinearLayout>
@@ -595,13 +595,13 @@
                     android:drawableStart="@drawable/ic_icon_eye_off"
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
-                android:text="隐藏最近任务"
+                android:text="@string/txt_auto_073"
                     android:textColor="#e2c2cf"
                     android:textSize="15sp"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="App 不出现在最近任务列表中"
+                    android:text="@string/txt_auto_074"
                     android:textColor="#675c62"
                     android:textSize="12sp"
                     android:layout_marginTop="2dp"/>
@@ -614,7 +614,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="心迹 v2.3"
+            android:text="@string/txt_auto_075"
             android:textColor="#3a3438"
             android:textSize="12sp"
             android:layout_gravity="center_horizontal"
@@ -624,7 +624,7 @@
             android:layout_height="wrap_content"
             android:drawableStart="@drawable/ic_icon_warning"
                 android:drawablePadding="8dp"
-                android:text="本应用数据仅供参考，不作医疗诊断用途。如有身体不适请及时就医。"
+                android:text="@string/txt_auto_076"
             android:textColor="#2a2428"
             android:textSize="10sp"
             android:gravity="center"

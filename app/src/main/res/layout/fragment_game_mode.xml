@@ -21,7 +21,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="游戏模式"
+                android:text="@string/txt_auto_032"
                 android:textColor="#ff5d7c"
                 android:textSize="22sp"
                 android:textStyle="bold"/>
@@ -60,13 +60,13 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="小窗/分屏继续记录"
+                        android:text="@string/txt_auto_033"
                         android:textColor="#e2c2cf"
                         android:textSize="14sp"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="切出去刷视频、回消息时不中断"
+                        android:text="@string/txt_auto_034"
                         android:textColor="#675c62"
                         android:textSize="11sp"
                         android:layout_marginTop="2dp"/>
@@ -103,7 +103,7 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:text="⏺ 开始记录"
+                android:text="@string/txt_auto_035"
                 android:backgroundTint="#ff5d7c"
                 android:textColor="#ffffff"
                 android:textSize="15sp"
@@ -113,7 +113,7 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:text="⏹ 停止记录"
+                android:text="@string/txt_auto_036"
                 android:backgroundTint="#2a282c"
                 android:textColor="#cbadbb"
                 android:textSize="15sp"
@@ -143,7 +143,7 @@
                 android:id="@+id/tvEmpty"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="暂无游戏\n点击右下角 + 添加"
+                android:text="@string/txt_auto_037"
                 android:textColor="#675c62"
                 android:textSize="16sp"
                 android:gravity="center"
@@ -160,5 +160,6 @@
         android:padding="16dp"
         android:layout_gravity="bottom|end"
         android:layout_margin="24dp"
-        android:contentDescription="添加游戏"/>
+        android:contentDescription="添加游戏"
+        android:importantForAccessibility="yes"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

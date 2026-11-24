@@ -19,6 +19,7 @@ public class HomeFragment extends Fragment {
         webView.getSettings().setRenderPriority(WebSettings.RenderPriority.LOW);
         webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
         webView.setLongClickable(false);
+        webView.setAccessibilityLiveRegion(android.view.View.ACCESSIBILITY_LIVE_REGION_POLITE);
         webView.setWebViewClient(new WebViewClient());
 
         eegBridge = new EegWaveformBridge(webView);

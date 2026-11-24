@@ -5,6 +5,7 @@
     android:background="#0c0c10">
     <WebView
         android:id="@+id/webView"
+        android:importantForAccessibility="yes"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </FrameLayout>

@@ -16,7 +16,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="设备连接"
+            android:text="@string/txt_auto_024"
             android:textColor="#ff5d7c"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -43,14 +43,14 @@
                     android:drawableStart="@drawable/ic_icon_bolt"
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
-                android:text="未连接"
+                android:text="@string/txt_auto_025"
                     android:textColor="#e2c2cf"
                     android:textSize="15sp"/>
                 <TextView
                     android:id="@+id/tvStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="待机"
+                    android:text="@string/txt_auto_026"
                     android:textColor="#675c62"
                     android:textSize="12sp"
                     android:layout_marginTop="4dp"/>
@@ -59,7 +59,7 @@
                 android:id="@+id/btnDisconnect"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:text="断开"
+                android:text="@string/txt_auto_027"
                 android:backgroundTint="#2a282c"
                 android:textColor="#cbadbb"
                 android:textSize="12sp"
@@ -83,7 +83,7 @@
                 android:drawableStart="@drawable/ic_icon_search"
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
-                android:text="开始搜索"
+                android:text="@string/txt_auto_028"
                 android:backgroundTint="#ff5d7c"
                 android:textColor="#ffffff"
                 android:textSize="14sp"/>
@@ -114,7 +114,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="广义搜索（不过滤特征码）"
+                android:text="@string/txt_auto_029"
                 android:textColor="#cbadbb"
                 android:textSize="13sp"/>
             <TextView
@@ -173,14 +173,14 @@
                 android:drawableStart="@drawable/ic_icon_clipboard"
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
-                android:text="日志"
+                android:text="@string/txt_auto_030"
                 android:textColor="#675c62"
                 android:textSize="13sp"/>
             <Button
                 android:id="@+id/btnClearLog"
                 android:layout_width="wrap_content"
                 android:layout_height="28dp"
-                android:text="清空"
+                android:text="@string/txt_auto_031"
                 android:backgroundTint="#2a282c"
                 android:textColor="#cbadbb"
                 android:textSize="10sp"
