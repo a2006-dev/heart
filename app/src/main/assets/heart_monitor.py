@@ -4,6 +4,27 @@
 双击运行，支持桌面悬浮窗、HRV记录、MQTT远程、OBS叠加
 """
 import json, threading, time, socket, os, sys, subprocess, importlib, urllib.request, logging, webbrowser
+
+HR_MIN = 20
+HR_MAX = 250
+HR_ABNORMAL = "数值异常"
+
+def _enable_dpi_awareness():
+    if sys.platform != "win32":
+        return
+    try:
+        import ctypes
+        ctypes.windll.shcore.SetProcessDpiAwareness(1)
+        return
+    except Exception:
+        pass
+    try:
+        import ctypes
+        ctypes.windll.user32.SetProcessDPIAware()
+    except Exception:
+        pass
+
+_enable_dpi_awareness()
 from http.server import HTTPServer, ThreadingHTTPServer, BaseHTTPRequestHandler
 from dataclasses import dataclass, field
 from typing import List, Optional
@@ -34,7 +55,7 @@ class HeartState:
     _lock: threading.Lock = field(default_factory=threading.Lock)
     def update(self, v, name="", ctype="", priority=0):
         with self._lock:
-            if not (0 < v < 250): return
+            if not (HR_MIN <= v <= HR_MAX): return
             if priority < self.source_priority and self.connected: return
             self.hr, self.connected, self.source_priority = v, True, priority
             if name: self.device_name = name; self.conn_type = ctype
@@ -361,13 +382,54 @@ if _HAS_GUI:
         {"name":"透明红","bg":"#1a0000","fg":"#ff2d55","border":"#ff2d55"},
         {"name":"高对比白","bg":"#111111","fg":"#ffffff","border":"#ff5d7c"},
     ]
+_ICON_CACHE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "heart.ico") if "__file__" in dir() else "heart.ico"
+
+def _ensure_icon_file():
+    if os.path.exists(_ICON_CACHE):
+        return _ICON_CACHE
+    try:
+        import struct as _st
+        w = h = 32
+        px = []
+        for y in range(h):
+            for x in range(w):
+                cx, cy, r = w / 2.0, h / 2.0, w / 2.0 - 1
+                dx, dy = x + 0.5 - cx, y + 0.5 - cy
+                if (dx * dx + dy * dy) ** 0.5 <= r:
+                    px.append((0xB0, 0x5B, 0x3B, 0xFF))
+                else:
+                    px.append((0, 0, 0, 0))
+        rows = b"".join(b"\x00" + b"".join(bytes(v) for v in px[y * w:(y + 1) * w]) for y in range(h))
+        dib = _st.pack("<IiiHHIIiiII", 40, w, h * 2, 1, 32, 0, len(rows), 0, 0, 0, 0) + rows
+        icondir = _st.pack("<HHH", 0, 1, 1) + _st.pack("<BBBBHHII", w, h, 0, 0, 1, 32, len(dib), 22)
+        with open(_ICON_CACHE, "wb") as f:
+            f.write(icondir + dib)
+        return _ICON_CACHE
+    except Exception:
+        return None
+
     _float_sidx=0
 
     class App:
         def __init__(self):
-            self.root=tk.Tk(); self.root.title("❤️ 心迹 v3.3")
+            self.root=tk.Tk(); self.root.title("心迹 v3.3")
             self.root.geometry("520x820"); self.root.configure(bg='#1a1a24')
-            self.root.resizable(False,False)
+            self.root.minsize(420, 640)
+            self.root.resizable(True,True)
+            try:
+                self.root.tk.call('tk', 'scaling', self.root.winfo_fpixels('1i') / 72.0)
+            except Exception:
+                pass
+            _app_icon = _ensure_icon_file()
+            if _app_icon:
+                try:
+                    self.root.iconbitmap(default=_app_icon)
+                except Exception:
+                    try:
+                        self.root.iconphoto(True, tk.PhotoImage(file=_app_icon))
+                    except Exception:
+                        pass
+            self.root.protocol("WM_DELETE_WINDOW", self.on_close)
             s=ttk.Style();s.theme_use('clam')
             s.configure('TLabel',background='#1a1a24',foreground='#e2c2cf',font=('Segoe UI',10))
 
@@ -634,6 +696,24 @@ if _HAS_GUI:
                 "2️⃣ 用 mqtt.html 诊断防火墙\n"
                 "3️⃣ 防火墙放行 1883 端口\n"
                 "4️⃣ 更换 Broker 见文档")
+        def on_close(self):
+            try:
+                _server_stop.set()
+            except Exception:
+                pass
+            try:
+                mqtt_disconnect()
+            except Exception:
+                pass
+            try:
+                if _float_win is not None:
+                    _float_win.destroy()
+            except Exception:
+                pass
+            try:
+                self.root.destroy()
+            except Exception:
+                pass
         def run(self): self.root.mainloop()
 
 # ═══════════ 启动 ═══════════
