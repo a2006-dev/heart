@@ -82,6 +82,7 @@ public class MainActivity extends FragmentActivity {
         }
 
         setFullScreen();
+        applyNavigationInsets();
         setupBottomNav();
         setupBackHandling();
         registerBroadcastReceivers();
@@ -150,6 +151,25 @@ public class MainActivity extends FragmentActivity {
         serviceLocator = null;
     }
 
+    private void applyNavigationInsets() {
+        final android.view.View nav = findViewById(R.id.bottomNav);
+        final android.view.View pager = findViewById(R.id.viewPager);
+        if (nav == null) return;
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(nav,
+            (v, insets) -> {
+                android.graphics.Insets bars = insets.getInsets(
+                    androidx.core.view.WindowInsetsCompat.Type.systemBars());
+                v.setPadding(v.getPaddingLeft(), v.getPaddingTop(),
+                    v.getPaddingRight(), bars.bottom);
+                if (pager != null) {
+                    pager.setPadding(pager.getPaddingLeft(), bars.top,
+                        pager.getPaddingRight(), pager.getPaddingBottom());
+                }
+                return insets;
+            });
+        androidx.core.view.ViewCompat.requestApplyInsets(nav);
+    }
+
     private void setFullScreen() {
         Window w = getWindow();
         View d = w.getDecorView();
@@ -160,17 +180,16 @@ public class MainActivity extends FragmentActivity {
             w.setNavigationBarColor(Color.TRANSPARENT);
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            d.post(() -> {
-                try {
-                    w.setDecorFitsSystemWindows(false);
-                    w.getInsetsController().hide(
-                        WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
-                    w.getInsetsController().setSystemBarsBehavior(
-                        WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-                } catch (Exception ignored) {}
-            });
-        } else {
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(w, false);
+        d.post(() -> {
+            try {
+                w.getInsetsController().hide(
+                    WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+                w.getInsetsController().setSystemBarsBehavior(
+                    WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+            } catch (Exception ignored) {}
+        });
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             d.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                     | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN

@@ -18,7 +18,7 @@ public class SplashActivity extends Activity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             getWindow().getDecorView().post(() -> {
                 try {
-                    getWindow().setDecorFitsSystemWindows(false);
+                    androidx.core.view.WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
                     getWindow().getInsetsController().hide(android.view.WindowInsets.Type.statusBars()
                             | android.view.WindowInsets.Type.navigationBars());
                     getWindow().getInsetsController().setSystemBarsBehavior(
