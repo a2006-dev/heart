@@ -1,7 +1,8 @@
 <resources>
      <style name="Theme.App.Starting" parent="Theme.SplashScreen">
          <item name="windowSplashScreenBackground">#0c0c10</item>
-         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher</item>
+         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
+        <item name="windowSplashScreenIconBackgroundColor">#C2385C</item>
          <item name="postSplashScreenTheme">@style/AppTheme</item>
      </style>
 

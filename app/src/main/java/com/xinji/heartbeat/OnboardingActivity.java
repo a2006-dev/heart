@@ -2,6 +2,7 @@ package com.xinji.heartbeat;
 import android.animation.*;
 import androidx.fragment.app.FragmentActivity;
 import android.content.Intent;
+import androidx.core.splashscreen.SplashScreen;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -39,10 +40,11 @@ public class OnboardingActivity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         SharedPreferences prefs = getSharedPreferences("app_settings", MODE_PRIVATE);
         if (prefs.getBoolean("onboarding_done", false)) {
-            goToMain();
+            goToMainDirect();
             return;
         }
         setContentView(R.layout.activity_onboarding);
@@ -214,6 +216,12 @@ public class OnboardingActivity extends FragmentActivity {
 
     private void goToMain() {
         startActivity(new Intent(this, SplashActivity.class));
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        finish();
+    }
+
+    private void goToMainDirect() {
+        startActivity(new Intent(this, MainActivity.class));
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         finish();
     }

@@ -61,7 +61,7 @@
 <activity
               android:name=".OnboardingActivity"
               android:exported="true"
-              android:theme="@style/SplashTheme">
+              android:theme="@style/Theme.App.Starting">
               <intent-filter>
                   <action android:name="android.intent.action.MAIN" />
                   <category android:name="android.intent.category.LAUNCHER" />
@@ -70,15 +70,8 @@
           <activity
               android:name=".SplashActivity"
               android:exported="false"
-              android:theme="@style/SplashTheme" />
-
-<activity
-              android:name=".MainActivity"
-              android:exported="false"
-              android:launchMode="singleTop"
-              android:configChanges="orientation|screenSize|keyboardHidden|navigation"
-              android:theme="@style/AppTheme">
-         </activity>
+              android:theme="@style/SplashTheme"
+              android:noHistory="true" />
 
 <service
                android:name=".core.GameModeService"
