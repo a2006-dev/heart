@@ -650,23 +650,49 @@ func parseCode(code string) (string, string, bool) {
 	if !useTLS && parts[0] != "V1" {
 		return "", "", false
 	}
-	tag := parts[1]
-	hostPort := parts[2]
-	topicBase := parts[3]
-
-	idx := strings.LastIndex(hostPort, ":")
-	if idx <= 0 {
+	tag := strings.TrimSpace(parts[1])
+	hostPort := strings.TrimSpace(parts[2])
+	topicBase := strings.TrimSpace(parts[3])
+	if tag == "" || hostPort == "" || topicBase == "" {
 		return "", "", false
 	}
-	host := hostPort[:idx]
-	port := hostPort[idx+1:]
-
-
+	var host, port string
+	bracketHost := ""
+	if strings.HasPrefix(hostPort, "[") {
+		closeIdx := strings.Index(hostPort, "]")
+		if closeIdx < 0 || closeIdx+1 >= len(hostPort) || hostPort[closeIdx+1] != ':' {
+			return "", "", false
+		}
+		host = hostPort[1:closeIdx]
+		bracketHost = hostPort[:closeIdx+1]
+		port = hostPort[closeIdx+2:]
+	} else {
+		idx := strings.LastIndex(hostPort, ":")
+		if idx <= 0 {
+			return "", "", false
+		}
+		host = hostPort[:idx]
+		port = hostPort[idx+1:]
+	}
+	if host == "" || port == "" {
+		return "", "", false
+	}
+	for _, c := range port {
+		if c < '0' || c > '9' {
+			return "", "", false
+		}
+	}
+	portNum, err := strconv.Atoi(port)
+	if err != nil || portNum < 1 || portNum > 65535 {
+		return "", "", false
+	}
 	fullTopic := topicBase
 	if !strings.HasSuffix(fullTopic, "/"+tag) {
 		fullTopic = fullTopic + "/" + tag
 	}
-
+	if bracketHost != "" {
+		return bracketHost + ":" + port, fullTopic, useTLS
+	}
 	return host + ":" + port, fullTopic, useTLS
 }
 
