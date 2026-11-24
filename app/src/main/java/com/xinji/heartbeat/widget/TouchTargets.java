@@ -5,6 +5,7 @@ import android.view.MotionEvent;
 import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewParent;
+import com.xinji.heartbeat.R;
 
 public final class TouchTargets {
 

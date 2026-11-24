@@ -157,7 +157,7 @@ public class MainActivity extends FragmentActivity {
         if (nav == null) return;
         androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(nav,
             (v, insets) -> {
-                android.graphics.Insets bars = insets.getInsets(
+                androidx.core.graphics.Insets bars = insets.getInsets(
                     androidx.core.view.WindowInsetsCompat.Type.systemBars());
                 v.setPadding(v.getPaddingLeft(), v.getPaddingTop(),
                     v.getPaddingRight(), bars.bottom);
