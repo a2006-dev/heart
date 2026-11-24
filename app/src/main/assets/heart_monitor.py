@@ -481,11 +481,15 @@ def _ensure_icon_file():
             # 地址信息 + 打开按钮
             info_frame=tk.Frame(self.root,bg='#1a1a24');info_frame.pack(padx=25,pady=(5,0),fill='x')
             row1=tk.Frame(info_frame,bg='#1a1a24');row1.pack(fill='x',pady=1)
-            tk.Label(row1,text=f"🌐 http://{ip()}:{UNIFIED_PORT}",font=('Consolas',9),fg='#ff5d7c',bg='#1a1a24').pack(side='left')
-            tk.Button(row1,text="打开",command=lambda: webbrowser.open(f"http://{ip()}:{UNIFIED_PORT}"),bg='#3a3a44',fg='#ccc',relief='flat',padx=8,font=('Segoe UI',8),cursor='hand2').pack(side='right')
+            self._ui_url=f"http://{ip()}:{UNIFIED_PORT}"
+            self._obs_url=f"{self._ui_url}/?transparent=1"
+            tk.Label(row1,text=f"🌐 {self._ui_url}",font=('Consolas',9),fg='#ff5d7c',bg='#1a1a24').pack(side='left')
+            self._copy_btn(row1,self._ui_url)
+            tk.Button(row1,text="打开",command=lambda: webbrowser.open(self._ui_url),bg='#3a3a44',fg='#ccc',relief='flat',padx=8,font=('Segoe UI',8),cursor='hand2').pack(side='right')
             row2=tk.Frame(info_frame,bg='#1a1a24');row2.pack(fill='x',pady=1)
-            tk.Label(row2,text=f"🎬 OBS: http://{ip()}:{UNIFIED_PORT}",font=('Consolas',9),fg='#998088',bg='#1a1a24').pack(side='left')
-            tk.Button(row2,text="打开",command=lambda: webbrowser.open(f"http://{ip()}:{UNIFIED_PORT}"),bg='#3a3a44',fg='#ccc',relief='flat',padx=8,font=('Segoe UI',8),cursor='hand2').pack(side='right')
+            tk.Label(row2,text=f"🎬 OBS: {self._obs_url}",font=('Consolas',9),fg='#998088',bg='#1a1a24').pack(side='left')
+            self._copy_btn(row2,self._obs_url)
+            tk.Button(row2,text="打开",command=lambda: webbrowser.open(self._obs_url),bg='#3a3a44',fg='#ccc',relief='flat',padx=8,font=('Segoe UI',8),cursor='hand2').pack(side='right')
 
             # HRV
             self.hrv_frame=tk.Frame(self.root,bg='#1a1a24')
@@ -501,6 +505,19 @@ def _ensure_icon_file():
             self.log_area.pack(padx=20,pady=(5,12),fill='both',expand=True)
             self.update_hr();self.update_log();self.update_hrv()
 
+        def _copy_btn(self,parent,text):
+            btn=tk.Button(parent,text="复制",bg='#3a3a44',fg='#ccc',relief='flat',padx=8,font=('Segoe UI',8),cursor='hand2')
+            btn.pack(side='right',padx=(0,4))
+            tip=tk.Label(parent,text="",font=('Segoe UI',8),fg='#7ee787',bg='#1a1a24')
+            def do_copy():
+                try:
+                    self.root.clipboard_clear();self.root.clipboard_append(text);self.root.update_idletasks()
+                except Exception:
+                    pass
+                tip.config(text="已复制 ✓")
+                self.root.after(1400,lambda: tip.config(text=""))
+            btn.config(command=do_copy)
+            tip.pack(side='right',padx=(0,4))
         def update_hr(self):
             s=state.snapshot()
             if s['connected'] and 30<s['hr']<220:
