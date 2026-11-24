@@ -914,6 +914,8 @@ func getLocalIP() string {
 	return strings.Split(addr, ":")[0]
 }
 
+const appVersion = "3.3"
+
 const (
 	logKeepLines = 200
 	logFlushWait = 200 * time.Millisecond
@@ -987,6 +989,30 @@ func startLocalServer() {
 			"hr": hr, "device": dev, "connected": conn,
 		})
 	})
+	mux.HandleFunc("/api/info", func(w http.ResponseWriter, r *http.Request) {
+		tip := getLocalIP()
+		port := localPort
+		mu.Lock()
+		hr, dev, conn := currentHR, deviceName, connected
+		mode := "本地"
+		if mqttActive {
+			mode = "MQTT"
+		}
+		mu.Unlock()
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Cache-Control", "no-cache")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"ip":        tip,
+			"port":      port,
+			"pushUrl":   fmt.Sprintf("http://%s:%d/api/hr", tip, port),
+			"obsUrl":    fmt.Sprintf("http://%s:%d/?transparent=1", tip, port),
+			"mode":      mode,
+			"hr":        hr,
+			"device":    dev,
+			"connected": conn,
+			"version":   appVersion,
+		})
+	})
 	mux.HandleFunc("/api/sse", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/event-stream")
 		w.Header().Set("Cache-Control", "no-cache")
@@ -1036,6 +1062,11 @@ h1{text-align:center;color:#ff5d7c;font-size:22px;margin:8px 0}
 .dot.off{background:#f44b6e}
 .info{font-size:12px;color:#998088;margin-bottom:4px}
 .val{font-family:monospace;font-size:13px;color:#ffb0bd;background:#0c0c10;padding:6px 10px;border-radius:8px;word-break:break-all;user-select:all}
+.row{display:flex;gap:8px;align-items:center}
+.row .val{flex:1;min-width:0}
+.cpy{background:#2a2a34;color:#ccc;border:none;border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;white-space:nowrap}
+.cpy:active{background:#3a3a44}
+.cpy.ok{background:#2e5c3a;color:#8ee6a0}
 .footer{text-align:center;font-size:11px;color:#4a3a40;padding:12px}
 </style>
 </head>
@@ -1048,23 +1079,71 @@ h1{text-align:center;color:#ff5d7c;font-size:22px;margin:8px 0}
 </div>
 <div class="card">
 <div class="info">📥 手机推送地址</div>
-<div class="val" id="pushUrl">加载中...</div>
+<div class="row"><div class="val" id="pushUrl">正在获取...</div><button class="cpy" data-t="pushUrl">复制</button></div>
 <div style="margin-top:8px" class="info">📺 OBS 叠加</div>
-<div class="val" id="obsUrl">加载中...</div>
+<div class="row"><div class="val" id="obsUrl">正在获取...</div><button class="cpy" data-t="obsUrl">复制</button></div>
 </div>
 <div class="card">
 <div class="info">📡 运行信息</div>
-<div class="info" id="logArea" style="margin-top:4px;line-height:1.6">启动中...</div>
+<div class="info" id="logArea" style="margin-top:4px;line-height:1.6">正在获取...</div>
 </div>
 <div class="footer">❤️ 心迹 · PC 心率监测</div>
-<script>function hrValid(v){return v>=20&&v<=250;}var HR_ABNORMAL='数值异常';
-var es=new EventSource('/api/sse'),last=0;
-es.onmessage=function(e){
-var d=JSON.parse(e.data);last=Date.now();
+<script>
+function hrValid(v){return v>=20&&v<=250;}
+var HR_ABNORMAL='数值异常';
+var T_CONNECTED='已连接',T_WAIT='等待数据',T_OFF='连接断开',T_STALE='数据已过期';
+var last=0,es=null,infoEl=document.getElementById('logArea');
+
+function setHr(hr){
 var el=document.getElementById('hrV'),dot=document.getElementById('dot'),st=document.getElementById('st');
-if(d.connected&&hrValid(d.hr)){el.innerText=d.hr;el.style.color='#ff5d7c';dot.className='dot on';st.innerText='✅ '+d.device;}
-else{el.innerText='--';el.style.color='#443a40';dot.className='dot off';st.innerText='⏳ 等待中...';}
+if(hr===null||hr===undefined){el.innerText='--';el.style.color='#443a40';dot.className='dot off';st.innerText=T_OFF;return;}
+if(hrValid(hr)){el.innerText=hr;el.style.color='#ff5d7c';dot.className='dot on';}
+else{el.innerText=HR_ABNORMAL;el.style.color='#ffa726';dot.className='dot on';}
+}
+
+function tick(){
+if(!last)return;
+var st=document.getElementById('st'),dot=document.getElementById('dot');
+if(Date.now()-last>10000){dot.className='dot off';st.innerText=T_STALE;document.getElementById('hrV').style.color='#443a40';}
+}
+
+function loadInfo(){
+fetch('/api/info',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){
+document.getElementById('pushUrl').innerText=d.pushUrl||'--';
+document.getElementById('obsUrl').innerText=d.obsUrl||'--';
+infoEl.innerText='运行模式：'+(d.mode||'--')+'　版本：'+(d.version||'--')+'　本机：'+(d.ip||'--')+':'+(d.port||'--');
+if(d.hr!==undefined)setHr(d.connected&&d.hr>0?d.hr:null);
+}).catch(function(){infoEl.innerText='运行信息获取失败';});
+}
+
+function connect(){
+if(es)es.close();
+last=0;
+es=new EventSource('/api/sse');
+es.onmessage=function(e){
+var d;try{d=JSON.parse(e.data);}catch(err){return;}
+last=Date.now();
+var st=document.getElementById('st'),dot=document.getElementById('dot');
+if(d.connected&&hrValid(d.hr)){setHr(d.hr);st.innerText=T_CONNECTED+'：'+(d.device||'');dot.className='dot on';}
+else if(d.connected&&d.hr>0){setHr(d.hr);st.innerText=T_CONNECTED+'：'+(d.device||'');dot.className='dot on';}
+else if(d.connected){setHr(null);st.innerText=T_WAIT;dot.className='dot on';}
+else{setHr(null);st.innerText=T_OFF;dot.className='dot off';}
 };
+es.onerror=function(){last=0;document.getElementById('st').innerText=T_OFF+'，正在重连...';document.getElementById('dot').className='dot off';};
+}
+
+document.querySelectorAll('.cpy').forEach(function(b){
+b.addEventListener('click',function(){
+var t=document.getElementById(b.getAttribute('data-t')).innerText;
+var done=function(){var o=b.innerText;b.innerText='已复制 ✓';b.className='cpy ok';setTimeout(function(){b.innerText=o;b.className='cpy';},1400);};
+if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done).catch(done);}
+else{var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(err){}document.body.removeChild(ta);done();}
+});
+});
+
+loadInfo();
+connect();
+setInterval(tick,1000);
 </script>
 </body>
 </html>`
