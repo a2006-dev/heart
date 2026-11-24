@@ -336,6 +336,8 @@
         }
         .action-buttons, .conn-btn, .conn-status, .connection-area { display: none !important; }
     </style>
+<script src="hr-widget.js"></script>
+<link rel="stylesheet" href="hr-widget.css">
 </head>
 <body>
 <div class="ambient"></div>
@@ -423,9 +425,10 @@
 </div>
 
 <script>
-    var HR_MIN = 20, HR_MAX = 250;
-    var HR_ABNORMAL = '数值异常';
-    function hrValid(v) { return v >= HR_MIN && v <= HR_MAX; }
+    var HR_MIN = HRWidget.HR_MIN, HR_MAX = HRWidget.HR_MAX;
+    var HR_ABNORMAL = HRWidget.TEXT.ABNORMAL;
+    var hrValid = HRWidget.isValid;
+    var HR_TEXT = HRWidget.TEXT;
 
     // =====================================================
     // ECG 波形引擎 — 收到数据才触发一次心跳波形，中间为平滑基线
@@ -855,14 +858,14 @@
     };
 
     window.setDeviceName = function(name) {
-        document.getElementById('deviceNameDisplay').innerText = name || "⚡ 未连接";
+        document.getElementById('deviceNameDisplay').innerText = name || HR_TEXT.WAITING;
     };
     window.setStatus = function(status) {
         document.getElementById('statusText').innerText = status;
     };
     window.resetHeartRate = function() {
         document.getElementById('heartRate').innerText = '—';
-        document.getElementById('statusText').innerText = '待机';
+        document.getElementById('statusText').innerText = HR_TEXT.IDLE;
         window.currentHr = null;
         if (ecgEngine) ecgEngine.connected = false;
     };

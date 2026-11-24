@@ -1075,7 +1075,7 @@ h1{text-align:center;color:#ff5d7c;font-size:22px;margin:8px 0}
 <div class="card">
 <div class="hr-num" id="hrV">--</div>
 <div class="hr-unit">BPM</div>
-<div class="status"><span class="dot off" id="dot"></span><span id="st">等待连接...</span></div>
+<div class="status"><span class="dot off" id="dot"></span><span id="st">等待数据</span></div>
 </div>
 <div class="card">
 <div class="info">📥 手机推送地址</div>
@@ -1089,7 +1089,8 @@ h1{text-align:center;color:#ff5d7c;font-size:22px;margin:8px 0}
 </div>
 <div class="footer">❤️ 心迹 · PC 心率监测</div>
 <script>
-function hrValid(v){return v>=20&&v<=250;}
+var HR_MIN=20,HR_MAX=250;
+function hrValid(v){return typeof v==='number'&&v>=HR_MIN&&v<=HR_MAX;}
 var HR_ABNORMAL='数值异常';
 var T_CONNECTED='已连接',T_WAIT='等待数据',T_OFF='连接断开',T_STALE='数据已过期';
 var last=0,es=null,infoEl=document.getElementById('logArea');

@@ -118,20 +118,20 @@ h1{text-align:center;color:#ff5d7c;font-size:28px;margin:10px 0;}
 </div>
 <div class="status-bar" id="statusBar">
 <span class="dot red" id="statusDot"></span>
-<span id="statusText">等待连接...</span>
+<span id="statusText">等待数据</span>
 <span style="margin-left:auto;color:#998088;font-size:12px;" id="connType"></span>
 </div>
 </div>
 
 <div class="card">
 <div class="section-title">📥 接收推送</div>
-<div class="code" id="pushUrl">加载中...</div>
+<div class="code" id="pushUrl">正在获取...</div>
 <div class="info" style="margin-top:8px;">手机/手表打开此地址可推送心率到电脑</div>
 </div>
 
 <div class="card">
 <div class="section-title">📺 OBS 直播</div>
-<div class="code" id="obsUrl">加载中...</div>
+<div class="code" id="obsUrl">正在获取...</div>
 <div class="info" style="margin-top:8px;">浏览器源添加此链接即可在直播中显示心率</div>
 </div>
 
@@ -143,13 +143,31 @@ h1{text-align:center;color:#ff5d7c;font-size:28px;margin:10px 0;}
 <div class="footer">心迹 v3.3 — 电脑端心率监测</div>
 </div>
 <script>
+var HR_MIN = 20, HR_MAX = 250;
+var HR_TEXT = {CONNECTED:'已连接', WAITING:'等待数据', DISCONNECTED:'连接断开', STALE:'数据已过期', ABNORMAL:'数值异常'};
+var lastRecv = 0;
+function hrValid(v){return typeof v === 'number' && v >= HR_MIN && v <= HR_MAX;}
 function updateDisplay(d){
-document.getElementById('hrVal').innerText = (d.connected && d.hr>=20 && d.hr<=250) ? d.hr : (d.connected && d.hr>0 ? '数值异常' : '--');
-document.getElementById('statusText').innerText = (d.connected && d.hr>=20 && d.hr<=250) ? (d.device || '已连接') : (d.connected && d.hr>0 ? '数据异常' : '等待连接...');
+lastRecv = Date.now();
+var ok = d.connected && hrValid(d.hr);
+document.getElementById('hrVal').innerText = ok ? d.hr : (d.connected && d.hr > 0 ? HR_TEXT.ABNORMAL : '--');
+var st;
+if (!d.connected) st = HR_TEXT.DISCONNECTED;
+else if (!d.hr || d.hr <= 0) st = HR_TEXT.WAITING;
+else if (!hrValid(d.hr)) st = HR_TEXT.ABNORMAL + '：' + (d.device || '');
+else st = HR_TEXT.CONNECTED + '：' + (d.device || '');
+document.getElementById('statusText').innerText = st;
 document.getElementById('connType').innerText = d.type || '';
 var dot = document.getElementById('statusDot');
-dot.className = 'dot ' + ((d.connected && d.hr>=20 && d.hr<=250) ? 'green' : 'red');
+dot.className = 'dot ' + (ok ? 'green' : 'red');
 }
+setInterval(function(){
+if (lastRecv && Date.now() - lastRecv > 10000) {
+document.getElementById('statusText').innerText = HR_TEXT.STALE;
+document.getElementById('statusDot').className = 'dot red';
+document.getElementById('hrVal').innerText = '--';
+}
+}, 1000);
 function fetchHR(){fetch('/api/hr').then(r=>r.json()).then(updateDisplay).catch(function(){});}
 setInterval(fetchHR, 1000);fetchHR();
 var es=new EventSource('/stream');

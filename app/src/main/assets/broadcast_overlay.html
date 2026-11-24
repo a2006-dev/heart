@@ -143,6 +143,8 @@
     text-shadow: 0 0 14px rgba(255,170,0,0.5);
   }
 </style>
+<script src="hr-widget.js"></script>
+<link rel="stylesheet" href="hr-widget.css">
 </head>
 <body>
 <div class="float-window" id="floatWindow">
@@ -155,13 +157,14 @@
   </div>
   <div class="device-bar">
     <div class="pulse-dot" id="pulseDot"></div>
-    <span class="device-name" id="deviceName">等待连接...</span>
+    <span class="device-name" id="deviceName">等待数据</span>
   </div>
 </div>
 <script>
-    var HR_MIN = 20, HR_MAX = 250;
-    var HR_ABNORMAL = '数值异常';
-    function hrValid(v) { return v >= HR_MIN && v <= HR_MAX; }
+    var HR_MIN = HRWidget.HR_MIN, HR_MAX = HRWidget.HR_MAX;
+    var HR_ABNORMAL = HRWidget.TEXT.ABNORMAL;
+    var hrValid = HRWidget.isValid;
+    var HR_TEXT = HRWidget.TEXT;
 
   // URL 参数
   (function(){
@@ -267,7 +270,7 @@
       win.classList.remove('stale-data');
       dot.classList.add('disconnected');
     }
-    nameEl.innerText = data.device || '等待连接...';
+    nameEl.innerText = data.device || HR_TEXT.WAITING;
   }
 
   // 5秒无更新 → stale 警告，15秒无更新 → 强制刷新

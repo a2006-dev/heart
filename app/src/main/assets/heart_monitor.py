@@ -293,12 +293,19 @@ body{{background:transparent;font-family:sans-serif;overflow:hidden}}
 .bpm{{font-size:0.8rem;color:#ffb0bd}}
 #devN{{font-size:0.6rem;color:#998088;text-align:center}}
 </style></head><body>
-<div id="fw"><div><span id="hrV">--</span><span class="bpm"> BPM</span></div><div><span id="devN">等待连接...</span></div></div>
+<div id="fw"><div><span id="hrV">--</span><span class="bpm"> BPM</span></div><div><span id="devN">等待数据</span></div></div>
 <script>
+var HR_MIN=20,HR_MAX=250,lastRecv=0;
+var HR_TEXT={{CONNECTED:'已连接',WAITING:'等待数据',DISCONNECTED:'连接断开',STALE:'数据已过期',ABNORMAL:'数值异常'}};
+function hrValid(v){{return typeof v==='number'&&v>=HR_MIN&&v<=HR_MAX;}}
 var es=new EventSource('/stream');
-es.onmessage=function(e){{try{{var d=JSON.parse(e.data);var el=document.getElementById('hrV'),dn=document.getElementById('devN');
-if(d.connected&&d.hr>=20&&d.hr<=250){{el.innerText=d.hr;dn.innerText=d.device||'已连接'}}else if(d.connected&&d.hr>0){{el.innerText='数值异常'}}
-else{{el.innerText='--';dn.innerText='等待连接...'}}}}catch(err){{}}}}
+es.onmessage=function(e){{try{{var d=JSON.parse(e.data);lastRecv=Date.now();var el=document.getElementById('hrV'),dn=document.getElementById('devN');
+if(!d.connected){{el.innerText='--';dn.innerText=HR_TEXT.DISCONNECTED}}
+else if(!d.hr||d.hr<=0){{el.innerText='--';dn.innerText=HR_TEXT.WAITING}}
+else if(hrValid(d.hr)){{el.innerText=d.hr;dn.innerText=HR_TEXT.CONNECTED+(d.device?'：'+d.device:'')}}
+else{{el.innerText=HR_TEXT.ABNORMAL;dn.innerText=d.device||''}}}}catch(err){{}}}}
+es.onerror=function(){{document.getElementById('devN').innerText=HR_TEXT.DISCONNECTED}};
+setInterval(function(){{if(lastRecv&&Date.now()-lastRecv>10000){{document.getElementById('hrV').innerText='--';document.getElementById('devN').innerText=HR_TEXT.STALE}}}},1000);
 </script></body></html>""".encode())
         def _json(self):
             s=state.snapshot();self.send_response(200)

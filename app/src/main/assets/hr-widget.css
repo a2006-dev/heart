@@ -1,0 +1,53 @@
+:root {
+  --hr-bg: #0c0c10;
+  --hr-card: #1a1a24;
+  --hr-accent: #ff5d7c;
+  --hr-accent-soft: #ffb0bd;
+  --hr-muted: #998088;
+  --hr-ok: #4CAF50;
+  --hr-err: #f44b6e;
+  --hr-warn: #ffa726;
+}
+
+.hr-state-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--hr-err);
+  vertical-align: middle;
+}
+
+.hr-state-dot.hr-ok {
+  background: var(--hr-ok);
+  box-shadow: 0 0 8px var(--hr-ok);
+}
+
+.hr-state-dot.hr-warn {
+  background: var(--hr-warn);
+}
+
+.hr-state-dot.hr-off {
+  background: var(--hr-err);
+}
+
+.hr-state-text {
+  font-size: 13px;
+  color: var(--hr-muted);
+}
+
+.hr-copy-btn {
+  background: #2a2a34;
+  color: #ccc;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.hr-copy-btn.hr-copied {
+  background: #2e5c3a;
+  color: #8ee6a0;
+}
