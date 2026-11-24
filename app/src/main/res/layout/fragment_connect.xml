@@ -40,7 +40,10 @@
                     android:id="@+id/tvDevice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="⚡ 未连接"
+                    android:drawableStart="@drawable/ic_icon_bolt"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="未连接"
                     android:textColor="#e2c2cf"
                     android:textSize="15sp"/>
                 <TextView
@@ -77,7 +80,10 @@
                 android:layout_width="0dp"
                 android:layout_height="44dp"
                 android:layout_weight="1"
-                android:text="🔍 开始搜索"
+                android:drawableStart="@drawable/ic_icon_search"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="开始搜索"
                 android:backgroundTint="#ff5d7c"
                 android:textColor="#ffffff"
                 android:textSize="14sp"/>
@@ -164,7 +170,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="📋 日志"
+                android:drawableStart="@drawable/ic_icon_clipboard"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="日志"
                 android:textColor="#675c62"
                 android:textSize="13sp"/>
             <Button

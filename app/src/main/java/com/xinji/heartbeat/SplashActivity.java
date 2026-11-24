@@ -26,7 +26,7 @@ public class SplashActivity extends Activity {
                 } catch (Exception ignored) {}
             });
         }
-        TextView heartIcon = findViewById(R.id.heartIcon);
+        View heartIcon = findViewById(R.id.heartIcon);
         TextView textTitle = findViewById(R.id.textTitle);
         TextView textSubtitle = findViewById(R.id.textSubtitle);
         TextView textVersion = findViewById(R.id.textVersion);

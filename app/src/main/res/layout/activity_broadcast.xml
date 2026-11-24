@@ -26,7 +26,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="📡 心率广播"
+                android:drawableStart="@drawable/ic_icon_broadcast"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="心率广播"
                 android:textColor="#ff5d7c"
                 android:textSize="22sp"
                 android:textStyle="bold"/>
@@ -131,7 +134,10 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="🔍 局域网检测"
+                    android:drawableStart="@drawable/ic_icon_search"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="局域网检测"
                     android:textColor="#e2c2cf"
                     android:textSize="14sp"
                     android:textStyle="bold"/>
@@ -179,7 +185,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="📤 自动推送"
+                        android:drawableStart="@drawable/ic_icon_upload"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="自动推送"
                         android:textColor="#e2c2cf"
                         android:textSize="15sp"/>
                     <TextView
@@ -252,7 +261,10 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="💻 分享电脑端客户端"
+                    android:drawableStart="@drawable/ic_icon_computer"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="分享电脑端客户端"
                     android:textColor="#e2c2cf"
                     android:textSize="15sp"/>
                 <TextView

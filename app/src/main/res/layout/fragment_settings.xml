@@ -194,7 +194,10 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="📡 心率广播"
+                    android:drawableStart="@drawable/ic_icon_broadcast"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="心率广播"
                     android:textColor="#e2c2cf"
                     android:textSize="15sp"/>
                 <TextView
@@ -242,7 +245,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="🔗 MQTT 远程推送"
+                        android:drawableStart="@drawable/ic_icon_link"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="MQTT 远程推送"
                         android:textColor="#e2c2cf"
                         android:textSize="15sp"/>
                     <TextView
@@ -375,7 +381,10 @@
                         android:id="@+id/btnMqttTest"
                         android:layout_width="match_parent"
                         android:layout_height="32dp"
-                        android:text="🔍 测试连接（检测 Broker 是否可达）"
+                        android:drawableStart="@drawable/ic_icon_search"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="测试连接（检测 Broker 是否可达）"
                         android:textColor="#ffffff"
                         android:textSize="12sp"
                         android:background="@drawable/glass_button"
@@ -413,7 +422,10 @@
                             android:layout_width="0dp"
                             android:layout_height="32dp"
                             android:layout_weight="1"
-                            android:text="📋 复制"
+                            android:drawableStart="@drawable/ic_icon_clipboard"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="复制"
                             android:textColor="#ffffff"
                             android:textSize="12sp"
                             android:background="@drawable/glass_button"
@@ -423,7 +435,10 @@
                             android:layout_width="0dp"
                             android:layout_height="32dp"
                             android:layout_weight="1"
-                            android:text="📤 分享"
+                            android:drawableStart="@drawable/ic_icon_upload"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="分享"
                             android:textColor="#ffffff"
                             android:textSize="12sp"
                             android:background="@drawable/glass_button"
@@ -434,7 +449,10 @@
                     android:id="@+id/btnMqttHelp"
                     android:layout_width="match_parent"
                     android:layout_height="32dp"
-                    android:text="📖 MQTT 帮助（公共 Broker / 自建 / 阿里云）"
+                    android:drawableStart="@drawable/ic_icon_book"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="MQTT 帮助（公共 Broker / 自建 / 阿里云）"
                     android:textColor="#ffffff"
                     android:textSize="12sp"
                     android:background="@drawable/glass_button"
@@ -453,7 +471,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="📖 使用帮助"
+                android:drawableStart="@drawable/ic_icon_book"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="使用帮助"
                 android:textColor="#e2c2cf"
                 android:textSize="15sp"/>
             <TextView
@@ -475,7 +496,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="💬 联系作者 (QQ: 3544399875)"
+                android:drawableStart="@drawable/ic_icon_chat"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="联系作者 (QQ: 3544399875)"
                 android:textColor="#e2c2cf"
                 android:textSize="15sp"/>
             <TextView
@@ -499,7 +523,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="🐙 GitHub 开源仓库"
+                android:drawableStart="@drawable/ic_icon_github"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="GitHub 开源仓库"
                 android:textColor="#e2c2cf"
                 android:textSize="15sp"/>
             <TextView
@@ -528,7 +555,10 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="⬇️ 去 Release 下载"
+                    android:drawableStart="@drawable/ic_icon_download"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="去 Release 下载"
                     android:textColor="#e2c2cf"
                     android:textSize="15sp"/>
                 <TextView
@@ -562,7 +592,10 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="👻 隐藏最近任务"
+                    android:drawableStart="@drawable/ic_icon_eye_off"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="隐藏最近任务"
                     android:textColor="#e2c2cf"
                     android:textSize="15sp"/>
                 <TextView
@@ -589,7 +622,9 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="⚠ 本应用数据仅供参考，不作医疗诊断用途。如有身体不适请及时就医。"
+            android:drawableStart="@drawable/ic_icon_warning"
+                android:drawablePadding="8dp"
+                android:text="本应用数据仅供参考，不作医疗诊断用途。如有身体不适请及时就医。"
             android:textColor="#2a2428"
             android:textSize="10sp"
             android:gravity="center"

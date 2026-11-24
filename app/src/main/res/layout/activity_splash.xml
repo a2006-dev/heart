@@ -5,15 +5,15 @@
     android:layout_height="match_parent"
     android:background="#0c0c10">
 
-    <TextView
+    <ImageView
         android:id="@+id/heartIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
         android:layout_centerInParent="true"
         android:layout_marginBottom="40dp"
-        android:text="❤️"
-        android:textSize="56sp"
-        android:gravity="center" />
+        android:src="@drawable/ic_icon_heart_fill"
+        android:contentDescription="心迹"
+        android:tint="#ff5d7c" />
 
     <TextView
         android:id="@+id/textTitle"
