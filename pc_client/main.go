@@ -55,6 +55,30 @@ var (
 	lastLogUpdate time.Time
 )
 
+func isMqttActive() bool {
+	mu.Lock()
+	defer mu.Unlock()
+	return mqttActive
+}
+
+func setMqttActive(v bool) {
+	mu.Lock()
+	mqttActive = v
+	mu.Unlock()
+}
+
+func isMqttModeOn() bool {
+	mu.Lock()
+	defer mu.Unlock()
+	return mqttModeOn
+}
+
+func setMqttModeOn(v bool) {
+	mu.Lock()
+	mqttModeOn = v
+	mu.Unlock()
+}
+
 func portCheck(base int) int {
 	for i := 0; i < 20; i++ {
 		p := base + i
@@ -237,7 +261,7 @@ func getEditText(id int) string {
 }
 
 func tryConnectMQTT() {
-	if mqttActive {
+	if isMqttActive() {
 		addLog("MQTT 已连接，请先断开再重连")
 		return
 	}
@@ -266,10 +290,10 @@ func tryConnectMQTT() {
 	go func() {
 		err := startMQTT(broker, topic)
 		result := C.WPARAM(0)
-		if err == nil && mqttClient != nil {
+		if err == nil && getMqttClient() != nil {
 			result = C.WPARAM(1)
-			mqttActive = true
-			mqttModeOn = true
+			setMqttActive(true)
+			setMqttModeOn(true)
 			addLog("MQTT 已连接，心率来源已切换至远程")
 		} else {
 			errMsg := "MQTT 连接失败"
@@ -284,7 +308,7 @@ func tryConnectMQTT() {
 
 
 func onMQTTConnectResult() {
-	if mqttClient == nil {
+	if getMqttClient() == nil {
 		addLog("MQTT 连接失败，请检查网络和连接码")
 		setTextW(C.GetDlgItem(hwnd, 17), "🔗 连接")
 		C.EnableWindow(C.GetDlgItem(hwnd, 17), 1)
@@ -292,8 +316,8 @@ func onMQTTConnectResult() {
 		return
 	}
 
-	mqttActive = true
-	mqttModeOn = true
+	setMqttActive(true)
+	setMqttModeOn(true)
 	addLog("MQTT 已连接，心率来源已切换至远程")
 	setTextW(C.GetDlgItem(hwnd, 17), "🔗 连接")
 	C.EnableWindow(C.GetDlgItem(hwnd, 17), 1)
@@ -335,8 +359,8 @@ func parseCode(code string) (string, string) {
 
 func tryDisconnectMQTT() {
 	stopMQTT()
-	mqttActive = false
-	mqttModeOn = false
+	setMqttActive(false)
+	setMqttModeOn(false)
 
 	C.PostMessageW(hwnd, 0x040C, 0, 0)
 	addLog("MQTT 已断开，已切换回本地模式")
@@ -363,7 +387,7 @@ func connectSSE(url string) {
 		for {
 			err := connectSSEOnce(url)
 			_ = err
-			if !mqttModeOn {
+			if !isMqttModeOn() {
 				connected = false
 				updateUIHR()
 				updateFloatHR()
@@ -418,7 +442,7 @@ func connectSSEOnce(url string) error {
 			}
 			if err := json.Unmarshal([]byte(data), &msg); err == nil {
 				mu.Lock()
-				if !mqttModeOn {
+				if !isMqttModeOn() {
 					currentHR = msg.HR
 					deviceName = msg.Device
 					connected = msg.Connected
@@ -497,8 +521,11 @@ func updateFloatHR() {
 	if hwnd == nil {
 		return
 	}
+	mu.Lock()
 	hr := currentHR
-	if connected && hr > 30 && hr < 220 {
+	conn := connected
+	mu.Unlock()
+	if conn && hr > 30 && hr < 220 {
 		C.PostMessageW(hwnd, 0x040F, C.WPARAM(hr), 0)
 	} else {
 		C.PostMessageW(hwnd, 0x040F, C.WPARAM(0), 0)

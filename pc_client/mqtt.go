@@ -200,6 +200,9 @@ func (m *MQTTClient) Disconnect() {
 
 func (m *MQTTClient) readLoop() {
 	defer func() {
+		if r := recover(); r != nil {
+			addLog(fmt.Sprintf("MQTT 读取循环异常退出: %v", r))
+		}
 		m.mu.Lock()
 		m.running = false
 		if m.conn != nil {
@@ -211,6 +214,14 @@ func (m *MQTTClient) readLoop() {
 
 	buf := make([]byte, 4096)
 	leftover := make([]byte, 0, 4096) // 缓存跨包数据
+
+	m.mu.Lock()
+	conn := m.conn
+	m.mu.Unlock()
+	if conn == nil {
+		return
+	}
+
 	for {
 		select {
 		case <-m.done:
@@ -218,8 +229,8 @@ func (m *MQTTClient) readLoop() {
 		default:
 		}
 
-		m.conn.SetReadDeadline(time.Now().Add(30 * time.Second))
-		n, err := m.conn.Read(buf)
+		_ = conn.SetReadDeadline(time.Now().Add(30 * time.Second))
+		n, err := conn.Read(buf)
 		if err != nil {
 			return
 		}
@@ -351,9 +362,21 @@ type HRData struct {
 
 var mqttClient *MQTTClient
 
+func getMqttClient() *MQTTClient {
+	mu.Lock()
+	defer mu.Unlock()
+	return mqttClient
+}
+
+func setMqttClient(c *MQTTClient) {
+	mu.Lock()
+	mqttClient = c
+	mu.Unlock()
+}
+
 func startMQTT(broker, topic string) error {
-	if mqttClient != nil {
-		mqttClient.Disconnect()
+	if old := getMqttClient(); old != nil {
+		old.Disconnect()
 	}
 
 	client := NewMQTTClient(broker, fmt.Sprintf("heart_pc_%d", time.Now().UnixNano()))
@@ -386,7 +409,7 @@ func startMQTT(broker, topic string) error {
 		return err
 	}
 
-	mqttClient = client
+	setMqttClient(client)
 	// 启动超时检测：10秒内未收到数据提示用户重新连接
 	go func() {
 		lastHR := 0
@@ -409,9 +432,9 @@ func startMQTT(broker, topic string) error {
 }
 
 func stopMQTT() {
-	if mqttClient != nil {
-		mqttClient.Disconnect()
-		mqttClient = nil
+	if c := getMqttClient(); c != nil {
+		c.Disconnect()
+		setMqttClient(nil)
 	}
 	// 切回本地模式提示
 	mu.Lock()
