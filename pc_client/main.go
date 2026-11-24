@@ -363,7 +363,11 @@ var (
 
 
 	lastUIUpdate time.Time
-	lastLogUpdate time.Time
+
+	logMu    sync.Mutex
+	logLines []string
+	logDirty bool
+	logTimer *time.Timer
 )
 
 func isMqttActive() bool {
@@ -910,26 +914,62 @@ func getLocalIP() string {
 	return strings.Split(addr, ":")[0]
 }
 
-func addLog(msg string) {
+const (
+	logKeepLines = 200
+	logFlushWait = 200 * time.Millisecond
+)
 
-	now := time.Now()
-	if now.Sub(lastLogUpdate) < 300*time.Millisecond {
-		return
-	}
-	lastLogUpdate = now
+func addLog(msg string) {
 	addLogForce(msg)
 }
 
-
 func addLogForce(msg string) {
 	t := time.Now().Format("15:04:05")
-	logContent = fmt.Sprintf("[%s] %s\r\n", t, msg) + logContent
-	if len(logContent) > 4000 {
-		logContent = logContent[:4000]
+	entry := fmt.Sprintf("[%s] %s", t, msg)
+	logMu.Lock()
+	logLines = append(logLines, entry)
+	if len(logLines) > logKeepLines {
+		logLines = append([]string(nil), logLines[len(logLines)-logKeepLines:]...)
 	}
+	logDirty = true
+	if logTimer == nil {
+		logTimer = time.AfterFunc(logFlushWait, flushLog)
+	}
+	logMu.Unlock()
+}
+
+func flushLog() {
+	logMu.Lock()
+	if !logDirty {
+		logTimer = nil
+		logMu.Unlock()
+		return
+	}
+	lines := append([]string(nil), logLines...)
+	logDirty = false
+	logTimer = nil
+	logMu.Unlock()
+	var b strings.Builder
+	for i := len(lines) - 1; i >= 0; i-- {
+		b.WriteString(lines[i])
+		b.WriteString("\r\n")
+	}
+	content := b.String()
+	logContent = content
 	if hwnd != nil {
-		setTextW(C.GetDlgItem(hwnd, 12), logContent)
+		setTextW(C.GetDlgItem(hwnd, 12), truncateRunes(content, 4000))
 	}
+}
+
+func truncateRunes(s string, limit int) string {
+	if len(s) <= limit {
+		return s
+	}
+	r := []rune(s)
+	if len(r) <= limit {
+		return s
+	}
+	return string(r[:limit])
 }
 
 func startLocalServer() {
