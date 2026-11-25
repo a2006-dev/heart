@@ -356,9 +356,8 @@
                         android:text="@string/txt_auto_059"
                         android:textColor="@color/label_secondary"
                         android:textSize="11sp"/>
-                    <androidx.appcompat.widget.SwitchCompat
+                    <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/swMqttTls"
-                style="@style/App.Switch"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
                 </LinearLayout>
