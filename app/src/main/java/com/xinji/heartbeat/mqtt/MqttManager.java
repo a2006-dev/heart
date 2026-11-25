@@ -358,7 +358,12 @@ public class MqttManager {
             throw new IOException("CONNACK 格式错误");
         }
         int returnCode = connack[3] & 0xFF;
-        if (returnCode != 0) throw new IOException("Broker 拒绝连接，返回码 " + returnCode);
+        if (returnCode != 0) {
+            StringBuilder hex = new StringBuilder();
+            for (byte b : connack) hex.append(String.format("%02X", b));
+            Log.w(TAG, "CONNACK 原始字节: " + hex + " 目标=" + brokerHost + ":" + brokerPort + " TLS=" + brokerTls);
+            throw new IOException("Broker 拒绝连接，返回码 " + returnCode + "（CONNACK=" + hex + "）");
+        }
 
         int subResult = sendSubscribePacket();
         if (subResult != 0) {
@@ -448,8 +453,8 @@ public class MqttManager {
         writePacket(0x82, body.toByteArray());
         byte[] suback = readPacket();
         if (suback == null || (suback[0] & 0xF0) != 0x90) return 0x80;
-        if (suback.length < 4) return 0x80;
-        return suback[3] & 0xFF;
+        if (suback.length < 5) return 0x80;
+        return suback[4] & 0xFF;
     }
 
     private void publishHeartRate(int hr) {
