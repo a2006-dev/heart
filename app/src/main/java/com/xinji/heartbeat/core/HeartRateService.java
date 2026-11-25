@@ -127,13 +127,9 @@ public class HeartRateService extends Service {
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setCategory(android.app.Notification.CATEGORY_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            builder.setSilent(true);
-        } else {
-            builder.setDefaults(0);
-            builder.setVibrate(null);
-            builder.setSound(null);
-        }
+        builder.setDefaults(0);
+        builder.setSound(null);
+        builder.setVibrate(null);
 
         int[] serviceTypes;
         if (Build.VERSION.SDK_INT >= 29) {
