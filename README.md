@@ -294,8 +294,27 @@ CC=x86_64-w64-mingw32-gcc CGO_ENABLED=1 GOOS=windows GOARCH=amd64 \
   go build -ldflags="-H windowsgui -s -w" -o heart_client.exe
 ```
 
----
+### CI 自动构建与发布
 
+每次推送到 `main` 由 GitHub Actions 自动构建，产物可在 Actions 运行页面的 Artifacts 中下载：
+
+| Job | 内容 | 产物 |
+|---|---|---|
+| Go (windows/amd64) | `go vet` → `go test` → `go build` | `heart_monitor_pc.exe`（保留 30 天） |
+| Android APK | `assembleRelease` + `assembleDebug` + 签名校验 | `heart-3.4-release.apk`、`heart-3.4-debug.apk`（保留 30 天） |
+
+发布正式版本只需推一个 `v*` 标签，CI 会自动创建 GitHub Release 并附上 exe 与两个 APK：
+
+```bash
+git tag -a v3.4 -m "v3.4"
+git push origin v3.4
+```
+
+- Release 签名由仓库 Secrets 提供（`KEYSTORE_BASE64`、`KEYSTORE_PASSWORD`、`KEY_ALIAS`、`KEY_PASSWORD`），keystore 本身不入库
+- Secrets 未配置时 CI 自动降级，只产出 debug 包
+- 自 v3.2 起更换过签名，安装新 APK 前需先卸载旧版本
+- `heart_monitor_pc.exe` 依赖 `adb.exe`，需与 `adb.exe` 放在同一目录或将其加入 `PATH`
+---
 ## 📋 更新日志
 
 ### v3.4 — 安全加固与体验统一（当前版本）
