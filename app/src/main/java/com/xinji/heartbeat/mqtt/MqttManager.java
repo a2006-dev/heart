@@ -268,7 +268,11 @@ public class MqttManager {
         prefs.edit().putString(KEY_CLIENT_ID, clientId).apply();
         running.set(true);
         connected = false;
-
+        publishExecutor = Executors.newSingleThreadExecutor(r -> {
+            Thread t = new Thread(r, "Heart-MQTT-Pub");
+            t.setDaemon(true);
+            return t;
+        });
         executor = Executors.newSingleThreadExecutor(r -> {
             Thread t = new Thread(r, "Heart-MQTT");
             t.setDaemon(true);
@@ -306,8 +310,12 @@ public class MqttManager {
         executor = null;
         if (oldExecutor != null) {
 
-
             oldExecutor.shutdownNow();
+        }
+        final ExecutorService oldPub = publishExecutor;
+        publishExecutor = null;
+        if (oldPub != null) {
+            oldPub.shutdownNow();
         }
         if (wasRunning && wasConnected) postDisconnected();
     }
@@ -467,7 +475,9 @@ public class MqttManager {
             ByteArrayOutputStream body = new ByteArrayOutputStream();
             writeU16(body, topicBytes.length); body.write(topicBytes, 0, topicBytes.length);
             body.write(payloadBytes, 0, payloadBytes.length);
-            writePacket(0x30, body.toByteArray());
+            synchronized (ioLock) {
+                writePacket(0x30, body.toByteArray());
+            }
             publishCount++;
             lastPublishTime = System.currentTimeMillis();
             publishFailed = false;
