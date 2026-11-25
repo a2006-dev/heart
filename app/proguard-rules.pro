@@ -6,3 +6,6 @@
 -keep public class * extends android.app.Service
 -keep public class * extends android.content.BroadcastReceiver
 -keep public class * extends androidx.fragment.app.Fragment
+-keep class com.xinji.heartbeat.MainActivity { *; }
+-keep class com.xinji.heartbeat.OnboardingActivity { *; }
+-keep class com.xinji.heartbeat.SplashActivity { *; }

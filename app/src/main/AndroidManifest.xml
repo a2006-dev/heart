@@ -69,6 +69,11 @@
               </intent-filter>
           </activity>
           <activity
+              android:name=".MainActivity"
+              android:exported="false"
+              android:theme="@style/AppTheme"
+              android:configChanges="orientation|screenSize|keyboardHidden" />
+          <activity
               android:name=".SplashActivity"
               android:exported="false"
               android:theme="@style/SplashTheme"
