@@ -32,7 +32,7 @@ public final class TouchTargets {
                 TouchDelegateGroup group = container.getTag(R.id.tag_touch_group) instanceof TouchDelegateGroup
                     ? (TouchDelegateGroup) container.getTag(R.id.tag_touch_group) : null;
                 if (group == null) {
-                    group = new TouchDelegateGroup();
+                    group = new TouchDelegateGroup(container);
                     container.setTag(R.id.tag_touch_group, group);
                     container.setTouchDelegate(group);
                 }
@@ -44,8 +44,8 @@ public final class TouchTargets {
     public static final class TouchDelegateGroup extends TouchDelegate {
         private final java.util.List<TouchDelegate> delegates = new java.util.ArrayList<>();
 
-        TouchDelegateGroup() {
-            super(new Rect(), null);
+        TouchDelegateGroup(View container) {
+            super(new Rect(), container);
         }
 
         void add(TouchDelegate d) {
