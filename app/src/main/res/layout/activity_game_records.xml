@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#0c0c10">
+    android:background="@color/bg">
     
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,7 +26,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textColor="#ff5d7c"
+            android:textColor="@color/accent"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginStart="16dp"/>
@@ -39,7 +39,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="分享"
             android:importantForAccessibility="yes"
-            android:tint="#ff5d7c"/>
+            android:tint="@color/accent"/>
     </LinearLayout>
     
     <ScrollView
@@ -65,7 +65,7 @@
                     android:id="@+id/tvStartTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#e2c2cf"
+                    android:textColor="@color/label"
                     android:textSize="14sp"
                     android:layout_marginBottom="8dp"/>
                 
@@ -73,7 +73,7 @@
                     android:id="@+id/tvEndTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#e2c2cf"
+                    android:textColor="@color/label"
                     android:textSize="14sp"
                     android:layout_marginBottom="8dp"/>
                 
@@ -81,7 +81,7 @@
                     android:id="@+id/tvDuration"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#e2c2cf"
+                    android:textColor="@color/label"
                     android:textSize="14sp"
                     android:layout_marginBottom="8dp"/>
                 
@@ -89,7 +89,7 @@
                     android:id="@+id/tvMaxHR"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#ff5d7c"
+                    android:textColor="@color/accent"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp"/>
@@ -98,7 +98,7 @@
                     android:id="@+id/tvMinHR"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#ff5d7c"
+                    android:textColor="@color/accent"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:layout_marginTop="8dp"/>
@@ -107,7 +107,7 @@
                     android:id="@+id/tvAvgHR"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#e2c2cf"
+                    android:textColor="@color/label"
                     android:textSize="14sp"
                     android:layout_marginTop="8dp"/>
             </LinearLayout>

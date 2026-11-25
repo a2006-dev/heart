@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0c0c10">
+    android:background="@color/bg">
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/txt_auto_020"
-        android:textColor="#675c62"
+        android:textColor="@color/label_secondary"
         android:textSize="15sp"
         android:padding="16dp"
         android:layout_gravity="top|end"
@@ -39,7 +39,7 @@
         android:textColor="#ffffff"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:background="#ff5d7c"
+        android:background="@color/accent"
         android:gravity="center"
         android:layout_marginHorizontal="24dp"
         android:layout_marginBottom="36dp" />

@@ -15,7 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Switch;
+import androidx.appcompat.widget.SwitchCompat;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,12 +33,12 @@ import com.xinji.heartbeat.widget.FloatWindowManager;
 public class SettingsFragment extends Fragment {
     private HeartServiceLocator serviceLocator;
     private PreferencesManager prefs;
-    private Switch swAutoConnect, swFloatMemory, swFloatVisible, swFloatLocked;
+    private SwitchCompat swAutoConnect, swFloatMemory, swFloatVisible, swFloatLocked;
     private TextView tvFloatStyleName, tvBroadcastStatus;
 
 
     private MqttManager mqttManager;
-    private Switch swMqttEnabled;
+    private SwitchCompat swMqttEnabled;
     private TextView tvMqttStatus, tvMqttTag, tvMqttCode;
     private EditText etMqttBroker, etMqttPort, etMqttTopic;
     private com.google.android.material.switchmaterial.SwitchMaterial swMqttTls;
@@ -286,7 +286,7 @@ public class SettingsFragment extends Fragment {
         v.findViewById(R.id.btnGitHub).setOnClickListener(v2 -> openGitHub());
         v.findViewById(R.id.btnCheckUpdate).setOnClickListener(v2 -> checkUpdate());
 
-        Switch swHide = v.findViewById(R.id.swHideRecents);
+        SwitchCompat swHide = v.findViewById(R.id.swHideRecents);
         swHide.setChecked(RecentsUtils.isHideFromRecents(requireContext()));
         swHide.setOnCheckedChangeListener((b, c) -> {
             if (c) {

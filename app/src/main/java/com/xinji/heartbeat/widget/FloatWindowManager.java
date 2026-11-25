@@ -25,7 +25,13 @@ public class FloatWindowManager {
     private static final String PREFS_POS = "float_pos";
     private static final String PREFS_SETTINGS = "app_settings";
 
-    public static final String[] STYLE_NAMES = {"简约文字", "科技胶囊", "圆形徽章", "心电脉搏", "超小迷你"};
+    public static final String[] STYLE_NAMES = {"大字", "胶囊", "圆环", "心跳", "迷你"};
+    private int floatBg, floatLabel, floatAccent;
+    private void loadFloatColors(Activity activity) {
+        floatBg = androidx.core.content.ContextCompat.getColor(activity, com.xinji.heartbeat.R.color.float_bg);
+        floatLabel = androidx.core.content.ContextCompat.getColor(activity, com.xinji.heartbeat.R.color.float_label);
+        floatAccent = androidx.core.content.ContextCompat.getColor(activity, com.xinji.heartbeat.R.color.float_accent);
+    }
 
     private final WeakReference<Activity> activityRef;
     private WindowManager wm;
@@ -65,6 +71,7 @@ public class FloatWindowManager {
     public void show() {
         Activity activity = activityRef.get();
         if (activity == null || activity.isFinishing()) return;
+        loadFloatColors(activity);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(activity)) {
             requestOverlayPermission(activity);
@@ -249,7 +256,7 @@ public class FloatWindowManager {
     private View buildTextStyle(Activity activity) {
         TextView v = new TextView(activity);
         v.setText("-- BPM");
-        v.setTextColor(0xFFFF5D7C);
+        v.setTextColor(floatAccent);
         v.setTextSize(20);
         v.setTypeface(null, Typeface.BOLD);
         v.setShadowLayer(3, 1, 1, 0xAA000000);
@@ -266,15 +273,15 @@ public class FloatWindowManager {
         v.setPadding(dp2px(activity, 14), dp2px(activity, 8), dp2px(activity, 14), dp2px(activity, 8));
 
         android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
-        bg.setColor(0xDD0A0E17);
-        bg.setCornerRadius(dp2px(activity, 20));
-        bg.setStroke(dp2px(activity, 2), 0x8800D4FF);
+        bg.setColor(floatBg);
+        bg.setCornerRadius(dp2px(activity, 24));
+        bg.setStroke(dp2px(activity, 1), (floatAccent & 0x00FFFFFF) | 0x33000000);
         v.setBackground(bg);
         v.setElevation(dp2px(activity, 6));
 
         TextView pulse = new TextView(activity);
         pulse.setText("●");
-        pulse.setTextColor(0xFF00D4FF);
+        pulse.setTextColor(floatAccent);
         pulse.setTextSize(10);
         LinearLayout.LayoutParams pulseLp = new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -283,7 +290,7 @@ public class FloatWindowManager {
 
         TextView hr = new TextView(activity);
         hr.setText("--");
-        hr.setTextColor(0xFFFFFFFF);
+        hr.setTextColor(floatLabel);
         hr.setTextSize(20);
         hr.setTypeface(Typeface.DEFAULT_BOLD);
         hr.setMinWidth(dp2px(activity, 32));
@@ -291,7 +298,7 @@ public class FloatWindowManager {
 
         TextView unit = new TextView(activity);
         unit.setText(" bpm");
-        unit.setTextColor(0x8800D4FF);
+        unit.setTextColor((floatAccent & 0x00FFFFFF) | 0x99000000);
         unit.setTextSize(11);
         unit.setTypeface(null, Typeface.BOLD);
         LinearLayout.LayoutParams unitLp = new LinearLayout.LayoutParams(
@@ -307,7 +314,7 @@ public class FloatWindowManager {
     private View buildCircleStyle(Activity activity) {
         TextView v = new TextView(activity);
         v.setText("--");
-        v.setTextColor(0xFFFFFFFF);
+        v.setTextColor(floatLabel);
         v.setTextSize(18);
         v.setTypeface(null, Typeface.BOLD);
         v.setGravity(Gravity.CENTER);
@@ -317,8 +324,8 @@ public class FloatWindowManager {
 
         android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
         bg.setShape(android.graphics.drawable.GradientDrawable.OVAL);
-        bg.setColor(0xDDFF5D7C);
-        bg.setStroke(dp2px(activity, 2), 0xFFFFFFFF);
+        bg.setColor(floatAccent);
+        bg.setStroke(dp2px(activity, 1), (floatLabel & 0x00FFFFFF) | 0x55000000);
         v.setBackground(bg);
 
         floatHrView = v;
@@ -334,9 +341,9 @@ public class FloatWindowManager {
         v.setPadding(dp2px(activity, 10), dp2px(activity, 8), dp2px(activity, 10), dp2px(activity, 8));
 
         android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
-        bg.setColor(0xDD0A0E17);
-        bg.setCornerRadius(dp2px(activity, 12));
-        bg.setStroke(dp2px(activity, 1), 0x66FF4466);
+        bg.setColor(floatBg);
+        bg.setCornerRadius(dp2px(activity, 18));
+        bg.setStroke(dp2px(activity, 1), (floatAccent & 0x00FFFFFF) | 0x33000000);
         v.setBackground(bg);
         v.setElevation(dp2px(activity, 4));
 
@@ -351,7 +358,7 @@ public class FloatWindowManager {
 
         TextView hr = new TextView(activity);
         hr.setText("--");
-        hr.setTextColor(0xFFFF5577);
+        hr.setTextColor(floatAccent);
         hr.setTextSize(14);
         hr.setTypeface(Typeface.DEFAULT_BOLD);
         hr.setGravity(Gravity.CENTER);
@@ -362,7 +369,7 @@ public class FloatWindowManager {
 
         TextView label = new TextView(activity);
         label.setText("脉搏");
-        label.setTextColor(0xAAFF5577);
+        label.setTextColor((floatAccent & 0x00FFFFFF) | 0xAA000000);
         label.setTextSize(8);
         label.setTypeface(null, Typeface.BOLD);
         v.addView(label);
@@ -374,7 +381,7 @@ public class FloatWindowManager {
     private View buildMiniStyle(Activity activity) {
         TextView v = new TextView(activity);
         v.setText("--");
-        v.setTextColor(0xFFFF5D7C);
+        v.setTextColor(floatAccent);
         v.setTextSize(10);
         v.setTypeface(null, Typeface.BOLD);
         v.setShadowLayer(1, 1, 1, 0xAA000000);

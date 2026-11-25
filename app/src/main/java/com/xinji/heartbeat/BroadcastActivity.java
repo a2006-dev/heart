@@ -15,12 +15,14 @@ import android.widget.*;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.content.ContextCompat;
 
 import com.xinji.heartbeat.server.BroadcastServer;
 import com.xinji.heartbeat.mqtt.MqttManager;
 
 public class BroadcastActivity extends AppCompatActivity {
-    private Switch swServer;
+    private SwitchCompat swServer;
     private TextView tvServerStatus, tvNetworkInfo, tvWifiName, tvLocalIP, tvAccessURL;
     private View btnBack;
     private Handler handler = new Handler(Looper.getMainLooper());
@@ -127,7 +129,7 @@ public class BroadcastActivity extends AppCompatActivity {
 
         if (running) {
             tvServerStatus.setText("运行中");
-            tvServerStatus.setTextColor(0xFF4CAF50);
+            tvServerStatus.setTextColor(ContextCompat.getColor(this, R.color.success));
             if (!"未连接".equals(ip)) {
                 int port = getActualServerPort();
                 String url = "http://" + ip + ":" + port;
@@ -139,7 +141,7 @@ public class BroadcastActivity extends AppCompatActivity {
             }
         } else {
             tvServerStatus.setText("未运行");
-            tvServerStatus.setTextColor(0xFF675c62);
+            tvServerStatus.setTextColor(ContextCompat.getColor(this, R.color.label_secondary));
             tvAccessURL.setText("💡 开启开关启动广播服务");
             tvAccessURL.setVisibility(View.VISIBLE);
         }

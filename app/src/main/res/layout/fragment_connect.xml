@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#0c0c10">
+    android:background="@color/bg">
 
     <!-- ========== 上半：连接/设备列表区域 ========== -->
     <LinearLayout
@@ -17,8 +17,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/txt_auto_024"
-            android:textColor="#ff5d7c"
-            android:textSize="20sp"
+            android:textColor="@color/accent"
+            android:textSize="34sp"
             android:textStyle="bold"
             android:layout_marginBottom="12dp"
             android:layout_marginTop="4dp"/>
@@ -44,14 +44,14 @@
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
                 android:text="@string/txt_auto_025"
-                    android:textColor="#e2c2cf"
+                    android:textColor="@color/label"
                     android:textSize="15sp"/>
                 <TextView
                     android:id="@+id/tvStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/txt_auto_026"
-                    android:textColor="#675c62"
+                    android:textColor="@color/label_secondary"
                     android:textSize="12sp"
                     android:layout_marginTop="4dp"/>
             </LinearLayout>
@@ -60,8 +60,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
                 android:text="@string/txt_auto_027"
-                android:backgroundTint="#2a282c"
-                android:textColor="#cbadbb"
+                android:backgroundTint="@color/fill_strong"
+                android:textColor="@color/label_secondary"
                 android:textSize="12sp"
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
@@ -84,7 +84,7 @@
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
                 android:text="@string/txt_auto_028"
-                android:backgroundTint="#ff5d7c"
+                android:backgroundTint="@color/accent"
                 android:textColor="#ffffff"
                 android:textSize="14sp"/>
             <TextView
@@ -92,7 +92,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textColor="#675c62"
+                android:textColor="@color/label_secondary"
                 android:textSize="12sp"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="8dp"/>
@@ -115,23 +115,24 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/txt_auto_029"
-                android:textColor="#cbadbb"
+                android:textColor="@color/label_secondary"
                 android:textSize="13sp"/>
             <TextView
                 android:id="@+id/tvBroadSearchHint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textColor="#ff5d7c"
+                android:textColor="@color/accent"
                 android:textSize="11sp"
                 android:layout_marginEnd="8sp"
                 android:visibility="gone"/>
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/swBroadSearch"
+                style="@style/App.Switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:thumbTint="#675c62"
-                android:trackTint="#2a282c"/>
+                android:thumbTint="@color/label_secondary"
+                android:trackTint="@color/fill_strong"/>
         </LinearLayout>
 
         <!-- 设备列表（RecyclerView） -->
@@ -149,7 +150,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#2a252a"/>
+        android:background="@color/separator"/>
 
     <!-- ========== 下半：日志区域 ========== -->
     <LinearLayout
@@ -174,15 +175,15 @@
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
                 android:text="@string/txt_auto_030"
-                android:textColor="#675c62"
+                android:textColor="@color/label_secondary"
                 android:textSize="13sp"/>
             <Button
                 android:id="@+id/btnClearLog"
                 android:layout_width="wrap_content"
                 android:layout_height="28dp"
                 android:text="@string/txt_auto_031"
-                android:backgroundTint="#2a282c"
-                android:textColor="#cbadbb"
+                android:backgroundTint="@color/fill_strong"
+                android:textColor="@color/label_secondary"
                 android:textSize="10sp"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
@@ -202,7 +203,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:textColor="#675c62"
+                android:textColor="@color/label_secondary"
                 android:textSize="11sp"
                 android:typeface="monospace"
                 android:lineSpacingExtra="2dp"

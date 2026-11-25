@@ -97,8 +97,12 @@ public class OnboardingActivity extends FragmentActivity {
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(size, size);
             lp.setMargins(dp(5), 0, dp(5), 0);
             dot.setLayoutParams(lp);
-            dot.setBackgroundResource(android.R.drawable.presence_offline);
-            dot.setAlpha(i == current ? 1f : 0.2f);
+            android.graphics.drawable.GradientDrawable dotBg = new android.graphics.drawable.GradientDrawable();
+            dotBg.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+            dotBg.setColor(androidx.core.content.ContextCompat.getColor(this,
+                i == current ? R.color.accent : R.color.label_tertiary));
+            dot.setBackground(dotBg);
+            dot.setAlpha(i == current ? 1f : 0.45f);
             if (i == current) {
                 ObjectAnimator.ofFloat(dot, "scaleX", 0.8f, 1.3f).setDuration(400).start();
                 ObjectAnimator.ofFloat(dot, "scaleY", 0.8f, 1.3f).setDuration(400).start();

@@ -10,7 +10,7 @@
         android:id="@+id/recordInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#e2c2cf"
+        android:textColor="@color/label"
         android:textSize="12sp"
         android:layout_marginBottom="6dp"/>
     <ImageView

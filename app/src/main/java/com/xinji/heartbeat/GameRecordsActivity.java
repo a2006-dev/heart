@@ -10,6 +10,7 @@ import android.widget.*;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+import androidx.core.content.ContextCompat;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.*;
@@ -88,16 +89,16 @@ public class GameRecordsActivity extends AppCompatActivity {
         }
 
         LineDataSet dataSet = new LineDataSet(entries, "心率");
-        dataSet.setColor(Color.parseColor("#FF5D7C"));
+        dataSet.setColor(ContextCompat.getColor(this, R.color.accent));
         dataSet.setLineWidth(2f);
         dataSet.setDrawCircles(false);
         dataSet.setDrawValues(false);
         dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
         dataSet.setDrawFilled(true);
-        dataSet.setFillColor(Color.parseColor("#33FF5D7C"));
+        dataSet.setFillColor((ContextCompat.getColor(this, R.color.accent) & 0x00FFFFFF) | 0x33000000);
         dataSet.setFillAlpha(80);
         dataSet.setHighlightEnabled(true);
-        dataSet.setHighLightColor(Color.parseColor("#66FF5D7C"));
+        dataSet.setHighLightColor((ContextCompat.getColor(this, R.color.accent) & 0x00FFFFFF) | 0x66000000);
 
         lineChart.setData(new LineData(dataSet));
         lineChart.setBackgroundColor(Color.TRANSPARENT);
@@ -113,10 +114,10 @@ public class GameRecordsActivity extends AppCompatActivity {
         XAxis xAxis = lineChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(true);
-        xAxis.setGridColor(Color.parseColor("#1AFFFFFF"));
+        xAxis.setGridColor(ContextCompat.getColor(this, R.color.chart_grid));
         xAxis.setGridLineWidth(0.5f);
         xAxis.setDrawAxisLine(false);
-        xAxis.setTextColor(Color.parseColor("#675c62"));
+        xAxis.setTextColor(ContextCompat.getColor(this, R.color.label_secondary));
         xAxis.setTextSize(10f);
         xAxis.setValueFormatter(new ValueFormatter() {
             @Override
@@ -129,12 +130,12 @@ public class GameRecordsActivity extends AppCompatActivity {
         });
 
         YAxis yAxisLeft = lineChart.getAxisLeft();
-        yAxisLeft.setTextColor(Color.parseColor("#675c62"));
+        yAxisLeft.setTextColor(ContextCompat.getColor(this, R.color.label_secondary));
         yAxisLeft.setTextSize(10f);
         yAxisLeft.setAxisMinimum(40f);
         yAxisLeft.setAxisMaximum(200f);
         yAxisLeft.setDrawGridLines(true);
-        yAxisLeft.setGridColor(Color.parseColor("#1AFFFFFF"));
+        yAxisLeft.setGridColor(ContextCompat.getColor(this, R.color.chart_grid));
         yAxisLeft.setGridLineWidth(0.5f);
         yAxisLeft.setDrawAxisLine(false);
 
@@ -193,9 +194,9 @@ public class GameRecordsActivity extends AppCompatActivity {
         lineChart.setDrawingCacheEnabled(false);
         Bitmap fallback = Bitmap.createBitmap(dp2px(300), dp2px(200), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(fallback);
-        canvas.drawColor(Color.parseColor("#0c0c10"));
+        canvas.drawColor(ContextCompat.getColor(this, R.color.bg));
         Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-        p.setColor(Color.parseColor("#675c62"));
+        p.setColor(ContextCompat.getColor(this, R.color.label_secondary));
         p.setTextSize(dp2px(16));
         canvas.drawText("图表加载失败", dp2px(80), dp2px(100), p);
         return fallback;
@@ -207,20 +208,20 @@ public class GameRecordsActivity extends AppCompatActivity {
         int totalHeight = textHeight + chartBitmap.getHeight() + 100;
         Bitmap combined = Bitmap.createBitmap(width, totalHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(combined);
-        canvas.drawColor(Color.parseColor("#0c0c10"));
+        canvas.drawColor(ContextCompat.getColor(this, R.color.bg));
 
         Paint titlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        titlePaint.setColor(Color.parseColor("#ff5d7c"));
+        titlePaint.setColor(ContextCompat.getColor(this, R.color.accent));
         titlePaint.setTextSize(dp2px(22));
         titlePaint.setTypeface(Typeface.DEFAULT_BOLD);
 
         Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        textPaint.setColor(Color.parseColor("#e2c2cf"));
+        textPaint.setColor(ContextCompat.getColor(this, R.color.label));
         textPaint.setTextSize(dp2px(18));
         textPaint.setTypeface(Typeface.DEFAULT_BOLD);
 
         Paint subPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        subPaint.setColor(Color.parseColor("#675c62"));
+        subPaint.setColor(ContextCompat.getColor(this, R.color.label_secondary));
         subPaint.setTextSize(dp2px(14));
 
         int x = 50, y = 55;

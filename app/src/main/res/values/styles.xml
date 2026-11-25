@@ -1,21 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
-         <item name="windowSplashScreenBackground">#0c0c10</item>
-         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
-        <item name="windowSplashScreenIconBackgroundColor">#C2385C</item>
-         <item name="postSplashScreenTheme">@style/AppTheme</item>
-     </style>
-
-     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
-         <item name="android:windowFullscreen">true</item>
-         <item name="android:windowBackground">@color/splash_bg</item>
-         <item name="android:statusBarColor">#0c0c10</item>
-         <item name="android:navigationBarColor">#0c0c10</item>
-     </style>
-
-     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_bg</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
+        <item name="postSplashScreenTheme">@style/AppTheme</item>
+    </style>
+    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
         <item name="android:windowBackground">@color/splash_bg</item>
+        <item name="android:statusBarColor">@color/splash_bg</item>
+        <item name="android:navigationBarColor">@color/splash_bg</item>
+    </style>
+    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/accent</item>
+        <item name="colorOnPrimary">@color/on_accent</item>
+        <item name="colorSurface">@color/card</item>
+        <item name="colorOnSurface">@color/label</item>
+        <item name="colorOnSurfaceVariant">@color/label_secondary</item>
+        <item name="colorOutline">@color/separator</item>
+        <item name="android:windowBackground">@color/bg</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:fontFamily">sans-serif</item>
     </style>
- </resources>
+    <style name="App.Title" parent="">
+        <item name="android:textSize">34sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/label</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+    <style name="App.SectionTitle" parent="">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/label_secondary</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.02</item>
+    </style>
+    <style name="App.Card" parent="">
+        <item name="android:background">@drawable/card</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+    </style>
+    <style name="App.Card.Clickable" parent="App.Card">
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+    </style>
+    <style name="App.RowTitle" parent="">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/label</item>
+    </style>
+    <style name="App.RowDesc" parent="">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/label_secondary</item>
+        <item name="android:layout_marginTop">2dp</item>
+    </style>
+    <style name="App.Button" parent="Widget.Material3.Button">
+        <item name="android:layout_height">48dp</item>
+        <item name="cornerRadius">14dp</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="backgroundTint">@color/accent</item>
+        <item name="android:textColor">@color/on_accent</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">6dp</item>
+    </style>
+    <style name="App.Button.Secondary" parent="App.Button">
+        <item name="backgroundTint">@color/fill</item>
+        <item name="android:textColor">@color/accent</item>
+    </style>
+    <style name="App.Button.Small" parent="Widget.Material3.Button.TextButton">
+        <item name="android:layout_height">32dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="cornerRadius">10dp</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="backgroundTint">@color/fill</item>
+        <item name="android:textColor">@color/accent</item>
+    </style>
+    <style name="App.Button.Ghost" parent="App.Button.Small">
+        <item name="backgroundTint">@android:color/transparent</item>
+    </style>
+    <style name="App.IconButton" parent="">
+        <item name="android:layout_width">36dp</item>
+        <item name="android:layout_height">36dp</item>
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+        <item name="android:tint">@color/accent</item>
+        <item name="android:scaleType">centerInside</item>
+    </style>
+    <style name="App.EditText" parent="Widget.AppCompat.EditText">
+        <item name="android:layout_height">40dp</item>
+        <item name="android:background">@drawable/fill_field</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/label</item>
+        <item name="android:textColorHint">@color/label_tertiary</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:importantForAutofill">no</item>
+    </style>
+    <style name="App.Chevron" parent="">
+        <item name="android:textSize">17sp</item>
+        <item name="android:textColor">@color/label_tertiary</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+    <style name="App.Switch" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="android:trackTint">@color/switch_track</item>
+        <item name="android:thumbTint">@color/switch_thumb</item>
+    </style>
+</resources>

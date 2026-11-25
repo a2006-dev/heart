@@ -375,7 +375,7 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
                 TextView tv = new TextView(requireContext());
                 tv.setPadding(24, 16, 24, 8);
                 tv.setTextSize(13);
-                tv.setTextColor(0xFF7a6a70);
+                tv.setTextColor(ContextCompat.getColor(requireContext(), R.color.label_secondary));
                 tv.setTypeface(null, android.graphics.Typeface.BOLD);
                 return new RecyclerView.ViewHolder(tv) {};
             }

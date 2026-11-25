@@ -63,7 +63,7 @@ public class OnboardingPageFragment extends Fragment {
                 }
             }
         }
-        v.setBackgroundColor(0xFF0c0c10);
+        v.setBackgroundColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.bg));
         v.post(() -> animateIn(v, icon, title, desc));
         return v;
     }

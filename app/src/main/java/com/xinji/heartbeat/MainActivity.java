@@ -241,13 +241,17 @@ public class MainActivity extends FragmentActivity {
         viewPager.setOffscreenPageLimit(3);
         viewPager.setAdapter(new ViewPagerAdapter(this));
         viewPager.setUserInputEnabled(false);
-
+        viewPager.setPageTransformer((page, position) -> {
+            float distance = Math.min(1f, Math.abs(position));
+            page.setAlpha(1f - 0.18f * distance);
+            page.setTranslationX(-position * page.getWidth() * 0.035f);
+        });
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.nav_home) viewPager.setCurrentItem(0, false);
-            else if (id == R.id.nav_connect) viewPager.setCurrentItem(1, false);
-            else if (id == R.id.nav_game) viewPager.setCurrentItem(2, false);
-            else if (id == R.id.nav_settings) viewPager.setCurrentItem(3, false);
+            if (id == R.id.nav_home) viewPager.setCurrentItem(0, true);
+            else if (id == R.id.nav_connect) viewPager.setCurrentItem(1, true);
+            else if (id == R.id.nav_game) viewPager.setCurrentItem(2, true);
+            else if (id == R.id.nav_settings) viewPager.setCurrentItem(3, true);
             return true;
         });
     }

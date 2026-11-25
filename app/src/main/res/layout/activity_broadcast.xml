@@ -2,12 +2,15 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0c0c10">
+    android:background="@color/bg">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="40dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -20,7 +23,7 @@
                 android:layout_height="40dp"
                 android:src="@android:drawable/ic_menu_revert"
                 android:background="@android:color/transparent"
-                android:tint="#e2c2cf"
+                android:tint="@color/label"
                 android:layout_marginEnd="12dp"/>
             <TextView
                 android:layout_width="0dp"
@@ -30,15 +33,15 @@
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
                 android:text="@string/txt_auto_001"
-                android:textColor="#ff5d7c"
-                android:textSize="22sp"
+                android:textColor="@color/accent"
+                android:textSize="28sp"
                 android:textStyle="bold"/>
             <TextView
                 android:id="@+id/tvServerStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/txt_auto_002"
-                android:textColor="#675c62"
+                android:textColor="@color/label_secondary"
                 android:textSize="14sp"/>
         </LinearLayout>
 
@@ -59,19 +62,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/txt_auto_003"
-                    android:textColor="#e2c2cf"
+                    android:textColor="@color/label"
                     android:textSize="15sp"/>
                 <TextView
                     android:id="@+id/tvNetworkInfo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/txt_auto_004"
-                    android:textColor="#675c62"
+                    android:textColor="@color/label_secondary"
                     android:textSize="12sp"
                     android:layout_marginTop="2dp"/>
             </LinearLayout>
-            <Switch
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/swServer"
+                style="@style/App.Switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
@@ -88,7 +92,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/txt_auto_005"
-                android:textColor="#e2c2cf"
+                android:textColor="@color/label"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp"/>
@@ -97,7 +101,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/txt_auto_006"
-                android:textColor="#e2c2cf"
+                android:textColor="@color/label"
                 android:textSize="13sp"
                 android:layout_marginBottom="6dp"/>
             <TextView
@@ -105,7 +109,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/txt_auto_007"
-                android:textColor="#e2c2cf"
+                android:textColor="@color/label"
                 android:textSize="13sp"
                 android:layout_marginBottom="6dp"/>
             <TextView
@@ -113,7 +117,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/txt_auto_008"
-                android:textColor="#ff5d7c"
+                android:textColor="@color/accent"
                 android:textSize="13sp"/>
         </LinearLayout>
 
@@ -138,7 +142,7 @@
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
                 android:text="@string/txt_auto_009"
-                    android:textColor="#e2c2cf"
+                    android:textColor="@color/label"
                     android:textSize="14sp"
                     android:textStyle="bold"/>
                 <TextView
@@ -146,14 +150,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/txt_auto_010"
-                    android:textColor="#ff5d7c"
+                    android:textColor="@color/accent"
                     android:textSize="12sp"/>
             </LinearLayout>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/txt_auto_011"
-                android:textColor="#675c62"
+                android:textColor="@color/label_secondary"
                 android:textSize="12sp"
                 android:layout_marginBottom="6dp"/>
             <TextView
@@ -161,7 +165,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/txt_auto_012"
-                android:textColor="#e2c2cf"
+                android:textColor="@color/label"
                 android:textSize="12sp"/>
         </LinearLayout>
 
@@ -189,18 +193,19 @@
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
                 android:text="@string/txt_auto_013"
-                        android:textColor="#e2c2cf"
+                        android:textColor="@color/label"
                         android:textSize="15sp"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/txt_auto_014"
-                        android:textColor="#675c62"
+                        android:textColor="@color/label_secondary"
                         android:textSize="12sp"
                         android:layout_marginTop="2dp"/>
                 </LinearLayout>
-                <Switch
+                <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/swAutoPush"
+                style="@style/App.Switch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
             </LinearLayout>
@@ -214,7 +219,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/txt_auto_015"
-                    android:textColor="#675c62"
+                    android:textColor="@color/label_secondary"
                     android:textSize="13sp"
                     android:layout_marginEnd="8dp"/>
                 <EditText
@@ -224,8 +229,8 @@
                     android:layout_weight="1"
                     android:hint="192.168.1.5:9091"
                     android:text="@string/txt_auto_016"
-                    android:textColor="#e2c2cf"
-                    android:textColorHint="#3a3438"
+                    android:textColor="@color/label"
+                    android:textColorHint="@color/label_tertiary"
                     android:textSize="13sp"
                     android:background="@drawable/glass_card"
                     android:padding="8dp"
@@ -237,7 +242,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=""
-                android:textColor="#4CAF50"
+                android:textColor="@color/success"
                 android:textSize="12sp"
                 android:layout_marginTop="6dp"/>
         </LinearLayout>
@@ -265,13 +270,13 @@
                 android:drawablePadding="8dp"
                 android:gravity="center_vertical"
                 android:text="@string/txt_auto_017"
-                    android:textColor="#e2c2cf"
+                    android:textColor="@color/label"
                     android:textSize="15sp"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/txt_auto_018"
-                    android:textColor="#675c62"
+                    android:textColor="@color/label_secondary"
                     android:textSize="12sp"
                     android:layout_marginTop="2dp"/>
             </LinearLayout>
@@ -279,7 +284,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/txt_auto_019"
-                android:textColor="#675c62"
+                android:textColor="@color/label_secondary"
                 android:textSize="18sp"/>
         </LinearLayout>
 

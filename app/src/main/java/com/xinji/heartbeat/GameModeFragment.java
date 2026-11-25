@@ -159,8 +159,8 @@ public class GameModeFragment extends Fragment implements HeartEventBus.EventLis
             int hh = 80;
             android.graphics.Bitmap bmp = android.graphics.Bitmap.createBitmap(w, hh, android.graphics.Bitmap.Config.ARGB_8888);
             Canvas c = new Canvas(bmp);
-            c.drawColor(0xFF0c0c10);
-            Paint line = new Paint(); line.setColor(0xFFFF5D7C); line.setStrokeWidth(2); line.setStyle(Paint.Style.STROKE);
+            c.drawColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.bg));
+            Paint line = new Paint(); line.setColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.accent)); line.setStrokeWidth(2); line.setStyle(Paint.Style.STROKE);
             int min = r.getMinHR(), max = r.getMaxHR(), range = Math.max(max - min, 10);
             float stepX = (float)(w - 20) / (r.hrValues.size() - 1);
             Path path = new Path();
@@ -170,7 +170,7 @@ public class GameModeFragment extends Fragment implements HeartEventBus.EventLis
                 if (i == 0) path.moveTo(x, y); else path.lineTo(x, y);
             }
             c.drawPath(path, line);
-            Paint dot = new Paint(); dot.setColor(0xFFFF5D7C); dot.setStyle(Paint.Style.FILL);
+            Paint dot = new Paint(); dot.setColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.accent)); dot.setStyle(Paint.Style.FILL);
             float lx = 10 + (r.hrValues.size() - 1) * stepX;
             float ly = hh - 10 - (float)(r.hrValues.get(r.hrValues.size() - 1) - min) / range * (hh - 20);
             c.drawCircle(lx, ly, 3, dot);
