@@ -72,6 +72,17 @@ jobs:
           keytool -list -keystore release.p12 -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS" | tail -3
       - name: Build release APK
         run: ./gradlew assembleRelease --no-daemon --stacktrace
+      - name: Prepare debug keystore
+        run: |
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -v \
+              -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -keypass android \
+              -alias androiddebugkey \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
       - name: Build debug APK
         run: ./gradlew assembleDebug --no-daemon --stacktrace
       - name: Verify signature
