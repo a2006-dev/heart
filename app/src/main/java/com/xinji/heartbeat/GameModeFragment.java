@@ -39,6 +39,7 @@ public class GameModeFragment extends Fragment implements HeartEventBus.EventLis
     private Handler handler = new Handler(Looper.getMainLooper());
     private RecyclerView recordsList;
     private RecordsAdapter recordsAdapter;
+    private View emptyView, btnEmptyAddGame;
     private final List<HeartRecord> records = new ArrayList<>();
 
     @Nullable @Override
@@ -57,9 +58,11 @@ public class GameModeFragment extends Fragment implements HeartEventBus.EventLis
         btnStartRecord.setOnClickListener(view -> startRecording());
         btnStopRecord.setOnClickListener(view -> stopRecording());
         btnStopRecord.setEnabled(false);
+        com.xinji.heartbeat.widget.Interactions.pressAll(btnStartRecord, btnStopRecord);
 
+        emptyView = v.findViewById(R.id.tvEmpty);
+        btnEmptyAddGame = v.findViewById(R.id.btnEmptyAddGame);
         v.findViewById(R.id.swShowSystem).setVisibility(View.GONE);
-        v.findViewById(R.id.tvEmpty).setVisibility(View.GONE);
         ((TextView)v.findViewById(R.id.tvWindowModeHint)).setVisibility(View.GONE);
 
         HeartEventBus.getInstance().register(this);
@@ -128,6 +131,10 @@ public class GameModeFragment extends Fragment implements HeartEventBus.EventLis
         records.sort((a, b) -> Long.compare(b.startTime, a.startTime));
         while (records.size() > 20) records.remove(records.size() - 1);
         recordsAdapter.notifyDataSetChanged();
+        boolean empty = records.isEmpty();
+        if (emptyView != null) emptyView.setVisibility(empty ? View.VISIBLE : View.GONE);
+        if (recordsList != null) recordsList.setVisibility(empty ? View.GONE : View.VISIBLE);
+        if (btnEmptyAddGame != null) btnEmptyAddGame.setVisibility(View.GONE);
     }
 
     class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHolder> {

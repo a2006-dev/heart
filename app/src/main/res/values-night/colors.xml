@@ -1,22 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="splash_bg">#000000</color>
-    <color name="bg">#000000</color>
-    <color name="card">#1C1C1E</color>
-    <color name="fill">#2C2C2E</color>
-    <color name="fill_strong">#3A3A3C</color>
-    <color name="separator">#33FFFFFF</color>
-    <color name="label">#FFFFFF</color>
+    <color name="splash_bg">#0B0B0F</color>
+    <color name="bg">#0B0B0F</color>
+    <color name="card">#16161A</color>
+    <color name="card_elevated">#1F1F25</color>
+    <color name="fill">#1F1F25</color>
+    <color name="fill_strong">#2A2A32</color>
+    <color name="separator">#2EFFFFFF</color>
+    <color name="label">#F2F2F7</color>
     <color name="label_secondary">#98989F</color>
     <color name="label_tertiary">#636366</color>
-    <color name="accent">#FF375F</color>
-    <color name="accent_soft">#26FF375F</color>
+    <color name="accent">#FF453A</color>
+    <color name="accent_soft">#26FF453A</color>
     <color name="on_accent">#FFFFFF</color>
     <color name="success">#30D158</color>
     <color name="warning">#FF9F0A</color>
     <color name="green">#30D158</color>
     <color name="chart_grid">#1FFFFFFF</color>
-    <color name="float_bg">#E61C1C1E</color>
-    <color name="float_label">#FFFFFF</color>
-    <color name="float_accent">#FF375F</color>
+    <color name="chart_line">#FF453A</color>
+    <color name="chart_fill">#26FF453A</color>
+    <color name="float_bg">#F216161A</color>
+    <color name="float_shadow">#66000000</color>
+    <color name="float_label">#F2F2F7</color>
+    <color name="float_accent">#FF453A</color>
 </resources>

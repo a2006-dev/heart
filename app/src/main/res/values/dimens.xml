@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="page_margin">20dp</dimen>
+    <dimen name="card_padding">16dp</dimen>
+    <dimen name="card_gap">12dp</dimen>
+    <dimen name="group_gap">28dp</dimen>
+    <dimen name="icon_text_gap">12dp</dimen>
+    <dimen name="min_touch">48dp</dimen>
+    <dimen name="row_height">52dp</dimen>
+    <dimen name="radius_card">18dp</dimen>
+    <dimen name="radius_field">12dp</dimen>
+    <dimen name="radius_pill">999dp</dimen>
+    <dimen name="font_large_title">34sp</dimen>
+    <dimen name="font_title2">22sp</dimen>
+    <dimen name="font_headline">17sp</dimen>
+    <dimen name="font_body">17sp</dimen>
+    <dimen name="font_subhead">15sp</dimen>
+    <dimen name="font_footnote">13sp</dimen>
+    <dimen name="font_caption">12sp</dimen>
+    <dimen name="font_huge">64sp</dimen>
+</resources>

@@ -4,164 +4,200 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg">
-    
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-        
+        android:orientation="vertical"
+        android:paddingStart="@dimen/page_margin"
+        android:paddingEnd="@dimen/page_margin"
+        android:paddingTop="12dp">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_margin="16dp"
-            android:layout_marginBottom="0dp">
+            android:gravity="center_vertical">
+
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/txt_auto_032"
-                android:textColor="@color/accent"
-                android:textSize="34sp"
-                android:textStyle="bold"/>
+                style="@style/App.LargeTitle"
+                android:text="@string/txt_auto_032" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=""/>
-                android:textColor="@color/label"
-                android:textSize="12sp"
-                android:layout_marginEnd="6dp"/>
+                style="@style/App.Footnote"
+                android:layout_marginEnd="8dp"
+                android:text="@string/txt_auto_038" />
+
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/swShowSystem"
                 style="@style/App.Switch"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
         </LinearLayout>
-        
-        <!-- 小窗/分屏继续记录开关 -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/App.Subhead"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="18dp"
+            android:text="@string/txt_auto_034" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/glass_card"
-            android:padding="12dp"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginBottom="8dp">
-            
+            style="@style/App.Card">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:gravity="center_vertical">
+
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/txt_auto_033"
-                        android:textColor="@color/label"
-                        android:textSize="14sp"/>
+                        style="@style/App.RowTitle"
+                        android:text="@string/txt_auto_033" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/txt_auto_034"
-                        android:textColor="@color/label_secondary"
-                        android:textSize="11sp"
-                        android:layout_marginTop="2dp"/>
+                        style="@style/App.RowDesc"
+                        android:text="@string/txt_auto_034" />
                 </LinearLayout>
+
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/swContinueInWindow"
-                style="@style/App.Switch"
+                    style="@style/App.Switch"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp" />
             </LinearLayout>
-            
+
             <TextView
                 android:id="@+id/tvWindowModeHint"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text=""
-                android:textColor="@color/label_secondary"
-                android:textSize="10sp"
-                android:layout_marginTop="6dp"
-                android:lineSpacingExtra="2dp"/>
+                style="@style/App.Caption"
+                android:layout_marginTop="10dp"
+                android:lineSpacingExtra="2dp"
+                android:text="" />
         </LinearLayout>
-        
-        <!-- 手动记录按钮 -->
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center"
-            android:padding="12dp"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginBottom="8dp"
-            android:background="@drawable/glass_card">
-            <Button
+            android:gravity="center_vertical"
+            android:layout_marginBottom="@dimen/card_gap">
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnStartRecord"
+                style="@style/App.Button"
                 android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_height="52dp"
                 android:layout_weight="1"
-                android:text="@string/txt_auto_035"
-                android:backgroundTint="@color/accent"
-                android:textColor="#ffffff"
-                android:textSize="15sp"
-                android:layout_marginEnd="8dp"/>
-            <Button
+                android:text="@string/txt_auto_035" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnStopRecord"
+                style="@style/App.Button.Secondary"
                 android:layout_width="0dp"
-                android:layout_height="48dp"
+                android:layout_height="52dp"
                 android:layout_weight="1"
-                android:text="@string/txt_auto_036"
-                android:backgroundTint="@color/fill_strong"
-                android:textColor="@color/label_secondary"
-                android:textSize="15sp"
-                android:enabled="false"/>
-            <TextView
-                android:id="@+id/tvRecordStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textColor="@color/success"
-                android:textSize="12sp"
-                android:layout_marginStart="8dp"/>
+                android:layout_marginStart="10dp"
+                android:enabled="false"
+                android:text="@string/txt_auto_036" />
         </LinearLayout>
-        
+
+        <TextView
+            android:id="@+id/tvRecordStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/App.Footnote"
+            android:textColor="@color/success"
+            android:layout_marginBottom="10dp"
+            android:text="" />
+
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1">
-            
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recordsList"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="8dp"/>
-            
-            <TextView
+                android:clipToPadding="false"
+                android:paddingBottom="88dp" />
+
+            <LinearLayout
                 android:id="@+id/tvEmpty"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/txt_auto_037"
-                android:textColor="@color/label_secondary"
-                android:textSize="16sp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
                 android:gravity="center"
-                android:layout_gravity="center"/>
+                android:paddingStart="@dimen/page_margin"
+                android:paddingEnd="@dimen/page_margin">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:background="@drawable/empty_circle"
+                    android:padding="16dp"
+                    android:src="@drawable/ic_icon_game_pad"
+                    android:tint="@color/label_tertiary"
+                    android:contentDescription="@string/empty_games_title"
+                    android:importantForAccessibility="no" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/App.EmptyTitle"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/empty_games_title" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/App.EmptyDesc"
+                    android:text="@string/empty_games_desc" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEmptyAddGame"
+                    style="@style/App.Button.Pill"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/empty_games_action" />
+            </LinearLayout>
         </FrameLayout>
     </LinearLayout>
-    
-    <ImageView
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnAddGame"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:src="@android:drawable/ic_menu_add"
-        android:background="@drawable/glass_card"
-        android:padding="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="24dp"
-        android:contentDescription="添加游戏"
-        android:importantForAccessibility="yes"/>
+        android:src="@drawable/ic_icon_add"
+        android:contentDescription="@string/empty_games_action"
+        android:importantForAccessibility="yes"
+        app:backgroundTint="@color/accent"
+        app:tint="@color/on_accent"
+        app:elevation="2dp"
+        app:borderWidth="0dp" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

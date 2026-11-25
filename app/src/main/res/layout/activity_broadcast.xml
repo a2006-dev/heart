@@ -1,292 +1,285 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg">
+    android:background="@color/bg"
+    android:fillViewport="true">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:paddingTop="20dp"
+        android:paddingStart="@dimen/page_margin"
+        android:paddingEnd="@dimen/page_margin"
+        android:paddingTop="12dp"
         android:paddingBottom="40dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:layout_marginBottom="24dp">
+            android:layout_marginBottom="20dp">
+
             <ImageButton
                 android:id="@+id/btnBack"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="@dimen/min_touch"
+                android:layout_height="@dimen/min_touch"
                 android:src="@android:drawable/ic_menu_revert"
-                android:background="@android:color/transparent"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:tint="@color/label"
-                android:layout_marginEnd="12dp"/>
+                android:layout_marginEnd="4dp"
+                android:contentDescription="@string/action_cancel" />
+
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:drawableStart="@drawable/ic_icon_broadcast"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="@string/txt_auto_001"
-                android:textColor="@color/accent"
-                android:textSize="28sp"
-                android:textStyle="bold"/>
+                style="@style/App.Title2"
+                android:text="@string/txt_auto_001" />
+
             <TextView
                 android:id="@+id/tvServerStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/txt_auto_002"
-                android:textColor="@color/label_secondary"
-                android:textSize="14sp"/>
+                style="@style/App.Footnote"
+                android:text="@string/txt_auto_002" />
         </LinearLayout>
 
-        <!-- 服务器开关 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/App.SectionHeader"
+            android:layout_marginBottom="8dp"
+            android:text="@string/txt_auto_003" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/glass_card"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp"
-            android:gravity="center_vertical">
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_003"
-                    android:textColor="@color/label"
-                    android:textSize="15sp"/>
-                <TextView
-                    android:id="@+id/tvNetworkInfo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_004"
-                    android:textColor="@color/label_secondary"
-                    android:textSize="12sp"
-                    android:layout_marginTop="2dp"/>
-            </LinearLayout>
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/swServer"
-                style="@style/App.Switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
-
-        <!-- 连接信息 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/glass_card"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp"
+            style="@style/App.Card"
             android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/txt_auto_005"
-                android:textColor="@color/label"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp"/>
-            <TextView
-                android:id="@+id/tvWifiName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/txt_auto_006"
-                android:textColor="@color/label"
-                android:textSize="13sp"
-                android:layout_marginBottom="6dp"/>
-            <TextView
-                android:id="@+id/tvLocalIP"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/txt_auto_007"
-                android:textColor="@color/label"
-                android:textSize="13sp"
-                android:layout_marginBottom="6dp"/>
-            <TextView
-                android:id="@+id/tvAccessURL"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/txt_auto_008"
-                android:textColor="@color/accent"
-                android:textSize="13sp"/>
-        </LinearLayout>
 
-        <!-- 局域网检测 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/glass_card"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp"
-            android:orientation="vertical">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="8dp">
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:drawableStart="@drawable/ic_icon_search"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="@string/txt_auto_009"
-                    android:textColor="@color/label"
-                    android:textSize="14sp"
-                    android:textStyle="bold"/>
-                <TextView
-                    android:id="@+id/tvLanStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_010"
-                    android:textColor="@color/accent"
-                    android:textSize="12sp"/>
-            </LinearLayout>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/txt_auto_011"
-                android:textColor="@color/label_secondary"
-                android:textSize="12sp"
-                android:layout_marginBottom="6dp"/>
-            <TextView
-                android:id="@+id/tvDeviceList"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/txt_auto_012"
-                android:textColor="@color/label"
-                android:textSize="12sp"/>
-        </LinearLayout>
-
-        <!-- 自动推送 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/glass_card"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp"
-            android:orientation="vertical">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical">
+
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:drawableStart="@drawable/ic_icon_upload"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="@string/txt_auto_013"
-                        android:textColor="@color/label"
-                        android:textSize="15sp"/>
+                        style="@style/App.RowTitle"
+                        android:text="@string/txt_auto_005" />
+
                     <TextView
+                        android:id="@+id/tvNetworkInfo"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/txt_auto_014"
-                        android:textColor="@color/label_secondary"
-                        android:textSize="12sp"
-                        android:layout_marginTop="2dp"/>
+                        style="@style/App.RowDesc"
+                        android:text="@string/txt_auto_004" />
                 </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/swServer"
+                    style="@style/App.Switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="14dp"
+                android:background="@color/separator" />
+
+            <TextView
+                android:id="@+id/tvWifiName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/App.Value"
+                android:layout_marginBottom="8dp"
+                android:text="@string/txt_auto_006" />
+
+            <TextView
+                android:id="@+id/tvLocalIP"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/App.Value"
+                android:layout_marginBottom="8dp"
+                android:text="@string/txt_auto_007" />
+
+            <TextView
+                android:id="@+id/tvAccessURL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/accent"
+                android:textSize="@dimen/font_subhead"
+                android:text="@string/txt_auto_008" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/App.SectionHeader"
+            android:layout_marginBottom="8dp"
+            android:text="@string/txt_auto_009" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/App.Card"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    style="@style/App.RowDesc"
+                    android:text="@string/txt_auto_011" />
+
+                <TextView
+                    android:id="@+id/tvLanStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/accent"
+                    android:textSize="@dimen/font_footnote"
+                    android:text="@string/txt_auto_010" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvDeviceList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/label"
+                android:textSize="@dimen/font_footnote"
+                android:layout_marginTop="10dp"
+                android:lineSpacingExtra="3dp"
+                android:text="@string/txt_auto_012" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/App.SectionHeader"
+            android:layout_marginBottom="8dp"
+            android:text="@string/txt_auto_013" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/App.Card"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/App.RowTitle"
+                        android:text="@string/txt_auto_014" />
+                </LinearLayout>
+
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/swAutoPush"
-                style="@style/App.Switch"
+                    style="@style/App.Switch"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp" />
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="14dp"
                 android:gravity="center_vertical">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_015"
-                    android:textColor="@color/label_secondary"
-                    android:textSize="13sp"
-                    android:layout_marginEnd="8dp"/>
+                    style="@style/App.Footnote"
+                    android:layout_marginEnd="10dp"
+                    android:text="@string/txt_auto_015" />
+
                 <EditText
                     android:id="@+id/etPushTarget"
+                    style="@style/App.EditText"
                     android:layout_width="0dp"
-                    android:layout_height="40dp"
+                    android:layout_height="44dp"
                     android:layout_weight="1"
                     android:hint="192.168.1.5:9091"
-                    android:text="@string/txt_auto_016"
-                    android:textColor="@color/label"
-                    android:textColorHint="@color/label_tertiary"
-                    android:textSize="13sp"
-                    android:background="@drawable/glass_card"
-                    android:padding="8dp"
-                    android:gravity="center_vertical"
-                    android:inputType="text|phone"/>
+                    android:inputType="textUri"
+                    android:text="@string/txt_auto_016" />
             </LinearLayout>
+
             <TextView
                 android:id="@+id/tvPushStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=""
+                style="@style/App.Caption"
                 android:textColor="@color/success"
-                android:textSize="12sp"
-                android:layout_marginTop="6dp"/>
+                android:layout_marginTop="10dp"
+                android:text="" />
         </LinearLayout>
 
-        <!-- 分享电脑端客户端 -->
         <LinearLayout
             android:id="@+id/btnSharePython"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/glass_card"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp"
-            android:gravity="center_vertical"
-            android:clickable="true"
-            android:focusable="true">
+            style="@style/App.Card.Clickable"
+            android:paddingTop="@dimen/card_padding"
+            android:paddingBottom="@dimen/card_padding"
+            android:paddingStart="@dimen/card_padding"
+            android:paddingEnd="@dimen/card_padding"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_icon_computer"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="@string/txt_auto_017"
-                    android:textColor="@color/label"
-                    android:textSize="15sp"/>
+                    style="@style/App.RowTitle"
+                    android:text="@string/txt_auto_017" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_018"
-                    android:textColor="@color/label_secondary"
-                    android:textSize="12sp"
-                    android:layout_marginTop="2dp"/>
+                    style="@style/App.RowDesc"
+                    android:text="@string/txt_auto_018" />
             </LinearLayout>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/txt_auto_019"
-                android:textColor="@color/label_secondary"
-                android:textSize="18sp"/>
+                style="@style/App.Chevron"
+                android:layout_marginStart="12dp"
+                android:text="@string/txt_auto_019" />
         </LinearLayout>
-
     </LinearLayout>
 </ScrollView>

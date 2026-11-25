@@ -94,4 +94,27 @@
         <item>左下角</item>
         <item>右下角</item>
     </string-array>
+    <string name="txt_auto_084">心率曲线</string>
+    <string name="txt_auto_085">游戏图标</string>
+    <string name="txt_auto_086">移除游戏</string>
+    <string name="empty_devices_title">还没有找到设备</string>
+    <string name="empty_devices_desc">打开心率设备的蓝牙广播后再开始扫描</string>
+    <string name="empty_devices_action">开始扫描</string>
+    <string name="empty_log_title">暂无日志</string>
+    <string name="empty_log_desc">连接设备后这里会显示运行日志</string>
+    <string name="empty_games_title">还没有添加游戏</string>
+    <string name="empty_games_desc">添加游戏后可为每个游戏单独统计心率记录</string>
+    <string name="empty_games_action">添加游戏</string>
+    <string name="confirm_disconnect_title">断开连接</string>
+    <string name="confirm_disconnect_msg">断开后将停止接收心率数据，确定断开吗？</string>
+    <string name="confirm_clear_log_title">清除日志</string>
+    <string name="confirm_clear_log_msg">清除后无法恢复，确定清除全部日志吗？</string>
+    <string name="confirm_remove_game_title">移除游戏</string>
+    <string name="confirm_remove_game_msg">该游戏的历史心率记录不会被删除，确定移除吗？</string>
+    <string name="confirm_stop_server_title">停止服务</string>
+    <string name="confirm_stop_server_msg">停止后局域网与推送将不可用，确定停止吗？</string>
+    <string name="action_confirm">确定</string>
+    <string name="action_cancel">取消</string>
+    <string name="rec_max_hr">最高心率</string>
+    <string name="rec_min_hr">最低心率</string>
 </resources>

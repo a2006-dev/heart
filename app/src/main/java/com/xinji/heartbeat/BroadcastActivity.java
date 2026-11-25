@@ -28,6 +28,16 @@ public class BroadcastActivity extends AppCompatActivity {
     private Handler handler = new Handler(Looper.getMainLooper());
     private ConnectivityManager connectivityManager;
     private ConnectivityManager.NetworkCallback networkCallback;
+    private boolean suppressToggle = false;
+
+    private void applyServerToggle(boolean enable) {
+        Intent intent = new Intent();
+        intent.setPackage(getPackageName());
+        intent.setAction(enable ? "com.xinji.heartbeat.START_BROADCAST"
+                                : "com.xinji.heartbeat.STOP_BROADCAST");
+        sendBroadcast(intent);
+        handler.postDelayed(this::updateStatus, 500);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,12 +61,25 @@ public class BroadcastActivity extends AppCompatActivity {
         updateStatus();
 
         swServer.setOnCheckedChangeListener((b, c) -> {
-            Intent intent = new Intent();
-            intent.setPackage(getPackageName());
-            intent.setAction(c ? "com.xinji.heartbeat.START_BROADCAST"
-                              : "com.xinji.heartbeat.STOP_BROADCAST");
-            sendBroadcast(intent);
-            handler.postDelayed(this::updateStatus, 500);
+            if (!c && !suppressToggle) {
+                new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+                    .setTitle(R.string.confirm_stop_server_title)
+                    .setMessage(R.string.confirm_stop_server_msg)
+                    .setNegativeButton(R.string.action_cancel, (d, w) -> {
+                        suppressToggle = true;
+                        swServer.setChecked(true);
+                        suppressToggle = false;
+                    })
+                    .setPositiveButton(R.string.action_confirm, (d, w) -> applyServerToggle(false))
+                    .setOnCancelListener(d -> {
+                        suppressToggle = true;
+                        swServer.setChecked(true);
+                        suppressToggle = false;
+                    })
+                    .show();
+                return;
+            }
+            applyServerToggle(c);
         });
 
         registerNetworkCallback();

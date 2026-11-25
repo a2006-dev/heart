@@ -4,46 +4,43 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="40dp">
+    android:paddingStart="@dimen/page_margin"
+    android:paddingEnd="@dimen/page_margin"
+    android:paddingTop="40dp"
+    android:paddingBottom="40dp">
 
     <TextView
         android:id="@+id/icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="72sp"
+        android:includeFontPadding="false"
         android:textAlignment="center" />
 
     <TextView
         android:id="@+id/title"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/accent"
-        android:textSize="24sp"
-        android:textStyle="bold"
+        style="@style/App.Title2"
         android:layout_marginTop="32dp"
         android:textAlignment="center" />
 
     <TextView
         android:id="@+id/desc"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        style="@style/App.Body"
         android:textColor="@color/label_secondary"
-        android:textSize="15sp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="14dp"
         android:gravity="center"
         android:lineSpacingExtra="4dp"
         android:textAlignment="center" />
 
-    <TextView
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnAction"
+        style="@style/App.Button.Pill"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:background="@drawable/glass_button"
-        android:paddingHorizontal="40dp"
-        android:paddingVertical="14dp"
-        android:layout_marginTop="48dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="40dp"
         android:visibility="gone" />
-
 </LinearLayout>

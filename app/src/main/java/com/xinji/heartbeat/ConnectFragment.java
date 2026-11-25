@@ -34,6 +34,7 @@ import com.xinji.heartbeat.app.HeartServiceLocator;
 import com.xinji.heartbeat.bluetooth.BleManager;
 import com.xinji.heartbeat.core.DeviceProfileManager;
 import com.xinji.heartbeat.data.model.BleDeviceInfo;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.xinji.heartbeat.widget.FloatWindowManager;
 
 import java.text.SimpleDateFormat;
@@ -49,6 +50,7 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
     private Button btnScan, btnDisconnect, btnClearLog;
     private TextView tvDevice, tvStatus, tvScanCount, tvLog, tvBroadSearchHint;
     private ScrollView logScrollView;
+    private View emptyDevices, emptyLog;
     private androidx.appcompat.widget.SwitchCompat swBroadSearch;
     private RecyclerView rvDevices;
     private DeviceAdapter deviceAdapter;
@@ -91,22 +93,46 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
         tvLog = v.findViewById(R.id.tvLog);
         logScrollView = (ScrollView) v.findViewById(R.id.logScrollView);
         btnClearLog = v.findViewById(R.id.btnClearLog);
+        emptyDevices = v.findViewById(R.id.emptyDevices);
+        emptyLog = v.findViewById(R.id.emptyLog);
         float dens = getResources().getDisplayMetrics().density;
         TouchTargets.expand(btnDisconnect, 8, dens);
         TouchTargets.expand(btnClearLog, 8, dens);
         TouchTargets.expand(btnScan, 4, dens);
         TouchTargets.expand(swBroadSearch, 8, dens);
+        com.xinji.heartbeat.widget.Interactions.pressAll(btnScan, btnDisconnect, btnClearLog);
 
         btnScan.setOnClickListener(view -> toggleScan());
-        btnDisconnect.setOnClickListener(view -> disconnectDevice());
+        btnDisconnect.setOnClickListener(view -> {
+            BleManager ble = serviceLocator.getBleManager();
+            if (ble == null || !ble.isConnected()) {
+                disconnectDevice();
+                return;
+            }
+            new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.confirm_disconnect_title)
+                .setMessage(R.string.confirm_disconnect_msg)
+                .setNegativeButton(R.string.action_cancel, null)
+                .setPositiveButton(R.string.action_confirm, (d, w) -> disconnectDevice())
+                .show();
+        });
         btnClearLog.setOnClickListener(view -> {
-            logEntries.clear();
-            updateLogDisplay();
+            if (logEntries.isEmpty()) return;
+            new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.confirm_clear_log_title)
+                .setMessage(R.string.confirm_clear_log_msg)
+                .setNegativeButton(R.string.action_cancel, null)
+                .setPositiveButton(R.string.action_confirm, (d, w) -> {
+                    logEntries.clear();
+                    updateLogDisplay();
+                })
+                .show();
         });
 
         swBroadSearch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             broadSearch = isChecked;
             deviceAdapter.notifyDataSetChanged();
+            updateEmptyState();
             appendLog(isChecked ? "🔓 广义搜索模式 — 已显示 ⋮ 可查看各设备广播服务" : "🔒 标准模式 — 仅显示心率设备", 0xFFcbadbb);
             if (isChecked) {
                 tvBroadSearchHint.setVisibility(View.VISIBLE);
@@ -208,7 +234,16 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
             ssb.setSpan(new ForegroundColorSpan(entry.color), start, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         tvLog.setText(ssb);
+        if (emptyLog != null) emptyLog.setVisibility(ssb.length() == 0 ? View.VISIBLE : View.GONE);
         logScrollView.post(() -> logScrollView.fullScroll(View.FOCUS_DOWN));
+    }
+
+
+    private void updateEmptyState() {
+        if (emptyDevices == null) return;
+        boolean empty = deviceList.isEmpty();
+        emptyDevices.setVisibility(empty ? View.VISIBLE : View.GONE);
+        rvDevices.setVisibility(empty ? View.GONE : View.VISIBLE);
     }
 
     private void requestBluetoothPermission() {
@@ -266,6 +301,7 @@ public class ConnectFragment extends Fragment implements HeartEventBus.EventList
 
         deviceList.clear();
         deviceAdapter.notifyDataSetChanged();
+        updateEmptyState();
         updateStatus("⚡ 未连接", "正在扫描...");
         appendLog("🔍 开始扫描" + (broadSearch ? "（广义模式）" : "（心率设备）"), 0xFFcbadbb);
 

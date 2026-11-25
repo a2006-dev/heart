@@ -3,8 +3,12 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@color/card"
-    android:padding="8dp"
+    android:background="@drawable/card"
+    android:elevation="3dp"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp"
     android:gravity="center">
 
     <TextView
@@ -12,15 +16,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/accent"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="bold"
-        android:text="@string/txt_auto_082"/>
+        android:includeFontPadding="false"
+        android:text="@string/txt_auto_082" />
 
     <TextView
         android:id="@+id/tvMarkerTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/label_secondary"
-        android:textSize="11sp"
-        android:text="@string/txt_auto_083"/>
+        style="@style/App.Caption"
+        android:layout_marginTop="2dp"
+        android:text="@string/txt_auto_083" />
 </LinearLayout>

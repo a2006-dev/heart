@@ -211,7 +211,7 @@ public class MainActivity extends FragmentActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override public void handleOnBackPressed() {
                 if (viewPager != null && viewPager.getCurrentItem() != 0) {
-                    viewPager.setCurrentItem(0, true);
+                    viewPager.setCurrentItem(0, false);
                     if (bottomNav != null) bottomNav.setSelectedItemId(R.id.nav_home);
                     return;
                 }
@@ -241,23 +241,18 @@ public class MainActivity extends FragmentActivity {
         viewPager.setOffscreenPageLimit(3);
         viewPager.setAdapter(new ViewPagerAdapter(this));
         viewPager.setUserInputEnabled(false);
-        viewPager.setPageTransformer((page, position) -> {
-            float distance = Math.min(1f, Math.abs(position));
-            page.setAlpha(1f - 0.18f * distance);
-            page.setTranslationX(-position * page.getWidth() * 0.035f);
-        });
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.nav_home) viewPager.setCurrentItem(0, true);
-            else if (id == R.id.nav_connect) viewPager.setCurrentItem(1, true);
-            else if (id == R.id.nav_game) viewPager.setCurrentItem(2, true);
-            else if (id == R.id.nav_settings) viewPager.setCurrentItem(3, true);
+            if (id == R.id.nav_home) viewPager.setCurrentItem(0, false);
+            else if (id == R.id.nav_connect) viewPager.setCurrentItem(1, false);
+            else if (id == R.id.nav_game) viewPager.setCurrentItem(2, false);
+            else if (id == R.id.nav_settings) viewPager.setCurrentItem(3, false);
             return true;
         });
     }
 
     void switchToTab(int tabIndex) {
-        viewPager.setCurrentItem(tabIndex, true);
+        viewPager.setCurrentItem(tabIndex, false);
     }
 
     class ViewPagerAdapter extends FragmentStateAdapter {

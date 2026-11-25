@@ -1,645 +1,688 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg">
+    android:background="@color/bg"
+    android:fillViewport="true"
+    android:scrollbars="none">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:paddingTop="20dp"
+        android:paddingStart="@dimen/page_margin"
+        android:paddingEnd="@dimen/page_margin"
+        android:paddingTop="12dp"
         android:paddingBottom="40dp">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/txt_auto_038"
-            android:textColor="@color/accent"
-            android:textSize="34sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="24dp"
-            android:layout_marginTop="16dp"/>
+            style="@style/App.LargeTitle"
+            android:text="@string/txt_auto_038" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/App.SectionHeader"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/txt_auto_039" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/glass_card"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp"
+            style="@style/App.Card"
+            android:orientation="horizontal"
             android:gravity="center_vertical">
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_039"
-                    android:textColor="@color/label"
-                    android:textSize="15sp"/>
+                    style="@style/App.RowTitle"
+                    android:text="@string/txt_auto_039" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_040"
-                    android:textColor="@color/label_secondary"
-                    android:textSize="12sp"
-                    android:layout_marginTop="2dp"/>
+                    style="@style/App.RowDesc"
+                    android:text="@string/txt_auto_040" />
             </LinearLayout>
+
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/swAutoConnect"
                 style="@style/App.Switch"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/glass_card"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp"
-            android:gravity="center_vertical">
-            <LinearLayout
-                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_041"
-                    android:textColor="@color/label"
-                    android:textSize="15sp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_042"
-                    android:textColor="@color/label_secondary"
-                    android:textSize="12sp"
-                    android:layout_marginTop="2dp"/>
-            </LinearLayout>
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/swFloatMemory"
-                style="@style/App.Switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/glass_card"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp"
-            android:gravity="center_vertical">
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_043"
-                    android:textColor="@color/label"
-                    android:textSize="15sp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_044"
-                    android:textColor="@color/label_secondary"
-                    android:textSize="12sp"
-                    android:layout_marginTop="2dp"/>
-            </LinearLayout>
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/swFloatVisible"
-                style="@style/App.Switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/glass_card"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp"
-            android:gravity="center_vertical">
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_045"
-                    android:textColor="@color/label"
-                    android:textSize="15sp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_046"
-                    android:textColor="@color/label_secondary"
-                    android:textSize="12sp"
-                    android:layout_marginTop="2dp"/>
-            </LinearLayout>
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/swFloatLocked"
-                style="@style/App.Switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/btnFloatStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/glass_card"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp"
-            android:gravity="center_vertical">
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_047"
-                    android:textColor="@color/label"
-                    android:textSize="15sp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_048"
-                    android:textColor="@color/label_secondary"
-                    android:textSize="12sp"
-                    android:layout_marginTop="2dp"/>
-            </LinearLayout>
-            <TextView
-                android:id="@+id/tvFloatStyleName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/accent"
-                android:textSize="14sp"/>
-        </LinearLayout>
-        <!-- 心率广播服务器（点击进入二级页面） -->
-        <LinearLayout
-            android:id="@+id/btnBroadcast"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/glass_card"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp"
-            android:gravity="center_vertical"
-            android:clickable="true"
-            android:focusable="true">
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_icon_broadcast"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="@string/txt_auto_001"
-                    android:textColor="@color/label"
-                    android:textSize="15sp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_049"
-                    android:textColor="@color/label_secondary"
-                    android:textSize="12sp"
-                    android:layout_marginTop="2dp"/>
-                <TextView
-                    android:id="@+id/tvBroadcastStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_050"
-                    android:textColor="@color/accent"
-                    android:textSize="12sp"
-                    android:layout_marginTop="4dp"/>
-            </LinearLayout>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/txt_auto_019"
-                android:textColor="@color/label_secondary"
-                android:textSize="18sp"/>
+                android:layout_marginStart="12dp" />
         </LinearLayout>
 
-        <!-- MQTT 远程推送（内嵌配置） -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/App.SectionHeader"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/txt_auto_041" />
+
         <LinearLayout
-            android:id="@+id/mqttPanel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/glass_card"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp"
+            style="@style/App.Card"
             android:orientation="vertical">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:gravity="center_vertical">
+
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:drawableStart="@drawable/ic_icon_link"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="@string/txt_auto_051"
-                        android:textColor="@color/label"
-                        android:textSize="15sp"/>
+                        style="@style/App.RowTitle"
+                        android:text="@string/txt_auto_043" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/txt_auto_052"
-                        android:textColor="@color/label_secondary"
-                        android:textSize="12sp"
-                        android:layout_marginTop="2dp"/>
+                        style="@style/App.RowDesc"
+                        android:text="@string/txt_auto_044" />
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/swFloatVisible"
+                    style="@style/App.Switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="14dp"
+                android:background="@color/separator" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/App.RowTitle"
+                        android:text="@string/txt_auto_045" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/App.RowDesc"
+                        android:text="@string/txt_auto_046" />
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/swFloatLocked"
+                    style="@style/App.Switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="14dp"
+                android:background="@color/separator" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/App.RowTitle"
+                        android:text="@string/txt_auto_042" />
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/swFloatMemory"
+                    style="@style/App.Switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btnFloatStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/App.Card.Clickable"
+            android:paddingStart="@dimen/card_padding"
+            android:paddingEnd="@dimen/card_padding"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/App.RowTitle"
+                    android:text="@string/txt_auto_047" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/App.RowDesc"
+                    android:text="@string/txt_auto_048" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvFloatStyleName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/App.Value"
+                android:layout_marginStart="12dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/App.Chevron"
+                android:layout_marginStart="6dp"
+                android:text="@string/txt_auto_019" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btnBroadcast"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/App.Card.Clickable"
+            android:paddingStart="@dimen/card_padding"
+            android:paddingEnd="@dimen/card_padding"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/App.RowTitle"
+                    android:text="@string/txt_auto_001" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/App.RowDesc"
+                    android:text="@string/txt_auto_049" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvBroadcastStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/App.Value"
+                android:layout_marginStart="12dp"
+                android:text="@string/txt_auto_050" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/App.Chevron"
+                android:layout_marginStart="6dp"
+                android:text="@string/txt_auto_019" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/App.SectionHeader"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/txt_auto_051" />
+
+        <LinearLayout
+            android:id="@+id/mqttPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/App.Card"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/App.RowTitle"
+                        android:text="@string/txt_auto_051" />
+
                     <TextView
                         android:id="@+id/tvMqttStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/txt_auto_053"
-                        android:textColor="@color/accent"
-                        android:textSize="12sp"
-                        android:layout_marginTop="4dp"/>
+                        style="@style/App.RowDesc"
+                        android:text="@string/txt_auto_053" />
                 </LinearLayout>
+
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/swMqttEnabled"
-                style="@style/App.Switch"
+                    style="@style/App.Switch"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp" />
             </LinearLayout>
-            <!-- 配置详情（启用后展开） -->
+
             <LinearLayout
                 android:id="@+id/mqttConfigBody"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="gone"
-                android:layout_marginTop="12dp">
+                android:layout_marginTop="16dp"
+                android:visibility="gone">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:layout_marginBottom="16dp"
+                    android:background="@color/separator" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_054"
-                    android:textColor="@color/label_secondary"
-                    android:textSize="11sp"/>
+                    style="@style/App.Caption"
+                    android:text="@string/txt_auto_054" />
+
                 <TextView
                     android:id="@+id/tvMqttTag"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
                     android:textColor="@color/accent"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp"/>
+                    android:textSize="@dimen/font_footnote"
+                    android:typeface="monospace" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_055"
-                    android:textColor="@color/label_secondary"
-                    android:textSize="11sp"/>
+                    style="@style/App.Caption"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginBottom="6dp"
+                    android:text="@string/txt_auto_055" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
+
                     <EditText
                         android:id="@+id/etMqttBroker"
+                        style="@style/App.EditText"
                         android:layout_width="0dp"
-                        android:layout_height="36dp"
+                        android:layout_height="44dp"
                         android:layout_weight="1"
-                        android:text="@string/txt_auto_056"
-                        android:textColor="@color/label"
-                        android:background="@drawable/glass_button"
-                        android:padding="6dp"
-                        android:textSize="13sp"
-                        android:singleLine="true"/>
+                        android:inputType="textUri"
+                        android:text="@string/txt_auto_056" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/txt_auto_057"
-                        android:textColor="@color/label_secondary"
-                        android:textSize="14sp"
-                        android:paddingHorizontal="4dp"/>
+                        style="@style/App.Caption"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:text="@string/txt_auto_057" />
+
                     <EditText
                         android:id="@+id/etMqttPort"
-                        android:layout_width="70dp"
-                        android:layout_height="36dp"
-                        android:text="@string/txt_auto_058"
-                        android:textColor="@color/label"
-                        android:background="@drawable/glass_button"
-                        android:padding="6dp"
-                        android:textSize="13sp"
-                        android:singleLine="true"
-                        android:inputType="number"/>
+                        style="@style/App.EditText"
+                        android:layout_width="76dp"
+                        android:layout_height="44dp"
+                        android:gravity="center"
+                        android:inputType="number"
+                        android:text="@string/txt_auto_058" />
                 </LinearLayout>
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="8dp">
-                    <TextView
+                    android:layout_marginTop="14dp">
+
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/txt_auto_059"
-                        android:textColor="@color/label_secondary"
-                        android:textSize="11sp"/>
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="@style/App.RowTitle"
+                            android:text="@string/txt_auto_059" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="@style/App.RowDesc"
+                            android:text="@string/txt_auto_060" />
+                    </LinearLayout>
+
                     <com.google.android.material.switchmaterial.SwitchMaterial
                         android:id="@+id/swMqttTls"
+                        style="@style/App.Switch"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp" />
                 </LinearLayout>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_060"
-                    android:textColor="@color/label_secondary"
-                    android:textSize="11sp"/>
+                    style="@style/App.Caption"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginBottom="6dp"
+                    android:text="@string/txt_auto_062" />
+
                 <EditText
                     android:id="@+id/etMqttTopic"
+                    style="@style/App.EditText"
                     android:layout_width="match_parent"
-                    android:layout_height="36dp"
-                    android:text="@string/txt_auto_061"
-                    android:textColor="@color/label"
-                    android:background="@drawable/glass_button"
-                    android:padding="6dp"
-                    android:textSize="13sp"
-                    android:singleLine="true"
-                    android:layout_marginBottom="4dp"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/txt_auto_062"
-                        android:textColor="@color/label_tertiary"
-                        android:textSize="10sp"
-                        android:layout_marginBottom="6dp"/>
-                    <Button
-                        android:id="@+id/btnMqttTest"
-                        android:layout_width="match_parent"
-                        android:layout_height="32dp"
-                        android:drawableStart="@drawable/ic_icon_search"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="@string/txt_auto_063"
-                        android:textColor="#ffffff"
-                        android:textSize="12sp"
-                        android:background="@drawable/glass_button"
-                        android:layout_marginBottom="8dp"/>
-                <!-- 连接码 -->
+                    android:layout_height="44dp"
+                    android:inputType="text"
+                    android:text="@string/txt_auto_061" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnMqttTest"
+                    style="@style/App.Button.Secondary"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/txt_auto_063" />
+
                 <LinearLayout
                     android:id="@+id/mqttCodeSection"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/fill"
-                    android:padding="10dp"
                     android:orientation="vertical"
+                    android:layout_marginTop="16dp"
                     android:visibility="gone">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/txt_auto_064"
-                        android:textColor="@color/label_secondary"
-                        android:textSize="10sp"/>
+                        style="@style/App.Caption"
+                        android:text="@string/txt_auto_064" />
+
                     <TextView
                         android:id="@+id/tvMqttCode"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/accent"
-                        android:textSize="11sp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/fill_field"
+                        android:padding="12dp"
+                        android:textColor="@color/label_secondary"
+                        android:textSize="12sp"
                         android:typeface="monospace"
-                        android:padding="6dp"/>
+                        android:lineSpacingExtra="3dp" />
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginTop="6dp">
-                        <Button
+                        android:layout_marginTop="10dp">
+
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnCopyCode"
+                            style="@style/App.Button.Small"
                             android:layout_width="0dp"
-                            android:layout_height="32dp"
+                            android:layout_height="36dp"
                             android:layout_weight="1"
-                            android:drawableStart="@drawable/ic_icon_clipboard"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="@string/txt_auto_065"
-                            android:textColor="#ffffff"
-                            android:textSize="12sp"
-                            android:background="@drawable/glass_button"
-                            android:layout_marginEnd="4dp"/>
-                        <Button
+                            android:text="@string/txt_auto_065" />
+
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnShareCode"
+                            style="@style/App.Button.Small"
                             android:layout_width="0dp"
-                            android:layout_height="32dp"
+                            android:layout_height="36dp"
                             android:layout_weight="1"
-                            android:drawableStart="@drawable/ic_icon_upload"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="@string/txt_auto_066"
-                            android:textColor="#ffffff"
-                            android:textSize="12sp"
-                            android:background="@drawable/glass_button"
-                            android:layout_marginStart="4dp"/>
+                            android:layout_marginStart="10dp"
+                            android:text="@string/txt_auto_066" />
                     </LinearLayout>
                 </LinearLayout>
-                <Button
+
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnMqttHelp"
+                    style="@style/App.Button.Ghost"
                     android:layout_width="match_parent"
-                    android:layout_height="32dp"
-                    android:drawableStart="@drawable/ic_icon_book"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="@string/txt_auto_067"
-                    android:textColor="#ffffff"
-                    android:textSize="12sp"
-                    android:background="@drawable/glass_button"
-                    android:layout_marginTop="6dp"/>
+                    android:layout_height="40dp"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/txt_auto_067" />
             </LinearLayout>
         </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/App.SectionHeader"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/txt_auto_068" />
+
         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/App.Card"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/App.RowTitle"
+                        android:text="@string/txt_auto_073" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/App.RowDesc"
+                        android:text="@string/txt_auto_074" />
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/swHideRecents"
+                    style="@style/App.Switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
             android:id="@+id/btnHelp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/glass_card"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp"
-            android:gravity="center_vertical">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:drawableStart="@drawable/ic_icon_book"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="@string/txt_auto_068"
-                android:textColor="@color/label"
-                android:textSize="15sp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/txt_auto_019"
-                android:textColor="@color/label_secondary"
-                android:textSize="18sp"/>
-        </LinearLayout>
+            style="@style/App.Card.Clickable"
+            android:paddingStart="@dimen/card_padding"
+            android:paddingEnd="@dimen/card_padding"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:text="@string/txt_auto_068"
+            android:textColor="@color/label"
+            android:textSize="@dimen/font_body" />
+
         <LinearLayout
             android:id="@+id/btnContact"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/glass_card"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp"
+            style="@style/App.Card.Clickable"
+            android:paddingStart="@dimen/card_padding"
+            android:paddingEnd="@dimen/card_padding"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:orientation="horizontal"
             android:gravity="center_vertical">
+
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:drawableStart="@drawable/ic_icon_chat"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="@string/txt_auto_069"
-                android:textColor="@color/label"
-                android:textSize="15sp"/>
+                style="@style/App.RowTitle"
+                android:text="@string/txt_auto_069" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/txt_auto_019"
-                android:textColor="@color/label_secondary"
-                android:textSize="18sp"/>
+                style="@style/App.Chevron"
+                android:text="@string/txt_auto_019" />
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/btnGitHub"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/glass_card"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp"
-            android:gravity="center_vertical"
-            android:clickable="true"
-            android:focusable="true">
+            style="@style/App.Card.Clickable"
+            android:paddingStart="@dimen/card_padding"
+            android:paddingEnd="@dimen/card_padding"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:drawableStart="@drawable/ic_icon_github"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="@string/txt_auto_070"
-                android:textColor="@color/label"
-                android:textSize="15sp"/>
+                style="@style/App.RowTitle"
+                android:text="@string/txt_auto_070" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/txt_auto_019"
-                android:textColor="@color/label_secondary"
-                android:textSize="18sp"/>
+                style="@style/App.Chevron"
+                android:text="@string/txt_auto_019" />
         </LinearLayout>
-        <!-- 检查更新 -->
+
         <LinearLayout
             android:id="@+id/btnCheckUpdate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/glass_card"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp"
-            android:gravity="center_vertical"
-            android:clickable="true"
-            android:focusable="true">
+            style="@style/App.Card.Clickable"
+            android:paddingStart="@dimen/card_padding"
+            android:paddingEnd="@dimen/card_padding"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_icon_download"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="@string/txt_auto_071"
-                    android:textColor="@color/label"
-                    android:textSize="15sp"/>
+                    style="@style/App.RowTitle"
+                    android:text="@string/txt_auto_071" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_072"
-                    android:textColor="@color/label_secondary"
-                    android:textSize="12sp"
-                    android:layout_marginTop="2dp"/>
+                    style="@style/App.RowDesc"
+                    android:text="@string/txt_auto_072" />
             </LinearLayout>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/txt_auto_019"
-                android:textColor="@color/label_secondary"
-                android:textSize="18sp"/>
+                style="@style/App.Chevron"
+                android:text="@string/txt_auto_019" />
         </LinearLayout>
-        <!-- 隐藏最近任务 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/glass_card"
-            android:padding="16dp"
-            android:layout_marginBottom="12dp"
-            android:gravity="center_vertical">
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_icon_eye_off"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="@string/txt_auto_073"
-                    android:textColor="@color/label"
-                    android:textSize="15sp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_074"
-                    android:textColor="@color/label_secondary"
-                    android:textSize="12sp"
-                    android:layout_marginTop="2dp"/>
-            </LinearLayout>
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/swHideRecents"
-                style="@style/App.Switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/txt_auto_075"
-            android:textColor="@color/label_tertiary"
-            android:textSize="12sp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="32dp"/>
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_icon_warning"
-                android:drawablePadding="8dp"
-                android:text="@string/txt_auto_076"
-            android:textColor="@color/label_tertiary"
-            android:textSize="10sp"
+            style="@style/App.Caption"
+            android:layout_marginTop="24dp"
             android:gravity="center"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="16dp"
-            android:lineSpacingExtra="2dp"
-            android:paddingHorizontal="16dp"/>
+            android:text="@string/txt_auto_075" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/App.Caption"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:lineSpacingExtra="3dp"
+            android:text="@string/txt_auto_076" />
     </LinearLayout>
 </ScrollView>

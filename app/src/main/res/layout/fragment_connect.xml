@@ -1,214 +1,286 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/bg">
 
-    <!-- ========== 上半：连接/设备列表区域 ========== -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingStart="@dimen/page_margin"
+        android:paddingEnd="@dimen/page_margin"
+        android:paddingTop="12dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/txt_auto_024"
-            android:textColor="@color/accent"
-            android:textSize="34sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="12dp"
-            android:layout_marginTop="4dp"/>
+            style="@style/App.LargeTitle"
+            android:text="@string/txt_auto_024" />
 
-        <!-- 当前连接状态卡片 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/App.Subhead"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="18dp"
+            android:text="@string/txt_auto_026" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            style="@style/App.Card">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvDevice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/App.Headline"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:text="@string/txt_auto_025" />
+
+                    <TextView
+                        android:id="@+id/tvStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/App.Footnote"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/txt_auto_026" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDisconnect"
+                    style="@style/App.Button.Small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:layout_marginStart="12dp"
+                    android:text="@string/txt_auto_027" />
+            </LinearLayout>
+        </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:background="@drawable/glass_card"
-            android:padding="14dp"
-            android:layout_marginBottom="10dp">
+            android:gravity="center_vertical"
+            android:layout_marginBottom="@dimen/card_gap">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnScan"
+                style="@style/App.Button"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_weight="1"
+                app:icon="@drawable/ic_icon_search"
+                app:iconGravity="textStart"
+                android:text="@string/txt_auto_028" />
+
+            <TextView
+                android:id="@+id/tvScanCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/App.Footnote"
+                android:layout_marginStart="12dp"
+                android:text="" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/card"
+            android:paddingStart="@dimen/card_padding"
+            android:paddingEnd="@dimen/card_padding"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:layout_marginBottom="@dimen/card_gap">
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical">
+
                 <TextView
-                    android:id="@+id/tvDevice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_icon_bolt"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="@string/txt_auto_025"
-                    android:textColor="@color/label"
-                    android:textSize="15sp"/>
+                    style="@style/App.RowTitle"
+                    android:text="@string/txt_auto_029" />
+
                 <TextView
-                    android:id="@+id/tvStatus"
+                    android:id="@+id/tvBroadSearchHint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/txt_auto_026"
-                    android:textColor="@color/label_secondary"
-                    android:textSize="12sp"
-                    android:layout_marginTop="4dp"/>
+                    style="@style/App.Caption"
+                    android:textColor="@color/accent"
+                    android:layout_marginTop="2dp"
+                    android:text=""
+                    android:visibility="gone" />
             </LinearLayout>
-            <Button
-                android:id="@+id/btnDisconnect"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="@string/txt_auto_027"
-                android:backgroundTint="@color/fill_strong"
-                android:textColor="@color/label_secondary"
-                android:textSize="12sp"
-                android:paddingStart="14dp"
-                android:paddingEnd="14dp"
-                android:gravity="center"/>
-        </LinearLayout>
 
-        <!-- 扫描控制行 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="6dp">
-            <Button
-                android:id="@+id/btnScan"
-                android:layout_width="0dp"
-                android:layout_height="44dp"
-                android:layout_weight="1"
-                android:drawableStart="@drawable/ic_icon_search"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="@string/txt_auto_028"
-                android:backgroundTint="@color/accent"
-                android:textColor="#ffffff"
-                android:textSize="14sp"/>
-            <TextView
-                android:id="@+id/tvScanCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textColor="@color/label_secondary"
-                android:textSize="12sp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="8dp"/>
-        </LinearLayout>
-
-        <!-- 广义搜索开关 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@drawable/glass_card"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
-            android:layout_marginBottom="6dp">
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/txt_auto_029"
-                android:textColor="@color/label_secondary"
-                android:textSize="13sp"/>
-            <TextView
-                android:id="@+id/tvBroadSearchHint"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textColor="@color/accent"
-                android:textSize="11sp"
-                android:layout_marginEnd="8sp"
-                android:visibility="gone"/>
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/swBroadSearch"
                 style="@style/App.Switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:thumbTint="@color/label_secondary"
-                android:trackTint="@color/fill_strong"/>
+                android:layout_marginStart="12dp" />
         </LinearLayout>
 
-        <!-- 设备列表（RecyclerView） -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvDevices"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="@drawable/glass_card"
-            android:clipToPadding="false"
-            android:padding="6dp"/>
+            android:background="@drawable/card"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvDevices"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp" />
+
+            <LinearLayout
+                android:id="@+id/emptyDevices"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingStart="@dimen/card_padding"
+                android:paddingEnd="@dimen/card_padding"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:background="@drawable/empty_circle"
+                    android:padding="16dp"
+                    android:src="@drawable/ic_icon_signal"
+                    android:tint="@color/label_tertiary"
+                    android:contentDescription="@string/empty_devices_title"
+                    android:importantForAccessibility="no" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/App.EmptyTitle"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/empty_devices_title" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/App.EmptyDesc"
+                    android:text="@string/empty_devices_desc" />
+            </LinearLayout>
+        </FrameLayout>
     </LinearLayout>
 
-    <!-- ========== 分割线 ========== -->
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/separator"/>
+        android:layout_height="1px"
+        android:background="@color/separator" />
 
-    <!-- ========== 下半：日志区域 ========== -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.5"
         android:orientation="vertical"
+        android:paddingStart="@dimen/page_margin"
+        android:paddingEnd="@dimen/page_margin"
         android:paddingTop="12dp"
-        android:paddingBottom="12dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:paddingBottom="12dp">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
+
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:drawableStart="@drawable/ic_icon_clipboard"
-                android:drawablePadding="8dp"
-                android:gravity="center_vertical"
-                android:text="@string/txt_auto_030"
-                android:textColor="@color/label_secondary"
-                android:textSize="13sp"/>
-            <Button
+                style="@style/App.SectionHeader"
+                android:text="@string/txt_auto_030" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnClearLog"
+                style="@style/App.Button.Ghost"
                 android:layout_width="wrap_content"
-                android:layout_height="28dp"
-                android:text="@string/txt_auto_031"
-                android:backgroundTint="@color/fill_strong"
-                android:textColor="@color/label_secondary"
-                android:textSize="10sp"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:gravity="center"/>
+                android:layout_height="32dp"
+                android:text="@string/txt_auto_031" />
         </LinearLayout>
 
-        <ScrollView
-            android:id="@+id/logScrollView"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="6dp"
-            android:background="@drawable/glass_card"
-            android:scrollbars="vertical"
-            android:fillViewport="true">
-            <TextView
-                android:id="@+id/tvLog"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:textColor="@color/label_secondary"
-                android:textSize="11sp"
-                android:typeface="monospace"
-                android:lineSpacingExtra="2dp"
-                android:gravity="top"/>
-        </ScrollView>
-    </LinearLayout>
+            android:layout_marginTop="8dp">
 
+            <ScrollView
+                android:id="@+id/logScrollView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/card"
+                android:scrollbars="vertical"
+                android:fillViewport="true">
+
+                <TextView
+                    android:id="@+id/tvLog"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/card_padding"
+                    android:textColor="@color/label_secondary"
+                    android:textSize="12sp"
+                    android:typeface="monospace"
+                    android:lineSpacingExtra="3dp"
+                    android:gravity="top" />
+            </ScrollView>
+
+            <LinearLayout
+                android:id="@+id/emptyLog"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/card"
+                android:paddingStart="@dimen/card_padding"
+                android:paddingEnd="@dimen/card_padding">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/App.Footnote"
+                    android:text="@string/empty_log_title" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/App.Caption"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:text="@string/empty_log_desc" />
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
 </LinearLayout>

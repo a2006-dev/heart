@@ -3,19 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/glass_card"
-    android:padding="12dp"
-    android:layout_margin="8dp">
+    android:background="@drawable/card"
+    android:elevation="1dp"
+    android:padding="@dimen/card_padding"
+    android:layout_marginBottom="@dimen/card_gap">
+
     <TextView
         android:id="@+id/recordInfo"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        style="@style/App.Subhead"
         android:textColor="@color/label"
-        android:textSize="12sp"
-        android:layout_marginBottom="6dp"/>
+        android:layout_marginBottom="10dp" />
+
     <ImageView
         android:id="@+id/recordChart"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:scaleType="fitXY"/>
+        android:layout_height="120dp"
+        android:contentDescription="@string/txt_auto_084"
+        android:importantForAccessibility="no"
+        android:scaleType="fitXY" />
 </LinearLayout>
